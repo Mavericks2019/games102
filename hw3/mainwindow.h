@@ -6,10 +6,13 @@
 #include <QPushButton>
 #include <QMap>
 
+
 class CanvasWidget;
 class QCheckBox;
 class QLabel;
 class QSlider;
+class QRadioButton;
+class QButtonGroup;
 
 class MainWindow : public QMainWindow
 {
@@ -28,12 +31,21 @@ private slots:
     void updateLambdaValue(int value);
     
     void showDeleteMessage();
+    void parameterizationMethodChanged(int id);
     
 private:
     QHBoxLayout* createSliderLayout(QSlider* slider, QLabel* valueLabel);
     
     CanvasWidget *canvas;
     
+    // Left panel controls
+    QButtonGroup *paramGroup;
+    QRadioButton *uniformParam;
+    QRadioButton *chordalParam;
+    QRadioButton *centripetalParam;
+    QRadioButton *foleyParam;
+    
+    // Right panel controls
     QCheckBox *polyInterpCheck;
     QCheckBox *gaussInterpCheck;
     QCheckBox *leastSquaresCheck;

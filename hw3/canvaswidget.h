@@ -13,10 +13,19 @@ class CanvasWidget : public QWidget
 public:
     explicit CanvasWidget(QWidget *parent = nullptr);
     
+    // Parameterization methods
+    enum ParameterizationMethod {
+        UNIFORM,
+        CHORDAL,
+        CENTRIPETAL,
+        FOLEY
+    };
+    
     void clearPoints();
     void setPolyDegree(int degree);
     void setGaussianSigma(double sigma);
     void setRidgeLambda(double lambda);
+    void setParameterizationMethod(ParameterizationMethod method);
     
     void togglePolyInterpolation(bool enabled);
     void toggleGaussianInterpolation(bool enabled);
@@ -45,6 +54,7 @@ private:
     };
     
     QVector<Point> points;
+    QVector<double> tValues; // Parameter values for each point
     int selectedIndex = -1;
     int hoveredIndex = -1;
     
@@ -53,6 +63,7 @@ private:
     bool showLeastSquares = false;
     bool showRidgeRegression = false;
     
+    ParameterizationMethod paramMethod = UNIFORM;
     int polyDegree = 3;
     double gaussianSigma = 10.0;
     double ridgeLambda = 0.1;
@@ -61,6 +72,9 @@ private:
     void drawPoints(QPainter &painter);
     void drawCurves(QPainter &painter);
     void drawHoverIndicator(QPainter &painter);
+    void drawParameterizationInfo(QPainter &painter);
+    
+    void calculateParameterization();
     
     QVector<QPointF> calculatePolynomialInterpolation();
     QVector<QPointF> calculateGaussianInterpolation();

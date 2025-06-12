@@ -11,6 +11,8 @@
 #include <QFrame>
 #include <QFormLayout>
 #include <QTimer>
+#include <QRadioButton>
+#include <QButtonGroup>
 
 QHBoxLayout* MainWindow::createSliderLayout(QSlider* slider, QLabel* valueLabel) {
     QHBoxLayout *layout = new QHBoxLayout;
@@ -22,43 +24,77 @@ QHBoxLayout* MainWindow::createSliderLayout(QSlider* slider, QLabel* valueLabel)
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    setWindowTitle("Interpolation and Fitting Tool");
-    resize(1200, 800);
+    setWindowTitle("Interpolation and Fitting Visualization");
+    resize(1400, 800);
     
-    // 初始化曲线颜色
+    // Initialize curve colors
     curveColors["Polynomial Interpolation"] = Qt::blue;
     curveColors["Gaussian Interpolation"] = Qt::darkGreen;
     curveColors["Least Squares"] = Qt::magenta;
     curveColors["Ridge Regression"] = Qt::darkCyan;
     
-    // 创建主部件和布局
+    // Create main widget and layout
     QWidget *centralWidget = new QWidget(this);
     QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
     
-    // 创建画布
+    // ========== LEFT CONTROL PANEL ==========
+    QGroupBox *leftControlGroup = new QGroupBox("Parameterization Methods");
+    leftControlGroup->setFixedWidth(250);
+    QVBoxLayout *leftLayout = new QVBoxLayout(leftControlGroup);
+    
+    // Parameterization methods
+    paramGroup = new QButtonGroup(this);
+    
+    uniformParam = new QRadioButton("Uniform Parameterization");
+    chordalParam = new QRadioButton("Chordal Parameterization");
+    centripetalParam = new QRadioButton("Centripetal Parameterization");
+    foleyParam = new QRadioButton("Foley-Nielsen Parameterization");
+    
+    paramGroup->addButton(uniformParam, 0);
+    paramGroup->addButton(chordalParam, 1);
+    paramGroup->addButton(centripetalParam, 2);
+    paramGroup->addButton(foleyParam, 3);
+    
+    uniformParam->setChecked(true);
+    
+    leftLayout->addWidget(uniformParam);
+    leftLayout->addWidget(chordalParam);
+    leftLayout->addWidget(centripetalParam);
+    leftLayout->addWidget(foleyParam);
+    
+    leftLayout->addStretch();
+    
+    // Connect parameterization signals
+    connect(paramGroup, QOverload<int>::of(&QButtonGroup::buttonClicked), 
+            this, &MainWindow::parameterizationMethodChanged);
+    
+    mainLayout->addWidget(leftControlGroup);
+    
+    // ========== CANVAS ==========
     canvas = new CanvasWidget(this);
     mainLayout->addWidget(canvas, 1);
     
-    // 创建控制面板
-    QGroupBox *controlGroup = new QGroupBox("Control Panel");
-    QVBoxLayout *controlLayout = new QVBoxLayout(controlGroup);
-    controlLayout->setAlignment(Qt::AlignTop);
+    // ========== RIGHT CONTROL PANEL ==========
+    QGroupBox *rightControlGroup = new QGroupBox("Fitting Methods");
+    rightControlGroup->setFixedWidth(300);
+    QVBoxLayout *rightLayout = new QVBoxLayout(rightControlGroup);
+    rightLayout->setAlignment(Qt::AlignTop);
     
-    // 添加点信息标签 - 简化版本
+    // Point information
     QGroupBox *pointGroup = new QGroupBox("Point Information");
     QVBoxLayout *pointLayout = new QVBoxLayout(pointGroup);
     
     pointInfoLabel = new QLabel("Hover over a point to see coordinates");
     pointInfoLabel->setAlignment(Qt::AlignCenter);
-    pointInfoLabel->setFixedHeight(40); // 固定高度
+    pointInfoLabel->setFixedHeight(50);
     pointInfoLabel->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px;");
     pointInfoLabel->setWordWrap(true);
     
     pointLayout->addWidget(pointInfoLabel);
     
-    controlLayout->addWidget(pointGroup);
+    rightLayout->addWidget(pointGroup);
     
-    // 添加图例标签
+    // Legend
     QGroupBox *legendGroup = new QGroupBox("Legend");
     QVBoxLayout *legendLayout = new QVBoxLayout(legendGroup);
     
@@ -67,10 +103,10 @@ MainWindow::MainWindow(QWidget *parent)
     legendLabel->setMinimumSize(200, 150);
     legendLayout->addWidget(legendLabel);
     
-    controlLayout->addWidget(legendGroup);
+    rightLayout->addWidget(legendGroup);
     
-    // 添加控制按钮
-    QGroupBox *methodGroup = new QGroupBox("Methods");
+    // Fitting methods
+    QGroupBox *methodGroup = new QGroupBox("Fitting Algorithms");
     QVBoxLayout *methodLayout = new QVBoxLayout(methodGroup);
     
     polyInterpCheck = new QCheckBox("Polynomial Interpolation");
@@ -93,13 +129,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ridgeRegCheck, &QCheckBox::toggled, this, &MainWindow::updateLegend);
     methodLayout->addWidget(ridgeRegCheck);
     
-    controlLayout->addWidget(methodGroup);
+    rightLayout->addWidget(methodGroup);
     
-    // 添加参数控制
+    // Parameters
     QGroupBox *paramGroup = new QGroupBox("Parameters");
     QFormLayout *paramLayout = new QFormLayout(paramGroup);
     
-    // 多项式次数
+    // Polynomial degree
     degreeSlider = new QSlider(Qt::Horizontal);
     degreeSlider->setRange(1, 10);
     degreeSlider->setValue(3);
@@ -112,7 +148,7 @@ MainWindow::MainWindow(QWidget *parent)
     
     paramLayout->addRow("Poly Degree:", createSliderLayout(degreeSlider, degreeValueLabel));
     
-    // 高斯Sigma
+    // Gaussian Sigma
     sigmaSlider = new QSlider(Qt::Horizontal);
     sigmaSlider->setRange(1, 100);
     sigmaSlider->setValue(10);
@@ -125,7 +161,7 @@ MainWindow::MainWindow(QWidget *parent)
     
     paramLayout->addRow("Gaussian Sigma:", createSliderLayout(sigmaSlider, sigmaValueLabel));
     
-    // 岭回归Lambda
+    // Ridge Lambda
     lambdaSlider = new QSlider(Qt::Horizontal);
     lambdaSlider->setRange(1, 100);
     lambdaSlider->setValue(10);
@@ -138,32 +174,32 @@ MainWindow::MainWindow(QWidget *parent)
     
     paramLayout->addRow("Ridge Lambda:", createSliderLayout(lambdaSlider, lambdaValueLabel));
     
-    controlLayout->addWidget(paramGroup);
+    rightLayout->addWidget(paramGroup);
     
-    // 添加清空按钮
+    // Clear button
     QPushButton *clearButton = new QPushButton("Clear Points");
     clearButton->setStyleSheet("background-color: #505050; color: white;");
     connect(clearButton, &QPushButton::clicked, canvas, &CanvasWidget::clearPoints);
-    controlLayout->addWidget(clearButton);
+    rightLayout->addWidget(clearButton);
     
-    controlLayout->addStretch();
+    rightLayout->addStretch();
     
-    mainLayout->addWidget(controlGroup);
+    mainLayout->addWidget(rightControlGroup);
     
     setCentralWidget(centralWidget);
     
-    // 连接画布信号
+    // Connect canvas signals
     connect(canvas, &CanvasWidget::pointHovered, this, &MainWindow::updatePointInfo);
     connect(canvas, &CanvasWidget::noPointHovered, this, &MainWindow::clearPointInfo);
     connect(canvas, &CanvasWidget::pointDeleted, this, &MainWindow::showDeleteMessage);
     
-    // 初始更新图例和参数值
+    // Initial updates
     updateLegend();
     updateDegreeValue(degreeSlider->value());
     updateSigmaValue(sigmaSlider->value());
     updateLambdaValue(lambdaSlider->value());
     
-    // 创建删除消息定时器
+    // Delete message timer
     deleteMessageTimer = new QTimer(this);
     deleteMessageTimer->setSingleShot(true);
     connect(deleteMessageTimer, &QTimer::timeout, this, [this]() {
@@ -209,11 +245,11 @@ void MainWindow::updateLegend()
 
 void MainWindow::updatePointInfo(const QPointF& point)
 {
-    // 将点坐标转换为数学坐标系
+    // Convert to mathematical coordinates
     double mathX = point.x();
     double mathY = canvas->height() - point.y();
     
-    // 使用紧凑的单行格式
+    // Compact single-line format
     QString info = QString("Screen: (%1, %2) \n Math: (%3, %4)")
                   .arg(point.x(), 0, 'f', 1)
                   .arg(point.y(), 0, 'f', 1)
@@ -250,6 +286,11 @@ void MainWindow::showDeleteMessage()
     pointInfoLabel->setText("Point deleted");
     pointInfoLabel->setStyleSheet("background-color: #6A2A2A; color: white; border-radius: 5px; padding: 5px;");
     
-    // 2秒后恢复原始状态
+    // Restore after 2 seconds
     deleteMessageTimer->start(2000);
+}
+
+void MainWindow::parameterizationMethodChanged(int id)
+{
+    canvas->setParameterizationMethod(static_cast<CanvasWidget::ParameterizationMethod>(id));
 }

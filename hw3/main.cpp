@@ -6,10 +6,10 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     
-    // 设置Fusion风格
+    // Set Fusion style
     QApplication::setStyle(QStyleFactory::create("Fusion"));
     
-    // 设置调色板
+    // Set palette
     QPalette palette;
     palette.setColor(QPalette::Window, QColor(53,53,53));
     palette.setColor(QPalette::WindowText, Qt::white);
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     palette.setColor(QPalette::HighlightedText, Qt::black);
     app.setPalette(palette);
     
-    // 设置应用样式
+    // Set application style
     app.setStyleSheet(
         "QGroupBox {"
         "  border: 1px solid #3A3939;"
@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
         "  border-radius: 4px;"
         "}"
         "QSlider::handle:horizontal {"
-        "  background:rgb(76, 145, 182);"
+        "  background: #42a4d8;"
         "  width: 16px;"
         "  margin: -4px 0;"
         "  border-radius: 8px;"
@@ -59,6 +59,10 @@ int main(int argc, char *argv[])
         "}"
         "QSlider::sub-page:horizontal {"
         "  background: #42a4d8;"
+        "}"
+        "QRadioButton {"
+        "  color: white;"
+        "  padding: 4px;"
         "}"
     );
     

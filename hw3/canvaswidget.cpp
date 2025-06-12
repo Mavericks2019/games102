@@ -18,6 +18,7 @@ CanvasWidget::CanvasWidget(QWidget *parent)
 void CanvasWidget::clearPoints()
 {
     points.clear();
+    tValues.clear();
     hoveredIndex = -1;
     update();
     emit noPointHovered();
@@ -38,6 +39,13 @@ void CanvasWidget::setGaussianSigma(double sigma)
 void CanvasWidget::setRidgeLambda(double lambda)
 {
     ridgeLambda = lambda;
+    update();
+}
+
+void CanvasWidget::setParameterizationMethod(ParameterizationMethod method)
+{
+    paramMethod = method;
+    calculateParameterization();
     update();
 }
 
@@ -95,7 +103,7 @@ void CanvasWidget::deletePoint(int index)
         
     points.remove(index);
     
-    // 更新悬停索引
+    // Update hover index
     if (hoveredIndex == index) {
         hoveredIndex = -1;
         emit noPointHovered();
@@ -103,15 +111,122 @@ void CanvasWidget::deletePoint(int index)
         hoveredIndex--;
     }
     
-    // 更新选中索引
+    // Update selected index
     if (selectedIndex == index) {
         selectedIndex = -1;
     } else if (selectedIndex > index) {
         selectedIndex--;
     }
     
+    calculateParameterization();
     update();
     emit pointDeleted();
+}
+
+void CanvasWidget::calculateParameterization()
+{
+    tValues.clear();
+    if (points.size() < 2) return;
+    
+    // Uniform parameterization
+    if (paramMethod == UNIFORM) {
+        for (int i = 0; i < points.size(); ++i) {
+            tValues.append(static_cast<double>(i) / (points.size() - 1));
+        }
+    }
+    // Chordal parameterization
+    else if (paramMethod == CHORDAL) {
+        tValues.append(0.0);
+        double totalLength = 0.0;
+        QVector<double> segmentLengths;
+        
+        // Calculate segment lengths
+        for (int i = 1; i < points.size(); ++i) {
+            QPointF p1 = toMathCoords(points[i-1].pos);
+            QPointF p2 = toMathCoords(points[i].pos);
+            double dx = p2.x() - p1.x();
+            double dy = p2.y() - p1.y();
+            double length = std::sqrt(dx*dx + dy*dy);
+            segmentLengths.append(length);
+            totalLength += length;
+        }
+        
+        // Calculate cumulative parameters
+        for (int i = 0; i < segmentLengths.size(); ++i) {
+            double t = tValues.last() + (segmentLengths[i] / totalLength);
+            tValues.append(t);
+        }
+    }
+    // Centripetal parameterization
+    else if (paramMethod == CENTRIPETAL) {
+        tValues.append(0.0);
+        double totalLength = 0.0;
+        QVector<double> segmentLengths;
+        
+        // Calculate segment lengths
+        for (int i = 1; i < points.size(); ++i) {
+            QPointF p1 = toMathCoords(points[i-1].pos);
+            QPointF p2 = toMathCoords(points[i].pos);
+            double dx = p2.x() - p1.x();
+            double dy = p2.y() - p1.y();
+            double length = std::sqrt(std::sqrt(dx*dx + dy*dy));
+            segmentLengths.append(length);
+            totalLength += length;
+        }
+        
+        // Calculate cumulative parameters
+        for (int i = 0; i < segmentLengths.size(); ++i) {
+            double t = tValues.last() + (segmentLengths[i] / totalLength);
+            tValues.append(t);
+        }
+    }
+    // Foley-Nielsen parameterization
+    else if (paramMethod == FOLEY) {
+        tValues.append(0.0);
+        double totalLength = 0.0;
+        QVector<double> segmentLengths;
+        
+        // Calculate segment lengths with angle weighting
+        for (int i = 1; i < points.size(); ++i) {
+            QPointF p0 = toMathCoords(points[i-1].pos);
+            QPointF p1 = toMathCoords(points[i].pos);
+            
+            double dx = p1.x() - p0.x();
+            double dy = p1.y() - p0.y();
+            double length = std::sqrt(dx*dx + dy*dy);
+            
+            // Angle weighting
+            double angleWeight = 1.0;
+            if (i < points.size() - 1) {
+                QPointF p2 = toMathCoords(points[i+1].pos);
+                
+                double dx1 = p1.x() - p0.x();
+                double dy1 = p1.y() - p0.y();
+                double dx2 = p2.x() - p1.x();
+                double dy2 = p2.y() - p1.y();
+                
+                double dot = dx1*dx2 + dy1*dy2;
+                double mag1 = std::sqrt(dx1*dx1 + dy1*dy1);
+                double mag2 = std::sqrt(dx2*dx2 + dy2*dy2);
+                
+                if (mag1 > 0.001 && mag2 > 0.001) {
+                    double cosTheta = dot / (mag1 * mag2);
+                    cosTheta = std::max(-1.0, std::min(1.0, cosTheta));
+                    double theta = std::acos(cosTheta);
+                    angleWeight = 1.0 + 1.5 * theta * (mag1 + mag2) / (2.0 * std::min(mag1, mag2));
+                }
+            }
+            
+            segmentLengths.append(length * angleWeight);
+            totalLength += length * angleWeight;
+        }
+        
+        // Calculate cumulative parameters
+        for (int i = 0; i < segmentLengths.size(); ++i) {
+            double t = tValues.last() + (segmentLengths[i] / totalLength);
+            tValues.append(t);
+        }
+    }
 }
 
 void CanvasWidget::paintEvent(QPaintEvent *event)
@@ -121,19 +236,22 @@ void CanvasWidget::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     
-    // 绘制背景
+    // Draw background
     painter.fillRect(rect(), Qt::white);
     
-    // 绘制网格
+    // Draw grid
     drawGrid(painter);
     
-    // 绘制曲线
+    // Draw curves
     drawCurves(painter);
     
-    // 绘制点
+    // Draw points
     drawPoints(painter);
     
-    // 绘制悬停指示器
+    // Draw parameterization info
+    drawParameterizationInfo(painter);
+    
+    // Draw hover indicator
     if (hoveredIndex >= 0) {
         drawHoverIndicator(painter);
     }
@@ -143,12 +261,12 @@ void CanvasWidget::drawGrid(QPainter &painter)
 {
     painter.setPen(QPen(QColor(240, 240, 240), 1));
     
-    // 绘制水平网格线
+    // Draw horizontal grid lines
     for (int y = 0; y < height(); y += 20) {
         painter.drawLine(0, y, width(), y);
     }
     
-    // 绘制垂直网格线
+    // Draw vertical grid lines
     for (int x = 0; x < width(); x += 20) {
         painter.drawLine(x, 0, x, height());
     }
@@ -160,9 +278,9 @@ void CanvasWidget::drawPoints(QPainter &painter)
     
     for (int i = 0; i < points.size(); ++i) {
         if (i == hoveredIndex) {
-            painter.setBrush(QColor(255, 100, 100)); // 悬停状态的点
+            painter.setBrush(QColor(255, 100, 100)); // Hovered point
         } else {
-            painter.setBrush(Qt::red); // 普通点
+            painter.setBrush(Qt::red); // Normal point
         }
         painter.drawEllipse(points[i].pos, 6, 6);
     }
@@ -175,22 +293,50 @@ void CanvasWidget::drawHoverIndicator(QPainter &painter)
         
     const QPointF &p = points[hoveredIndex].pos;
     
-    // 绘制坐标文本背景
+    // Draw coordinate text background
     QRectF textRect(p.x() + 15, p.y() - 30, 120, 25);
     painter.setBrush(QColor(255, 255, 220, 220));
     painter.setPen(QPen(Qt::darkGray, 1));
     painter.drawRoundedRect(textRect, 5, 5);
     
-    // 绘制坐标文本
+    // Draw coordinate text
     QPointF mathPoint = toMathCoords(p);
     QString coordText = QString("(%1, %2)").arg(mathPoint.x(), 0, 'f', 1).arg(mathPoint.y(), 0, 'f', 1);
     
     painter.setPen(Qt::black);
     painter.drawText(textRect, Qt::AlignCenter, coordText);
     
-    // 绘制连接线
+    // Draw connection line
     painter.setPen(QPen(Qt::darkGray, 1, Qt::DashLine));
     painter.drawLine(p, QPointF(p.x() + 15, p.y() - 15));
+}
+
+void CanvasWidget::drawParameterizationInfo(QPainter &painter)
+{
+    if (points.size() < 2) return;
+    
+    painter.setPen(Qt::darkGray);
+    painter.setFont(QFont("Arial", 9));
+    
+    QString methodName;
+    switch (paramMethod) {
+        case UNIFORM: methodName = "Uniform"; break;
+        case CHORDAL: methodName = "Chordal"; break;
+        case CENTRIPETAL: methodName = "Centripetal"; break;
+        case FOLEY: methodName = "Foley-Nielsen"; break;
+    }
+    
+    QString info = QString("Parameterization: %1").arg(methodName);
+    painter.drawText(10, 20, info);
+    
+    // Draw t-values near points
+    painter.setPen(Qt::darkBlue);
+    for (int i = 0; i < points.size(); ++i) {
+        if (i < tValues.size()) {
+            QString tText = QString("t=%1").arg(tValues[i], 0, 'f', 2);
+            painter.drawText(points[i].pos.x() + 10, points[i].pos.y() - 15, tText);
+        }
+    }
 }
 
 void CanvasWidget::drawCurves(QPainter &painter)
@@ -246,7 +392,7 @@ void CanvasWidget::mousePressEvent(QMouseEvent *event)
 
 void CanvasWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    // 更新悬停状态
+    // Update hover state
     int newHoveredIndex = findHoveredPoint(event->pos());
     if (newHoveredIndex != hoveredIndex) {
         hoveredIndex = newHoveredIndex;
@@ -259,10 +405,11 @@ void CanvasWidget::mouseMoveEvent(QMouseEvent *event)
         }
     }
     
-    // 处理点拖动
+    // Handle point dragging
     if ((event->buttons() & Qt::LeftButton) && selectedIndex >= 0) {
         points[selectedIndex].pos = event->pos();
         emit pointHovered(points[selectedIndex].pos);
+        calculateParameterization();
         update();
     }
 }
@@ -274,10 +421,11 @@ void CanvasWidget::mouseReleaseEvent(QMouseEvent *event)
             points[selectedIndex].moving = false;
             selectedIndex = -1;
         } else {
-            // 添加新点
+            // Add new point
             points.append({event->pos(), false});
             hoveredIndex = points.size() - 1;
             emit pointHovered(points.last().pos);
+            calculateParameterization();
         }
         update();
     }
@@ -285,14 +433,14 @@ void CanvasWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void CanvasWidget::contextMenuEvent(QContextMenuEvent *event)
 {
-    // 直接删除点，无需菜单
+    // Directly delete points without menu
     int pointIndex = findHoveredPoint(event->pos());
     
     if (pointIndex >= 0) {
-        // 删除悬停的点
+        // Delete hovered point
         deletePoint(pointIndex);
     } else if (!points.isEmpty()) {
-        // 删除最后一个点
+        // Delete last point
         deletePoint(points.size() - 1);
     }
 }
@@ -308,32 +456,38 @@ void CanvasWidget::leaveEvent(QEvent *event)
 QVector<QPointF> CanvasWidget::calculatePolynomialInterpolation()
 {
     int n = points.size();
-    VectorXd x(n), y(n);
+    if (n < 2) return QVector<QPointF>();
     
-    // 填充数据
+    VectorXd t(n), x(n), y(n);
+    
+    // Fill data (convert to mathematical coordinates)
     for (int i = 0; i < n; ++i) {
         QPointF mathPoint = toMathCoords(points[i].pos);
+        t(i) = tValues[i];
         x(i) = mathPoint.x();
         y(i) = mathPoint.y();
     }
     
-    // 创建范德蒙矩阵
+    // Create Vandermonde matrix
     MatrixXd A(n, n);
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
-            A(i, j) = pow(x(i), j);
+            A(i, j) = pow(t(i), j);
         }
     }
     
-    // 解线性方程组
-    VectorXd coeffs = A.colPivHouseholderQr().solve(y);
+    // Solve linear systems
+    VectorXd xCoeffs = A.colPivHouseholderQr().solve(x);
+    VectorXd yCoeffs = A.colPivHouseholderQr().solve(y);
     
-    // 生成曲线
+    // Generate curve
     QVector<QPointF> curve;
-    for (int px = 0; px < width(); px += 2) {
+    for (double tVal = 0.0; tVal <= 1.0; tVal += 0.005) {
+        double px = 0;
         double py = 0;
         for (int j = 0; j < n; ++j) {
-            py += coeffs(j) * pow(px, j);
+            px += xCoeffs(j) * pow(tVal, j);
+            py += yCoeffs(j) * pow(tVal, j);
         }
         curve.append(toScreenCoords(QPointF(px, py)));
     }
@@ -345,46 +499,46 @@ QVector<QPointF> CanvasWidget::calculateGaussianInterpolation()
     int n = points.size();
     if (n < 1) return QVector<QPointF>();
     
-    VectorXd x(n), y(n);
+    VectorXd t(n), x(n), y(n);
     
-    // 填充数据（转换为数学坐标系）
+    // Fill data (convert to mathematical coordinates)
     for (int i = 0; i < n; ++i) {
         QPointF mathPoint = toMathCoords(points[i].pos);
+        t(i) = tValues[i];
         x(i) = mathPoint.x();
         y(i) = mathPoint.y();
     }
     
-    // 创建高斯核矩阵
+    // Create Gaussian kernel matrix
     MatrixXd A(n, n);
     double sigma_sq = gaussianSigma * gaussianSigma;
     
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < n; ++j) {
-            double dist = x(i) - x(j);
-            // 高斯核函数：K(x_i, x_j) = exp(-||x_i - x_j||^2 / (2 * sigma^2))
+            double dist = t(i) - t(j);
             A(i, j) = exp(-dist * dist / (2 * sigma_sq));
         }
     }
     
-    // 添加正则化项防止矩阵奇异
+    // Add regularization to prevent singularity
     MatrixXd I = MatrixXd::Identity(n, n);
     MatrixXd A_reg = A + 1e-6 * I;
     
-    // 解线性方程组
-    VectorXd weights = A_reg.colPivHouseholderQr().solve(y);
+    // Solve linear systems
+    VectorXd xWeights = A_reg.colPivHouseholderQr().solve(x);
+    VectorXd yWeights = A_reg.colPivHouseholderQr().solve(y);
     
-    // 生成曲线
+    // Generate curve
     QVector<QPointF> curve;
-    for (int px = 0; px < width(); px += 2) {
-        double math_x = px; // 屏幕x坐标等于数学x坐标
-        double math_y = 0;
-        
+    for (double tVal = 0.0; tVal <= 1.0; tVal += 0.005) {
+        double px = 0;
+        double py = 0;
         for (int j = 0; j < n; ++j) {
-            double dist = math_x - x(j);
-            math_y += weights(j) * exp(-dist * dist / (2 * sigma_sq));
+            double dist = tVal - t(j);
+            px += xWeights(j) * exp(-dist * dist / (2 * sigma_sq));
+            py += yWeights(j) * exp(-dist * dist / (2 * sigma_sq));
         }
-        
-        curve.append(toScreenCoords(QPointF(math_x, math_y)));
+        curve.append(toScreenCoords(QPointF(px, py)));
     }
     return curve;
 }
@@ -394,32 +548,36 @@ QVector<QPointF> CanvasWidget::calculateLeastSquares()
     int n = points.size();
     if (n <= polyDegree) return QVector<QPointF>();
     
-    VectorXd x(n), y(n);
+    VectorXd t(n), x(n), y(n);
     
-    // 填充数据
+    // Fill data
     for (int i = 0; i < n; ++i) {
         QPointF mathPoint = toMathCoords(points[i].pos);
+        t(i) = tValues[i];
         x(i) = mathPoint.x();
         y(i) = mathPoint.y();
     }
     
-    // 创建设计矩阵
+    // Create design matrix
     MatrixXd A(n, polyDegree + 1);
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j <= polyDegree; ++j) {
-            A(i, j) = pow(x(i), j);
+            A(i, j) = pow(t(i), j);
         }
     }
     
-    // 解最小二乘问题
-    VectorXd coeffs = (A.transpose() * A).ldlt().solve(A.transpose() * y);
+    // Solve least squares problems
+    VectorXd xCoeffs = (A.transpose() * A).ldlt().solve(A.transpose() * x);
+    VectorXd yCoeffs = (A.transpose() * A).ldlt().solve(A.transpose() * y);
     
-    // 生成曲线
+    // Generate curve
     QVector<QPointF> curve;
-    for (int px = 0; px < width(); px += 2) {
+    for (double tVal = 0.0; tVal <= 1.0; tVal += 0.005) {
+        double px = 0;
         double py = 0;
         for (int j = 0; j <= polyDegree; ++j) {
-            py += coeffs(j) * pow(px, j);
+            px += xCoeffs(j) * pow(tVal, j);
+            py += yCoeffs(j) * pow(tVal, j);
         }
         curve.append(toScreenCoords(QPointF(px, py)));
     }
@@ -431,35 +589,39 @@ QVector<QPointF> CanvasWidget::calculateRidgeRegression()
     int n = points.size();
     if (n <= polyDegree) return QVector<QPointF>();
     
-    VectorXd x(n), y(n);
+    VectorXd t(n), x(n), y(n);
     
-    // 填充数据
+    // Fill data
     for (int i = 0; i < n; ++i) {
         QPointF mathPoint = toMathCoords(points[i].pos);
+        t(i) = tValues[i];
         x(i) = mathPoint.x();
         y(i) = mathPoint.y();
     }
     
-    // 创建设计矩阵
+    // Create design matrix
     MatrixXd A(n, polyDegree + 1);
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j <= polyDegree; ++j) {
-            A(i, j) = pow(x(i), j);
+            A(i, j) = pow(t(i), j);
         }
     }
     
-    // 创建正则化矩阵
+    // Create regularization matrix
     MatrixXd I = MatrixXd::Identity(polyDegree + 1, polyDegree + 1);
     
-    // 解岭回归问题
-    VectorXd coeffs = (A.transpose() * A + ridgeLambda * I).ldlt().solve(A.transpose() * y);
+    // Solve ridge regression problems
+    VectorXd xCoeffs = (A.transpose() * A + ridgeLambda * I).ldlt().solve(A.transpose() * x);
+    VectorXd yCoeffs = (A.transpose() * A + ridgeLambda * I).ldlt().solve(A.transpose() * y);
     
-    // 生成曲线
+    // Generate curve
     QVector<QPointF> curve;
-    for (int px = 0; px < width(); px += 2) {
+    for (double tVal = 0.0; tVal <= 1.0; tVal += 0.005) {
+        double px = 0;
         double py = 0;
         for (int j = 0; j <= polyDegree; ++j) {
-            py += coeffs(j) * pow(px, j);
+            px += xCoeffs(j) * pow(tVal, j);
+            py += yCoeffs(j) * pow(tVal, j);
         }
         curve.append(toScreenCoords(QPointF(px, py)));
     }
