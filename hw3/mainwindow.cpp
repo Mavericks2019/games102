@@ -137,7 +137,7 @@ MainWindow::MainWindow(QWidget *parent)
     
     // Polynomial degree
     degreeSlider = new QSlider(Qt::Horizontal);
-    degreeSlider->setRange(1, 10);
+    degreeSlider->setRange(1, 20);
     degreeSlider->setValue(3);
     connect(degreeSlider, &QSlider::valueChanged, canvas, &CanvasWidget::setPolyDegree);
     connect(degreeSlider, &QSlider::valueChanged, this, &MainWindow::updateDegreeValue);

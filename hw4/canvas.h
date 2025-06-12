@@ -29,7 +29,9 @@ private:
     void drawCurve(QPainter &painter);
     void generateSpline(std::vector<QPointF>& curvePoints);
     double distance(const QPointF& p1, const QPointF& p2);
-
+    void solveTridiagonalSystem(std::vector<double>& a, std::vector<double>& b, 
+                                  std::vector<double>& c, std::vector<double>& d, 
+                                  std::vector<double>& x);
     std::vector<ControlPoint> controlPoints;
     bool showCurve;
     int draggingPoint;

@@ -17,8 +17,6 @@ cmath
 -
 algorithm
 -
-iostream
--
 
 /opt/games102/hw4/canvas.h
 QWidget

@@ -25,10 +25,12 @@ add_executable(${PROJECT_NAME}
     curve_designer.cpp
     curve_designer.h
 )
-
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIRS})
 # 链接Qt和OpenCV库
 target_link_libraries(${PROJECT_NAME}
     Qt5::Widgets
     Qt5::Core
     ${OpenCV_LIBS}
+    Eigen3::Eigen    
 )

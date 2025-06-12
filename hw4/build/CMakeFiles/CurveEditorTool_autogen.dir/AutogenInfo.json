@@ -32,6 +32,7 @@
 	],
 	"MOC_INCLUDES" : 
 	[
+		"/usr/include/eigen3",
 		"/usr/include/x86_64-linux-gnu/qt5",
 		"/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
 		"/usr/include/x86_64-linux-gnu/qt5/QtGui",

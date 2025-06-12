@@ -3,7 +3,6 @@
 #include <QMouseEvent>
 #include <cmath>
 #include <algorithm>
-#include <iostream>
 
 ControlPoint::ControlPoint(QPointF p, int idx) : 
     pos(p), leftTangent(-20, 0), rightTangent(20, 0), 
@@ -78,7 +77,7 @@ void Canvas::mousePressEvent(QMouseEvent *event) {
                 for (size_t j = 0; j < controlPoints.size(); ++j) {
                     if (j != i) controlPoints[j].selected = false;
                 }
-                std::cout << 1 << std::endl;
+                
                 update();
                 return;
             }
@@ -141,38 +140,38 @@ void Canvas::mousePressEvent(QMouseEvent *event) {
             
             // 计算差值向量
             QPointF diffVector;
-            // if (controlPoints.size() >= 2) {
-            //     // 有上上个点：计算上上个点到新点的差值向量
-            //     const ControlPoint& prevPrevPoint = controlPoints[controlPoints.size() - 2];
-            //     diffVector = pos - prevPrevPoint.pos;
+            if (controlPoints.size() >= 2) {
+                // 有上上个点：计算上上个点到新点的差值向量
+                const ControlPoint& prevPrevPoint = controlPoints[controlPoints.size() - 2];
+                diffVector = pos - prevPrevPoint.pos;
                 
-            //     // 归一化差值向量
-            //     qreal diffLength = sqrt(diffVector.x() * diffVector.x() + diffVector.y() * diffVector.y());
-            //     if (diffLength > 0.001) {
-            //         diffVector = diffVector * (1.0 / diffLength);
-            //     } else {
-            //         diffVector = QPointF(1, 0); // 默认方向
-            //     }
+                // 归一化差值向量
+                qreal diffLength = sqrt(diffVector.x() * diffVector.x() + diffVector.y() * diffVector.y());
+                if (diffLength > 0.001) {
+                    diffVector = diffVector * (1.0 / diffLength);
+                } else {
+                    diffVector = QPointF(1, 0); // 默认方向
+                }
                 
-            //     // 标记上上个点需要刷新
-            //     pointsToUpdate.push_back(controlPoints.size() - 2);
-            // } else {
-            //     // 没有上上个点（只有两个点）：使用上一个点到新点的方向
-            //     QPointF prevToNew = pos - prevPoint.pos;
-            //     if (dist > 0.001) {
-            //         diffVector = prevToNew * (1.0 / dist);
-            //     } else {
-            //         diffVector = QPointF(1, 0); // 默认方向
-            //     }
-            // }
+                // 标记上上个点需要刷新
+                pointsToUpdate.push_back(controlPoints.size() - 2);
+            } else {
+                // 没有上上个点（只有两个点）：使用上一个点到新点的方向
+                QPointF prevToNew = pos - prevPoint.pos;
+                if (dist > 0.001) {
+                    diffVector = prevToNew * (1.0 / dist);
+                } else {
+                    diffVector = QPointF(1, 0); // 默认方向
+                }
+            }
             
             // 更新上一个点的左右导数
             // 左导数：指向左面（与差值向量相反方向）
-            //prevPoint.leftTangent = -diffVector * tangentLength;
+            prevPoint.leftTangent = -diffVector * tangentLength;
             prevPoint.leftTangentFixed = false; // 清除固定标志
             
             // 右导数：指向右面（与差值向量相同方向）
-            //prevPoint.rightTangent = diffVector * tangentLength;
+            prevPoint.rightTangent = diffVector * tangentLength;
             prevPoint.rightTangentFixed = false; // 清除固定标志
             
             // 标记上一个点需要刷新
@@ -180,13 +179,11 @@ void Canvas::mousePressEvent(QMouseEvent *event) {
             
             // 设置新点的左侧切线（指向上一个点）
             newPoint.leftTangent = -prevPoint.rightTangent;
-        } 
-        // else {
-        //     // 第一个点的默认切线
-        //     newPoint.leftTangent = QPointF(-20, 0);
-        // }
+        } else {
+            // 第一个点的默认切线
+            newPoint.leftTangent = QPointF(-20, 0);
+        }
         
-        newPoint.leftTangent = QPointF(-20, 0);
         // 设置新点的右侧切线（默认水平方向）
         newPoint.rightTangent = QPointF(20, 0);
         
@@ -196,19 +193,17 @@ void Canvas::mousePressEvent(QMouseEvent *event) {
         draggingLeftTangent = false;
         draggingRightTangent = false;
         
-        //强制刷新所有被影响的点
-        // for (size_t index : pointsToUpdate) {
-        //     controlPoints[index].leftTangent = -controlPoints[index].leftTangent
-        //     controlPoints[index].leftTangentFixed = true; // 临时选中以强制绘制切线
-        //     update();
-            
-        // }
+        // 强制刷新所有被影响的点
+        for (size_t index : pointsToUpdate) {
+            controlPoints[index].selected = true; // 临时选中以强制绘制切线
+        }
         
-        // //恢复点的选中状态
-        // for (size_t index : pointsToUpdate) {
-        //     controlPoints[index].leftTangentFixed = false;
-        // }
         update();
+        
+        // 恢复点的选中状态
+        for (size_t index : pointsToUpdate) {
+            controlPoints[index].selected = false;
+        }
     } 
     // 右键点击
     else if (event->button() == Qt::RightButton) {
@@ -391,80 +386,13 @@ void Canvas::generateSpline(std::vector<QPointF>& curvePoints) {
     curvePoints.clear();
     if (controlPoints.size() < 2) return;
     
-    // 生成每个段
     for (size_t i = 0; i < controlPoints.size() - 1; ++i) {
         const auto& p0 = controlPoints[i].pos;
         const auto& p3 = controlPoints[i+1].pos;
         
-        QPointF p1, p2;
-        
-        // 计算起点控制点
-        if (controlPoints[i].rightTangentFixed) {
-            p1 = p0 + controlPoints[i].rightTangent;
-        } else {
-            if (i == 0) {
-                // 第一个点：使用到下一个点的方向
-                QPointF dir = p3 - p0;
-                qreal length = sqrt(dir.x() * dir.x() + dir.y() * dir.y());
-                if (length > 0.001) {
-                    dir = dir * (0.3 * length / length);
-                } else {
-                    dir = QPointF(20, 0);
-                }
-                p1 = p0 + dir;
-            } else {
-                // 使用前一个点和下一个点的平均方向
-                QPointF prevDir = p0 - controlPoints[i-1].pos;
-                QPointF nextDir = p3 - p0;
-                
-                qreal prevLength = sqrt(prevDir.x() * prevDir.x() + prevDir.y() * prevDir.y());
-                qreal nextLength = sqrt(nextDir.x() * nextDir.x() + nextDir.y() * nextDir.y());
-                
-                // 计算加权平均方向
-                QPointF avgDir = (prevDir * nextLength + nextDir * prevLength) / (prevLength + nextLength + 0.0001);
-                qreal avgLength = (prevLength + nextLength) * 0.15;
-                
-                if (avgLength > 0.001) {
-                    p1 = p0 + avgDir * (avgLength / sqrt(avgDir.x() * avgDir.x() + avgDir.y() * avgDir.y()));
-                } else {
-                    p1 = p0 + QPointF(20, 0);
-                }
-            }
-        }
-        
-        // 计算终点控制点
-        if (controlPoints[i+1].leftTangentFixed) {
-            p2 = p3 + controlPoints[i+1].leftTangent;
-        } else {
-            if (i == controlPoints.size() - 2) {
-                // 最后一个点：使用到前一个点的方向
-                QPointF dir = p0 - p3;
-                qreal length = sqrt(dir.x() * dir.x() + dir.y() * dir.y());
-                if (length > 0.001) {
-                    dir = dir * (0.3 * length / length);
-                } else {
-                    dir = QPointF(-20, 0);
-                }
-                p2 = p3 + dir;
-            } else {
-                // 使用当前点和下下个点的方向
-                QPointF prevDir = p3 - p0;
-                QPointF nextDir = controlPoints[i+2].pos - p3;
-                
-                qreal prevLength = sqrt(prevDir.x() * prevDir.x() + prevDir.y() * prevDir.y());
-                qreal nextLength = sqrt(nextDir.x() * nextDir.x() + nextDir.y() * nextDir.y());
-                
-                // 计算加权平均方向
-                QPointF avgDir = (prevDir * nextLength + nextDir * prevLength) / (prevLength + nextLength + 0.0001);
-                qreal avgLength = (prevLength + nextLength) * 0.15;
-                
-                if (avgLength > 0.001) {
-                    p2 = p3 + avgDir * (avgLength / sqrt(avgDir.x() * avgDir.x() + avgDir.y() * avgDir.y()));
-                } else {
-                    p2 = p3 + QPointF(-20, 0);
-                }
-            }
-        }
+        // 直接使用存储的切线向量
+        QPointF p1 = p0 + controlPoints[i].rightTangent;
+        QPointF p2 = p3 + controlPoints[i+1].leftTangent;
         
         // 生成贝塞尔曲线点
         for (double t = 0; t <= 1.0; t += 0.01) {
