@@ -453,43 +453,115 @@ void CanvasWidget::leaveEvent(QEvent *event)
     emit noPointHovered();
 }
 
+// QVector<QPointF> CanvasWidget::calculatePolynomialInterpolation()
+// {
+//     int n = points.size();
+//     if (n < 2) return QVector<QPointF>();
+    
+//     VectorXd t(n), x(n), y(n);
+    
+//     // Fill data (convert to mathematical coordinates)
+//     for (int i = 0; i < n; ++i) {
+//         QPointF mathPoint = toMathCoords(points[i].pos);
+//         t(i) = tValues[i];
+//         x(i) = mathPoint.x();
+//         y(i) = mathPoint.y();
+//     }
+    
+//     // Create Vandermonde matrix
+//     MatrixXd A(n, n);
+//     for (int i = 0; i < n; ++i) {
+//         for (int j = 0; j < n; ++j) {
+//             A(i, j) = pow(t(i), j);
+//         }
+//     }
+    
+//     // Solve linear systems
+//     VectorXd xCoeffs = A.colPivHouseholderQr().solve(x);
+//     VectorXd yCoeffs = A.colPivHouseholderQr().solve(y);
+    
+//     // Generate curve
+//     QVector<QPointF> curve;
+//     for (double tVal = 0.0; tVal <= 1.0; tVal += 0.005) {
+//         double px = 0;
+//         double py = 0;
+//         for (int j = 0; j < n; ++j) {
+//             px += xCoeffs(j) * pow(tVal, j);
+//             py += yCoeffs(j) * pow(tVal, j);
+//         }
+//         curve.append(toScreenCoords(QPointF(px, py)));
+//     }
+//     return curve;
+// }
+
 QVector<QPointF> CanvasWidget::calculatePolynomialInterpolation()
 {
     int n = points.size();
     if (n < 2) return QVector<QPointF>();
     
-    VectorXd t(n), x(n), y(n);
+    // 准备数据容器
+    QVector<double> t(n);
+    QVector<QPointF> mathPoints(n);
     
-    // Fill data (convert to mathematical coordinates)
+    // 填充数据（转换为数学坐标系）
     for (int i = 0; i < n; ++i) {
-        QPointF mathPoint = toMathCoords(points[i].pos);
-        t(i) = tValues[i];
-        x(i) = mathPoint.x();
-        y(i) = mathPoint.y();
+        mathPoints[i] = toMathCoords(points[i].pos);
+        t[i] = tValues[i];
     }
     
-    // Create Vandermonde matrix
-    MatrixXd A(n, n);
+    // 根据t值排序（牛顿插值需要有序节点）
+    QVector<int> indices(n);
+    std::iota(indices.begin(), indices.end(), 0);
+    std::sort(indices.begin(), indices.end(), [&](int a, int b) {
+        return t[a] < t[b];
+    });
+    
+    // 提取排序后的数据
+    VectorXd t_sorted(n), x_sorted(n), y_sorted(n);
     for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            A(i, j) = pow(t(i), j);
+        int idx = indices[i];
+        t_sorted(i) = t[idx];
+        x_sorted(i) = mathPoints[idx].x();
+        y_sorted(i) = mathPoints[idx].y();
+    }
+    
+    // 计算差商表（牛顿插值核心）
+    MatrixXd Fx(n, n), Fy(n, n);
+    
+    // 初始化0阶差商
+    for (int i = 0; i < n; ++i) {
+        Fx(i, 0) = x_sorted(i);
+        Fy(i, 0) = y_sorted(i);
+    }
+    
+    // 计算高阶差商
+    for (int j = 1; j < n; ++j) {
+        for (int i = j; i < n; ++i) {
+            Fx(i, j) = (Fx(i, j-1) - Fx(i-1, j-1)) / (t_sorted(i) - t_sorted(i-j));
+            Fy(i, j) = (Fy(i, j-1) - Fy(i-1, j-1)) / (t_sorted(i) - t_sorted(i-j));
         }
     }
     
-    // Solve linear systems
-    VectorXd xCoeffs = A.colPivHouseholderQr().solve(x);
-    VectorXd yCoeffs = A.colPivHouseholderQr().solve(y);
+    // 提取对角线元素（牛顿插值系数）
+    VectorXd cx(n), cy(n);
+    for (int i = 0; i < n; ++i) {
+        cx(i) = Fx(i, i);
+        cy(i) = Fy(i, i);
+    }
     
-    // Generate curve
+    // 生成曲线
     QVector<QPointF> curve;
     for (double tVal = 0.0; tVal <= 1.0; tVal += 0.005) {
-        double px = 0;
-        double py = 0;
-        for (int j = 0; j < n; ++j) {
-            px += xCoeffs(j) * pow(tVal, j);
-            py += yCoeffs(j) * pow(tVal, j);
+        double xVal = cx(n-1);
+        double yVal = cy(n-1);
+        
+        // 牛顿插值公式（反向嵌套乘法）
+        for (int j = n-2; j >= 0; j--) {
+            xVal = xVal * (tVal - t_sorted(j)) + cx(j);
+            yVal = yVal * (tVal - t_sorted(j)) + cy(j);
         }
-        curve.append(toScreenCoords(QPointF(px, py)));
+        
+        curve.append(toScreenCoords(QPointF(xVal, yVal)));
     }
     return curve;
 }
@@ -542,6 +614,7 @@ QVector<QPointF> CanvasWidget::calculateGaussianInterpolation()
     }
     return curve;
 }
+
 
 QVector<QPointF> CanvasWidget::calculateLeastSquares()
 {

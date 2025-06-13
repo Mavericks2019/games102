@@ -4,7 +4,6 @@ project(CurveEditorTool)
 # 设置C++标准
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 # 自动处理Qt的moc、uic和rcc
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)

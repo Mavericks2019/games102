@@ -305,37 +305,88 @@ void CanvasWidget::leaveEvent(QEvent *event)
     emit noPointHovered();
 }
 
+// QVector<QPointF> CanvasWidget::calculatePolynomialInterpolation()
+// {
+//     int n = points.size();
+//     VectorXd x(n), y(n);
+    
+//     // 填充数据
+//     for (int i = 0; i < n; ++i) {
+//         QPointF mathPoint = toMathCoords(points[i].pos);
+//         x(i) = mathPoint.x();
+//         y(i) = mathPoint.y();
+//     }
+    
+//     // 创建范德蒙矩阵
+//     MatrixXd A(n, n);
+//     for (int i = 0; i < n; ++i) {
+//         for (int j = 0; j < n; ++j) {
+//             A(i, j) = pow(x(i), j);
+//         }
+//     }
+    
+//     // 解线性方程组
+//     VectorXd coeffs = A.colPivHouseholderQr().solve(y);
+    
+//     // 生成曲线
+//     QVector<QPointF> curve;
+//     for (int px = 0; px < width(); px += 2) {
+//         double py = 0;
+//         for (int j = 0; j < n; ++j) {
+//             py += coeffs(j) * pow(px, j);
+//         }
+//         curve.append(toScreenCoords(QPointF(px, py)));
+//     }
+//     return curve;
+// }
+
 QVector<QPointF> CanvasWidget::calculatePolynomialInterpolation()
 {
     int n = points.size();
-    VectorXd x(n), y(n);
+    if (n == 0) return QVector<QPointF>();
     
-    // 填充数据
+    // 转换并排序点（牛顿插值需要有序节点）
+    QVector<QPointF> mathPoints;
     for (int i = 0; i < n; ++i) {
-        QPointF mathPoint = toMathCoords(points[i].pos);
-        x(i) = mathPoint.x();
-        y(i) = mathPoint.y();
+        mathPoints.append(toMathCoords(points[i].pos));
+    }
+    std::sort(mathPoints.begin(), mathPoints.end(), 
+              [](const QPointF& a, const QPointF& b) { 
+                  return a.x() < b.x(); 
+              });
+    
+    // 提取坐标
+    VectorXd x(n), y(n);
+    for (int i = 0; i < n; ++i) {
+        x(i) = mathPoints[i].x();
+        y(i) = mathPoints[i].y();
     }
     
-    // 创建范德蒙矩阵
-    MatrixXd A(n, n);
+    // 计算差商表 (牛顿插值核心)
+    MatrixXd F(n, n);
     for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            A(i, j) = pow(x(i), j);
+        F(i, 0) = y(i);  // 0阶差商
+    }
+    for (int j = 1; j < n; ++j) {
+        for (int i = j; i < n; ++i) {
+            F(i, j) = (F(i, j-1) - F(i-1, j-1)) / (x(i) - x(i-j));
         }
     }
-    
-    // 解线性方程组
-    VectorXd coeffs = A.colPivHouseholderQr().solve(y);
     
     // 生成曲线
     QVector<QPointF> curve;
     for (int px = 0; px < width(); px += 2) {
-        double py = 0;
-        for (int j = 0; j < n; ++j) {
-            py += coeffs(j) * pow(px, j);
+        double mathX = toMathCoords(QPointF(px, 0)).x();  // 转换为数学坐标系
+        
+        // 牛顿插值公式
+        double mathY = F(0, 0);  // 初始值 = f(x0)
+        double product = 1.0;
+        for (int j = 1; j < n; ++j) {
+            product *= (mathX - x(j-1));  // 累乘(x-x0)(x-x1)...
+            mathY += F(j, j) * product;   // 添加差商项
         }
-        curve.append(toScreenCoords(QPointF(px, py)));
+        
+        curve.append(toScreenCoords(QPointF(mathX, mathY)));
     }
     return curve;
 }
