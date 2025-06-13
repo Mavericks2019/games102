@@ -1,4 +1,3 @@
-// [文件]: main.cpp
 #include "curve_designer.h"
 #include <QApplication>
 #include <QMainWindow>
@@ -7,10 +6,10 @@
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
     
-    // 设置Fusion样式 - 与您提供的UI一致
+    // 设置Fusion样式 - 与插值工具一致
     QApplication::setStyle(QStyleFactory::create("Fusion"));
     
-    // 设置深色主题 - 与您提供的UI一致
+    // 设置深色主题 - 与插值工具一致
     QPalette palette;
     palette.setColor(QPalette::Window, QColor(53,53,53));
     palette.setColor(QPalette::WindowText, Qt::white);
@@ -27,7 +26,7 @@ int main(int argc, char *argv[]) {
     palette.setColor(QPalette::HighlightedText, Qt::black);
     app.setPalette(palette);
     
-    // 设置应用样式 - 与您提供的UI一致
+    // 设置应用样式 - 与插值工具一致
     app.setStyleSheet(
         "QGroupBox {"
         "  border: 1px solid #3A3939;"
@@ -80,7 +79,9 @@ int main(int argc, char *argv[]) {
     
     QMainWindow mainWindow;
     mainWindow.setWindowTitle("Curve Design Tool");
-    mainWindow.setMinimumSize(1200, 800);
+    // 设置与插值工具相同的窗口大小
+    mainWindow.resize(1400, 800);
+    mainWindow.setMinimumSize(1400, 800);
     
     CurveDesigner *designer = new CurveDesigner();
     mainWindow.setCentralWidget(designer);

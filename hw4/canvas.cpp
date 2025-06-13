@@ -49,6 +49,9 @@ void Canvas::paintEvent(QPaintEvent *) {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     
+    // 设置深色背景 - 与插值工具一致
+    painter.fillRect(rect(), QColor(53, 53, 53));
+    
     // 绘制网格
     drawGrid(painter);
     
@@ -108,7 +111,8 @@ void Canvas::paintEvent(QPaintEvent *) {
 }
 
 void Canvas::drawGrid(QPainter &painter) {
-    painter.setPen(QPen(QColor(60, 64, 72), 1));
+    // 设置网格线颜色 - 与插值工具一致
+    painter.setPen(QPen(QColor(100, 100, 100), 1));
     
     int gridSize = 20;
     for (int x = 0; x < width(); x += gridSize) {
@@ -121,18 +125,18 @@ void Canvas::drawGrid(QPainter &painter) {
 
 void Canvas::drawControlPoint(QPainter &painter, const ControlPoint &point, int index) {
     // 绘制点
-    QColor pointColor = (index == hoveredIndex) ? QColor(255, 150, 150) : 
-                     point.selected ? QColor(241, 196, 15) : QColor(52, 152, 219);
+    QColor pointColor = (index == hoveredIndex) ? QColor(255, 100, 100) : // 悬停点红色
+                     point.selected ? QColor(241, 196, 15) : QColor(52, 152, 219); // 普通点蓝色
+    
     painter.setBrush(pointColor);
     painter.setPen(QPen(QColor(236, 240, 241), 2));
     painter.drawEllipse(point.pos, 8, 8);
     
-    // 绘制点编号
+    // 绘制点编号 - 与插值工具一致
     painter.setPen(QColor(236, 240, 241));
     painter.setFont(QFont("Arial", 9, QFont::Bold));
     painter.drawText(point.pos + QPointF(12, -12), QString::number(index));
 }
-
 void Canvas::drawTangents(QPainter &painter, const ControlPoint &point) {
     QPointF leftEnd = point.pos + point.leftTangent;
     QPointF rightEnd = point.pos + point.rightTangent;
@@ -176,7 +180,7 @@ void Canvas::drawCurve(QPainter &painter) {
     generateSpline(curvePoints);
     
     if (curvePoints.size() < 2) return;
-    
+    painter.setRenderHint(QPainter::Antialiasing, true); // 增加抗锯齿
     // 使用当前曲线类型的颜色
     painter.setPen(QPen(getCurveColor(), 3));
     for (size_t i = 0; i < curvePoints.size() - 1; ++i) {
@@ -190,7 +194,7 @@ void Canvas::drawBezierCurve(QPainter &painter) {
     generateSpline(curvePoints);
     
     if (curvePoints.size() < 2) return;
-    
+    painter.setRenderHint(QPainter::Antialiasing, true); // 增加抗锯齿
     // 使用当前曲线类型的颜色
     painter.setPen(QPen(getCurveColor(), 3));
     for (size_t i = 0; i < curvePoints.size() - 1; ++i) {
@@ -223,6 +227,7 @@ void Canvas::drawQuadraticSpline(QPainter &painter) {
     if (controlPoints.size() < 2) return;
     
     // 使用当前曲线类型的颜色
+    painter.setRenderHint(QPainter::Antialiasing, true); // 增加抗锯齿
     painter.setPen(QPen(getCurveColor(), 3));
     
     // 简单的二次样条实现
@@ -238,7 +243,7 @@ void Canvas::drawQuadraticSpline(QPainter &painter) {
         
         // 绘制二次贝塞尔曲线
         QPointF prev = p0;
-        for (double t = 0.1; t <= 1.0; t += 0.1) {
+        for (double t = 0.1; t <= 1.0; t += 0.051) {
             double u = 1 - t;
             QPointF p = u*u * p0 + 2*u*t * control + t*t * p1;
             painter.drawLine(prev, p);
@@ -252,6 +257,7 @@ void Canvas::drawCubicSpline(QPainter &painter) {
     if (controlPoints.size() < 2) return;
     
     // 使用当前曲线类型的颜色
+    painter.setRenderHint(QPainter::Antialiasing, true); // 增加抗锯齿
     painter.setPen(QPen(getCurveColor(), 3));
     
     // 简单的三次样条实现
@@ -265,7 +271,7 @@ void Canvas::drawCubicSpline(QPainter &painter) {
         
         // 绘制三次贝塞尔曲线
         QPointF prev = p0;
-        for (double t = 0.1; t <= 1.0; t += 0.001) {
+        for (double t = 0.1; t <= 1.0; t += 0.005) {
             double u = 1 - t;
             double x = u*u*u*p0.x() + 3*u*u*t*p1.x() + 3*u*t*t*p2.x() + t*t*t*p3.x();
             double y = u*u*u*p0.y() + 3*u*u*t*p1.y() + 3*u*t*t*p2.y() + t*t*t*p3.y();
@@ -633,7 +639,7 @@ void Canvas::generateSpline(std::vector<QPointF>& curvePoints) {
         }
         
         // 生成贝塞尔曲线点
-        for (double t = 0; t <= 1.0; t += 0.01) {
+        for (double t = 0; t <= 1.0; t += 0.005) {
             double u = 1 - t;
             double x = u*u*u*p0.x() + 3*u*u*t*p1.x() + 3*u*t*t*p2.x() + t*t*t*p3.x();
             double y = u*u*u*p0.y() + 3*u*u*t*p1.y() + 3*u*t*t*p2.y() + t*t*t*p3.y();
