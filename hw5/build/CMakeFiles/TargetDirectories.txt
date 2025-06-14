@@ -1,0 +1,4 @@
+/opt/games102/hw5/build/CMakeFiles/rebuild_cache.dir
+/opt/games102/hw5/build/CMakeFiles/edit_cache.dir
+/opt/games102/hw5/build/CMakeFiles/InterpolationTool.dir
+/opt/games102/hw5/build/CMakeFiles/InterpolationTool_autogen.dir
