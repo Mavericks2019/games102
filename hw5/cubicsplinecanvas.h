@@ -17,7 +17,6 @@ public:
     // 重写基类方法
     void drawCurves(QPainter &painter) override;
     void drawPoints(QPainter &painter) override;
-    void deletePoint(int index) override;
     void drawInfoPanel(QPainter &painter) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
@@ -25,19 +24,26 @@ public:
 private:
     struct ControlPoint {
         QPointF pos;
-        bool isTangent = false;
-        int parentIndex = -1;
-        bool leftTangent = true;
+        bool moving = false;
+        bool selected = false;
+        QPointF leftTangent = QPointF(-20, 0);
+        QPointF rightTangent = QPointF(20, 0);
+        bool leftTangentFixed = false;
+        bool rightTangentFixed = false;
     };
-     void updateControlPoints();
-    void calculateSpline();
-    void showDerivatives(int pointIndex);
     
-    QVector<ControlPoint> controlPoints;
+    void calculateSpline();
+    void calculateSplineNaive();
+    double distance(const QPointF &p1, const QPointF &p2);
+    void updateAdjacentTangents(int index);
+    
+    QVector<ControlPoint> points;
     QVector<QPointF> splinePoints;
-    int selectedControlPoint = -1;
     bool showControlPoints = true;
-    int currentPointIndex = -1;
+    int selectedIndex = -1;
+    int hoveredIndex = -1;
+    bool draggingLeftTangent = false;
+    bool draggingRightTangent = false;
 };
 
 #endif // CUBICSPLINECANVAS_H
