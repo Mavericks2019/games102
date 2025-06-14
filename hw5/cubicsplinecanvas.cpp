@@ -15,6 +15,19 @@ CubicSplineCanvas::CubicSplineCanvas(QWidget *parent)
     draggingRightTangent = false;
 }
 
+// 添加clearPoints实现
+void CubicSplineCanvas::clearPoints()
+{
+    points.clear();
+    splinePoints.clear();
+    selectedIndex = -1;
+    hoveredIndex = -1;
+    draggingLeftTangent = false;
+    draggingRightTangent = false;
+    update();
+    emit noPointHovered();
+}
+
 void CubicSplineCanvas::drawCurves(QPainter &painter)
 {
     if (points.size() < 2) return;
@@ -307,6 +320,27 @@ void CubicSplineCanvas::mouseReleaseEvent(QMouseEvent *event)
                 
                 // 设置新点的左侧切线（指向上一个点）
                 newPoint.leftTangent = -diffVector;
+
+                if (points.size() >= 2) {
+                    // 获取上上个点
+                    ControlPoint& prevPrevPoint = points[points.size()-2];
+                    
+                    // 计算从上上个点到新点的方向
+                    QPointF globalDir = newPoint.pos - prevPrevPoint.pos;
+                    qreal globalDist = distance(prevPrevPoint.pos, newPoint.pos);
+                    
+                    if (globalDist > 0.001) {
+                        // 计算平滑的切线长度（全局距离的15%）
+                        qreal smoothTangentLength = globalDist * 0.15;
+                        
+                        // 计算平滑的切线方向
+                        QPointF smoothTangent = globalDir * (smoothTangentLength / globalDist);
+                        
+                        // 更新上一个点的左切线和右切线
+                        prevPoint.leftTangent = -smoothTangent;
+                        prevPoint.rightTangent = smoothTangent;
+                    }
+                }
             }
             
             // 清除所有点的选中状态

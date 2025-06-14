@@ -21,6 +21,8 @@ public:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void clearPoints() override; // 添加重写的clearPoints声明
+    
 private:
     struct ControlPoint {
         QPointF pos;
