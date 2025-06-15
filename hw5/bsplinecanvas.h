@@ -18,6 +18,12 @@ public:
     void drawCurves(QPainter &painter) override;
     void drawPoints(QPainter &painter) override;
     void drawInfoPanel(QPainter &painter) override;
+    double distance(const QPointF &p1, const QPointF &p2)
+    {
+        double dx = p1.x() - p2.x();
+        double dy = p1.y() - p2.y();
+        return std::sqrt(dx*dx + dy*dy);
+    }
 
 private:
     QVector<QPointF> calculateBSpline();

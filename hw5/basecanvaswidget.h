@@ -6,6 +6,7 @@
 #include <QPointF>
 #include <QVector>
 #include <QColor>
+#include <math.h>
 
 class BaseCanvasWidget : public QWidget
 {
@@ -43,6 +44,12 @@ public:
     
     // 删除点
     virtual void deletePoint(int index);
+    double distance(const QPointF &p1, const QPointF &p2)
+    {
+        double dx = p1.x() - p2.x();
+        double dy = p1.y() - p2.y();
+        return std::sqrt(dx*dx + dy*dy);
+    }
 
 signals:
     void pointHovered(const QPointF& point);
@@ -53,8 +60,8 @@ protected:
     struct Point {
         QPointF pos;
         bool moving = false;
+        bool movable = true;
     };
-
     QVector<Point> points;
     int selectedIndex = -1;
     int hoveredIndex = -1;

@@ -278,6 +278,7 @@ void MainWindow::setupChaikinControls()
                 PolygonCanvas::CurveType type = static_cast<PolygonCanvas::CurveType>(id);
                 polygonCanvas->setCurveType(type);
             });
+    
     // Chaikin细分按钮
     QPushButton *chaikinButton = new QPushButton("Chaikin Subdivision");
     connect(chaikinButton, &QPushButton::clicked, polygonCanvas, &PolygonCanvas::performChaikinSubdivision);
@@ -296,6 +297,19 @@ void MainWindow::setupChaikinControls()
     layout->addWidget(dooSabinButton);
     layout->addWidget(catmullClarkButton);
     layout->addWidget(loopButton);
+    
+    // 连接细分次数变化信号
+    connect(polygonCanvas, &PolygonCanvas::subdivisionCountChanged, 
+            [chaikinButton, this](int count) {
+                // 达到最大细分次数时禁用按钮
+                chaikinButton->setEnabled(count < 6);
+                
+                // 更新按钮文本
+                chaikinButton->setText(QString("Chaikin Subdivision (%1/6)").arg(count));
+                
+                // 在信息面板显示是否可以添加点
+                polygonCanvas->update();
+            });
     
     layout->addStretch();
     

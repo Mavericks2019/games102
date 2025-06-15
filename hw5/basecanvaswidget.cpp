@@ -132,7 +132,7 @@ void BaseCanvasWidget::mousePressEvent(QMouseEvent *event)
         selectedIndex = -1;
         hoveredIndex = findHoveredPoint(event->pos());
         
-        if (hoveredIndex >= 0) {
+        if (hoveredIndex >= 0 && points[hoveredIndex].movable) {
             selectedIndex = hoveredIndex;
             points[selectedIndex].moving = true;
             emit pointHovered(points[selectedIndex].pos);
@@ -142,8 +142,19 @@ void BaseCanvasWidget::mousePressEvent(QMouseEvent *event)
 
 void BaseCanvasWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    // 更新悬停状态
-    int newHoveredIndex = findHoveredPoint(event->pos());
+    // 更新悬停状态 - 只考虑可拖动的点
+    int newHoveredIndex = -1;
+    double minDist = 20.0;
+    for (int i = 0; i < points.size(); ++i) {
+        if (!points[i].movable) continue;
+        
+        double d = distance(event->pos(), points[i].pos);
+        if (d < minDist) {
+            minDist = d;
+            newHoveredIndex = i;
+        }
+    }
+    
     if (newHoveredIndex != hoveredIndex) {
         hoveredIndex = newHoveredIndex;
         update();
@@ -155,13 +166,14 @@ void BaseCanvasWidget::mouseMoveEvent(QMouseEvent *event)
         }
     }
     
-    // 处理点拖动
-    if ((event->buttons() & Qt::LeftButton) && selectedIndex >= 0) {
+    // 处理点拖动 - 只拖动可移动的点
+    if ((event->buttons() & Qt::LeftButton) && selectedIndex >= 0 && points[selectedIndex].movable) {
         points[selectedIndex].pos = event->pos();
         emit pointHovered(points[selectedIndex].pos);
         update();
     }
 }
+
 
 void BaseCanvasWidget::mouseReleaseEvent(QMouseEvent *event)
 {
@@ -170,8 +182,9 @@ void BaseCanvasWidget::mouseReleaseEvent(QMouseEvent *event)
             points[selectedIndex].moving = false;
             selectedIndex = -1;
         } else {
-            // 添加新点
-            points.append({event->pos(), false});
+            // 添加新点 - 新添加的点总是可拖动的
+            Point newPoint = {event->pos(), false, true};
+            points.append(newPoint);
             hoveredIndex = points.size() - 1;
             emit pointHovered(points.last().pos);
         }
@@ -203,6 +216,8 @@ int BaseCanvasWidget::findHoveredPoint(const QPointF &pos) const
     const int hoverRadius = 15;
     
     for (int i = 0; i < points.size(); ++i) {
+        if (!points[i].movable) continue;
+        
         QPointF diff = pos - points[i].pos;
         if (diff.manhattanLength() < hoverRadius) {
             return i;
