@@ -352,6 +352,33 @@ parametriccurvecanvas.cpp.s:
 	$(MAKE) -f CMakeFiles/InterpolationTool.dir/build.make CMakeFiles/InterpolationTool.dir/parametriccurvecanvas.cpp.s
 .PHONY : parametriccurvecanvas.cpp.s
 
+polygoncanvas.o: polygoncanvas.cpp.o
+
+.PHONY : polygoncanvas.o
+
+# target to build an object file
+polygoncanvas.cpp.o:
+	$(MAKE) -f CMakeFiles/InterpolationTool.dir/build.make CMakeFiles/InterpolationTool.dir/polygoncanvas.cpp.o
+.PHONY : polygoncanvas.cpp.o
+
+polygoncanvas.i: polygoncanvas.cpp.i
+
+.PHONY : polygoncanvas.i
+
+# target to preprocess a source file
+polygoncanvas.cpp.i:
+	$(MAKE) -f CMakeFiles/InterpolationTool.dir/build.make CMakeFiles/InterpolationTool.dir/polygoncanvas.cpp.i
+.PHONY : polygoncanvas.cpp.i
+
+polygoncanvas.s: polygoncanvas.cpp.s
+
+.PHONY : polygoncanvas.s
+
+# target to generate assembly for a file
+polygoncanvas.cpp.s:
+	$(MAKE) -f CMakeFiles/InterpolationTool.dir/build.make CMakeFiles/InterpolationTool.dir/polygoncanvas.cpp.s
+.PHONY : polygoncanvas.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -386,6 +413,9 @@ help:
 	@echo "... parametriccurvecanvas.o"
 	@echo "... parametriccurvecanvas.i"
 	@echo "... parametriccurvecanvas.s"
+	@echo "... polygoncanvas.o"
+	@echo "... polygoncanvas.i"
+	@echo "... polygoncanvas.s"
 .PHONY : help
 
 

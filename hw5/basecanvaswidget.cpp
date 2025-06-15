@@ -24,6 +24,7 @@ void BaseCanvasWidget::clearPoints()
 {
     points.clear();
     hoveredIndex = -1;
+    selectedIndex = -1; // 确保选中索引也被清除
     update();
     emit noPointHovered();
 }

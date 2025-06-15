@@ -5,3 +5,4 @@
 #include "EWIEGA46WW/moc_cubicsplinecanvas.cpp"
 #include "EWIEGA46WW/moc_mainwindow.cpp"
 #include "EWIEGA46WW/moc_parametriccurvecanvas.cpp"
+#include "EWIEGA46WW/moc_polygoncanvas.cpp"

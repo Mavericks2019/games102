@@ -10,6 +10,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/InterpolationTool.dir/main.cpp.o"
   "CMakeFiles/InterpolationTool.dir/mainwindow.cpp.o"
   "CMakeFiles/InterpolationTool.dir/parametriccurvecanvas.cpp.o"
+  "CMakeFiles/InterpolationTool.dir/polygoncanvas.cpp.o"
   "InterpolationTool"
   "InterpolationTool.pdb"
 )

@@ -1,8 +1,4 @@
 #include "mainwindow.h"
-#include "parametriccurvecanvas.h"
-#include "cubicsplinecanvas.h"
-#include "beziercurvecanvas.h"
-#include "bsplinecanvas.h"
 #include <QVBoxLayout>
 #include <QGroupBox>
 #include <QFormLayout>
@@ -33,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     curveColors["Spline"] = Qt::darkGreen;
     curveColors["Bezier"] = Qt::magenta;
     curveColors["B-Spline"] = Qt::darkCyan;
+    curveColors["Chaikin"] = Qt::darkYellow; // 添加新的颜色
     
     // 创建主部件和布局
     QWidget *centralWidget = new QWidget(this);
@@ -45,13 +42,15 @@ MainWindow::MainWindow(QWidget *parent)
     splineCanvas = new CubicSplineCanvas;
     bezierCanvas = new BezierCurveCanvas;
     bSplineCanvas = new BSplineCanvas;
-    
+    polygonCanvas = new PolygonCanvas;
+
     tabWidget->addTab(parametricCanvas, "Parametric Curve");
     tabWidget->addTab(splineCanvas, "Cubic Spline");
     tabWidget->addTab(bezierCanvas, "Bezier Curve");
     tabWidget->addTab(bSplineCanvas, "B-Spline");
+    tabWidget->addTab(polygonCanvas, "Chaikin Subdivision"); 
     
-    mainLayout->addWidget(tabWidget, 4);
+    mainLayout->addWidget(tabWidget, 5);
     
     // ========== 右侧控制面板 ==========
     controlPanel = new QWidget;
@@ -102,6 +101,7 @@ MainWindow::MainWindow(QWidget *parent)
     setupSplineControls();
     setupBezierControls();
     setupBSplineControls();
+    setupChaikinControls();
     
     // 清除按钮
     QPushButton *clearButton = new QPushButton("Clear Points");
@@ -112,6 +112,7 @@ MainWindow::MainWindow(QWidget *parent)
             case 1: splineCanvas->clearPoints(); break;
             case 2: bezierCanvas->clearPoints(); break;
             case 3: bSplineCanvas->clearPoints(); break;
+            case 4: polygonCanvas->clearPoints(); break;
         }
     });
     controlLayout->addWidget(clearButton);
@@ -240,6 +241,40 @@ void MainWindow::setupParametricControls()
     
     stackedControlLayout->addWidget(panel);
 }
+
+void MainWindow::setupChaikinControls()
+{
+    QWidget *panel = new QWidget;
+    QVBoxLayout *layout = new QVBoxLayout(panel);
+    
+    QLabel *infoLabel = new QLabel("Draw a polygon and click 'Subdivide' to apply Chaikin algorithm.");
+    infoLabel->setWordWrap(true);
+    layout->addWidget(infoLabel);
+    
+    // Chaikin细分按钮
+    QPushButton *chaikinButton = new QPushButton("Chaikin Subdivision");
+    connect(chaikinButton, &QPushButton::clicked, polygonCanvas, &PolygonCanvas::performChaikinSubdivision);
+    
+    // 添加还原按钮
+    QPushButton *restoreButton = new QPushButton("Restore Original");
+    connect(restoreButton, &QPushButton::clicked, polygonCanvas, &PolygonCanvas::restoreOriginalPolygon);
+    
+    // 其他细分方法按钮（暂时不实现功能）
+    QPushButton *dooSabinButton = new QPushButton("Doo-Sabin (Not Implemented)");
+    QPushButton *catmullClarkButton = new QPushButton("Catmull-Clark (Not Implemented)");
+    QPushButton *loopButton = new QPushButton("Loop (Not Implemented)");
+    
+    layout->addWidget(chaikinButton);
+    layout->addWidget(restoreButton); // 添加还原按钮
+    layout->addWidget(dooSabinButton);
+    layout->addWidget(catmullClarkButton);
+    layout->addWidget(loopButton);
+    
+    layout->addStretch();
+    
+    stackedControlLayout->addWidget(panel);
+}
+
 
 void MainWindow::setupSplineControls()
 {
@@ -389,6 +424,9 @@ void MainWindow::updateCanvasView(int index)
         case 3: 
             bSplineCanvas->setCurveColor(curveColors["B-Spline"]);
             break;
+        case 4: // Chaikin面板
+            polygonCanvas->setCurveColor(curveColors["Chaikin"]);
+        break;
     }
     
     // 连接当前画布的信号

@@ -18,6 +18,7 @@ add_executable(${PROJECT_NAME}
     cubicsplinecanvas.cpp
     beziercurvecanvas.cpp
     bsplinecanvas.cpp
+    polygoncanvas.cpp 
 )
 
 target_link_libraries(${PROJECT_NAME}

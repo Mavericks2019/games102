@@ -1,15 +1,20 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-
 #include <QMainWindow>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QMap>
 #include <QTabWidget>
 #include <QStackedLayout>  // 添加头文件
+#include "polygoncanvas.h"
+#include "parametriccurvecanvas.h"
+#include "cubicsplinecanvas.h"
+#include "beziercurvecanvas.h"
+#include "bsplinecanvas.h"
 
 class BaseCanvasWidget;
 class ParametricCurveCanvas;
+class PolygonCanvas;
 class CubicSplineCanvas;
 class BezierCurveCanvas;
 class BSplineCanvas;
@@ -50,12 +55,14 @@ private:
     void setupSplineControls();
     void setupBezierControls();
     void setupBSplineControls();
+    void setupChaikinControls();
     
     QTabWidget *tabWidget;
     ParametricCurveCanvas *parametricCanvas;
     CubicSplineCanvas *splineCanvas;
     BezierCurveCanvas *bezierCanvas;
     BSplineCanvas *bSplineCanvas;
+    PolygonCanvas *polygonCanvas;
     
     // 右侧控制面板
     QWidget *controlPanel;

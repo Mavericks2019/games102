@@ -12,6 +12,7 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "/opt/games102/hw5/main.cpp" "/opt/games102/hw5/build/CMakeFiles/InterpolationTool.dir/main.cpp.o"
   "/opt/games102/hw5/mainwindow.cpp" "/opt/games102/hw5/build/CMakeFiles/InterpolationTool.dir/mainwindow.cpp.o"
   "/opt/games102/hw5/parametriccurvecanvas.cpp" "/opt/games102/hw5/build/CMakeFiles/InterpolationTool.dir/parametriccurvecanvas.cpp.o"
+  "/opt/games102/hw5/polygoncanvas.cpp" "/opt/games102/hw5/build/CMakeFiles/InterpolationTool.dir/polygoncanvas.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
