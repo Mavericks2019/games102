@@ -247,10 +247,37 @@ void MainWindow::setupChaikinControls()
     QWidget *panel = new QWidget;
     QVBoxLayout *layout = new QVBoxLayout(panel);
     
-    QLabel *infoLabel = new QLabel("Draw a polygon and click 'Subdivide' to apply Chaikin algorithm.");
+    QLabel *infoLabel = new QLabel("Draw a polygon and curves will be automatically generated based on the initial points.");
     infoLabel->setWordWrap(true);
     layout->addWidget(infoLabel);
     
+    // 曲线类型选择
+    QGroupBox *curveGroup = new QGroupBox("Curve Type");
+    QVBoxLayout *curveLayout = new QVBoxLayout(curveGroup);
+    
+    QButtonGroup *curveButtonGroup = new QButtonGroup(this);
+    QRadioButton *noneButton = new QRadioButton("None");
+    QRadioButton *quadraticButton = new QRadioButton("Quadratic Uniform B-Spline");
+    QRadioButton *cubicButton = new QRadioButton("Cubic Uniform B-Spline");
+    
+    curveButtonGroup->addButton(noneButton, 0);
+    curveButtonGroup->addButton(quadraticButton, 1);
+    curveButtonGroup->addButton(cubicButton, 2);
+    
+    noneButton->setChecked(true);
+    
+    curveLayout->addWidget(noneButton);
+    curveLayout->addWidget(quadraticButton);
+    curveLayout->addWidget(cubicButton);
+    
+    layout->addWidget(curveGroup);
+    
+    // 连接信号 - 选择曲线类型后立即更新
+    connect(curveButtonGroup, QOverload<int>::of(&QButtonGroup::buttonClicked), 
+            [this](int id) {
+                PolygonCanvas::CurveType type = static_cast<PolygonCanvas::CurveType>(id);
+                polygonCanvas->setCurveType(type);
+            });
     // Chaikin细分按钮
     QPushButton *chaikinButton = new QPushButton("Chaikin Subdivision");
     connect(chaikinButton, &QPushButton::clicked, polygonCanvas, &PolygonCanvas::performChaikinSubdivision);
@@ -259,13 +286,13 @@ void MainWindow::setupChaikinControls()
     QPushButton *restoreButton = new QPushButton("Restore Original");
     connect(restoreButton, &QPushButton::clicked, polygonCanvas, &PolygonCanvas::restoreOriginalPolygon);
     
-    // 其他细分方法按钮（暂时不实现功能）
+    // 其他细分方法按钮
     QPushButton *dooSabinButton = new QPushButton("Doo-Sabin (Not Implemented)");
     QPushButton *catmullClarkButton = new QPushButton("Catmull-Clark (Not Implemented)");
     QPushButton *loopButton = new QPushButton("Loop (Not Implemented)");
     
     layout->addWidget(chaikinButton);
-    layout->addWidget(restoreButton); // 添加还原按钮
+    layout->addWidget(restoreButton);
     layout->addWidget(dooSabinButton);
     layout->addWidget(catmullClarkButton);
     layout->addWidget(loopButton);
@@ -274,7 +301,6 @@ void MainWindow::setupChaikinControls()
     
     stackedControlLayout->addWidget(panel);
 }
-
 
 void MainWindow::setupSplineControls()
 {

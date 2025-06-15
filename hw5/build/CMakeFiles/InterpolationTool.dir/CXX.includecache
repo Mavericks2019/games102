@@ -92,6 +92,18 @@ QVector
 Eigen/Dense
 -
 
+/opt/games102/hw5/polygoncanvas.cpp
+polygoncanvas.h
+/opt/games102/hw5/polygoncanvas.h
+QPainter
+-
+QMouseEvent
+-
+cmath
+-
+Eigen/Dense
+-
+
 /opt/games102/hw5/polygoncanvas.h
 basecanvaswidget.h
 /opt/games102/hw5/basecanvaswidget.h
@@ -1863,6 +1875,10 @@ QtCore/qglobal.h
 /usr/include/x86_64-linux-gnu/qt5/QtGui/QColor
 qcolor.h
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qcolor.h
+
+/usr/include/x86_64-linux-gnu/qt5/QtGui/QMouseEvent
+qevent.h
+/usr/include/x86_64-linux-gnu/qt5/QtGui/qevent.h
 
 /usr/include/x86_64-linux-gnu/qt5/QtGui/QPainter
 qpainter.h
