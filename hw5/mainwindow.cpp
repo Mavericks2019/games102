@@ -288,7 +288,9 @@ void MainWindow::setupChaikinControls()
     connect(restoreButton, &QPushButton::clicked, polygonCanvas, &PolygonCanvas::restoreOriginalPolygon);
     
     // 其他细分方法按钮
-    QPushButton *dooSabinButton = new QPushButton("Doo-Sabin (Not Implemented)");
+    QPushButton *dooSabinButton = new QPushButton("Chaikin Subdivision(3)");
+    connect(dooSabinButton, &QPushButton::clicked, polygonCanvas, &PolygonCanvas::performChaikincubedivision);
+
     QPushButton *catmullClarkButton = new QPushButton("Catmull-Clark (Not Implemented)");
     QPushButton *loopButton = new QPushButton("Loop (Not Implemented)");
     
