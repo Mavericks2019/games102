@@ -467,6 +467,7 @@ CMakeFiles/InterpolationTool.dir/basecanvaswidget.cpp.o: /usr/include/x86_64-lin
 CMakeFiles/InterpolationTool.dir/beziercurvecanvas.cpp.o: ../basecanvaswidget.h
 CMakeFiles/InterpolationTool.dir/beziercurvecanvas.cpp.o: ../beziercurvecanvas.cpp
 CMakeFiles/InterpolationTool.dir/beziercurvecanvas.cpp.o: ../beziercurvecanvas.h
+CMakeFiles/InterpolationTool.dir/beziercurvecanvas.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QDebug
 CMakeFiles/InterpolationTool.dir/beziercurvecanvas.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QPointF
 CMakeFiles/InterpolationTool.dir/beziercurvecanvas.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/QVector
 CMakeFiles/InterpolationTool.dir/beziercurvecanvas.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qalgorithms.h
@@ -544,6 +545,7 @@ CMakeFiles/InterpolationTool.dir/beziercurvecanvas.cpp.o: /usr/include/x86_64-li
 CMakeFiles/InterpolationTool.dir/beziercurvecanvas.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QColor
 CMakeFiles/InterpolationTool.dir/beziercurvecanvas.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QMouseEvent
 CMakeFiles/InterpolationTool.dir/beziercurvecanvas.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QPainter
+CMakeFiles/InterpolationTool.dir/beziercurvecanvas.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QWheelEvent
 CMakeFiles/InterpolationTool.dir/beziercurvecanvas.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qbrush.h
 CMakeFiles/InterpolationTool.dir/beziercurvecanvas.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qcolor.h
 CMakeFiles/InterpolationTool.dir/beziercurvecanvas.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qcursor.h
