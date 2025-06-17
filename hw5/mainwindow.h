@@ -41,6 +41,7 @@ private slots:
     void updateDegreeValue(int value);
     void updateSigmaValue(int value);
     void updateLambdaValue(int value);
+    void updateAlphaValue(int value);
     void parameterizationMethodChanged(int id);
     
     // 通用控制
@@ -78,6 +79,9 @@ private:
     QSlider *lambdaSlider;
     QLabel *sigmaValueLabel;
     QLabel *lambdaValueLabel;
+
+    QSlider *alphaSlider;
+    QLabel *alphaValueLabel;
     
     // 通用控件
     QCheckBox *showCurveCheck;

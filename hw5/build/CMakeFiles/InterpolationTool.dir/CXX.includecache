@@ -20,24 +20,6 @@ QColor
 math.h
 -
 
-/opt/games102/hw5/beziercurvecanvas.cpp
-beziercurvecanvas.h
-/opt/games102/hw5/beziercurvecanvas.h
-QPainter
--
-QPointF
--
-QMouseEvent
--
-QWheelEvent
--
-vector
--
-math.h
--
-QDebug
--
-
 /opt/games102/hw5/beziercurvecanvas.h
 basecanvaswidget.h
 /opt/games102/hw5/basecanvaswidget.h
@@ -47,78 +29,6 @@ basecanvaswidget.h
 /opt/games102/hw5/basecanvaswidget.h
 vector
 -
-
-/opt/games102/hw5/build/InterpolationTool_autogen/EWIEGA46WW/moc_basecanvaswidget.cpp
-../../../basecanvaswidget.h
-/opt/games102/hw5/basecanvaswidget.h
-QtCore/qbytearray.h
--
-QtCore/qmetatype.h
--
-
-/opt/games102/hw5/build/InterpolationTool_autogen/EWIEGA46WW/moc_beziercurvecanvas.cpp
-../../../beziercurvecanvas.h
-/opt/games102/hw5/beziercurvecanvas.h
-QtCore/qbytearray.h
--
-QtCore/qmetatype.h
--
-
-/opt/games102/hw5/build/InterpolationTool_autogen/EWIEGA46WW/moc_bsplinecanvas.cpp
-../../../bsplinecanvas.h
-/opt/games102/hw5/bsplinecanvas.h
-QtCore/qbytearray.h
--
-QtCore/qmetatype.h
--
-
-/opt/games102/hw5/build/InterpolationTool_autogen/EWIEGA46WW/moc_cubicsplinecanvas.cpp
-../../../cubicsplinecanvas.h
-/opt/games102/hw5/cubicsplinecanvas.h
-QtCore/qbytearray.h
--
-QtCore/qmetatype.h
--
-
-/opt/games102/hw5/build/InterpolationTool_autogen/EWIEGA46WW/moc_mainwindow.cpp
-../../../mainwindow.h
-/opt/games102/hw5/mainwindow.h
-QtCore/qbytearray.h
--
-QtCore/qmetatype.h
--
-
-/opt/games102/hw5/build/InterpolationTool_autogen/EWIEGA46WW/moc_parametriccurvecanvas.cpp
-../../../parametriccurvecanvas.h
-/opt/games102/hw5/parametriccurvecanvas.h
-QtCore/qbytearray.h
--
-QtCore/qmetatype.h
--
-
-/opt/games102/hw5/build/InterpolationTool_autogen/EWIEGA46WW/moc_polygoncanvas.cpp
-../../../polygoncanvas.h
-/opt/games102/hw5/polygoncanvas.h
-QtCore/qbytearray.h
--
-QtCore/qmetatype.h
--
-
-/opt/games102/hw5/build/InterpolationTool_autogen/mocs_compilation.cpp
-EWIEGA46WW/moc_basecanvaswidget.cpp
-/opt/games102/hw5/build/InterpolationTool_autogen/EWIEGA46WW/moc_basecanvaswidget.cpp
-EWIEGA46WW/moc_beziercurvecanvas.cpp
-/opt/games102/hw5/build/InterpolationTool_autogen/EWIEGA46WW/moc_beziercurvecanvas.cpp
-EWIEGA46WW/moc_bsplinecanvas.cpp
-/opt/games102/hw5/build/InterpolationTool_autogen/EWIEGA46WW/moc_bsplinecanvas.cpp
-EWIEGA46WW/moc_cubicsplinecanvas.cpp
-/opt/games102/hw5/build/InterpolationTool_autogen/EWIEGA46WW/moc_cubicsplinecanvas.cpp
-EWIEGA46WW/moc_mainwindow.cpp
-/opt/games102/hw5/build/InterpolationTool_autogen/EWIEGA46WW/moc_mainwindow.cpp
-EWIEGA46WW/moc_parametriccurvecanvas.cpp
-/opt/games102/hw5/build/InterpolationTool_autogen/EWIEGA46WW/moc_parametriccurvecanvas.cpp
-EWIEGA46WW/moc_polygoncanvas.cpp
-/opt/games102/hw5/build/InterpolationTool_autogen/EWIEGA46WW/moc_polygoncanvas.cpp
 
 /opt/games102/hw5/cubicsplinecanvas.h
 basecanvaswidget.h
@@ -126,14 +36,6 @@ basecanvaswidget.h
 vector
 -
 Eigen/Dense
--
-
-/opt/games102/hw5/main.cpp
-mainwindow.h
-/opt/games102/hw5/mainwindow.h
-QApplication
--
-QStyleFactory
 -
 
 /opt/games102/hw5/mainwindow.cpp
@@ -1242,10 +1144,6 @@ lapacke_mangling.h
 
 /usr/include/eigen3/Eigen/src/plugins/MatrixCwiseUnaryOps.h
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/QDebug
-qdebug.h
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qdebug.h
-
 /usr/include/x86_64-linux-gnu/qt5/QtCore/QMap
 qmap.h
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qmap.h
@@ -1360,20 +1258,6 @@ limits.h
 new
 -
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h
-QtCore/qglobal.h
--
-QtCore/qstring.h
--
-QtCore/qobject.h
--
-QtCore/qcoreevent.h
--
-QtCore/qeventloop.h
--
-QtCore/qscopedpointer.h
--
-
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreevent.h
 QtCore/qnamespace.h
 -
@@ -1420,10 +1304,6 @@ list
 map
 -
 utility
--
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qeventloop.h
-QtCore/qobject.h
 -
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qfile.h
@@ -1986,17 +1866,9 @@ QtCore/qglobal.h
 qcolor.h
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qcolor.h
 
-/usr/include/x86_64-linux-gnu/qt5/QtGui/QMouseEvent
-qevent.h
-/usr/include/x86_64-linux-gnu/qt5/QtGui/qevent.h
-
 /usr/include/x86_64-linux-gnu/qt5/QtGui/QPainter
 qpainter.h
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qpainter.h
-
-/usr/include/x86_64-linux-gnu/qt5/QtGui/QWheelEvent
-qevent.h
-/usr/include/x86_64-linux-gnu/qt5/QtGui/qevent.h
 
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qbrush.h
 QtGui/qtguiglobal.h
@@ -2100,22 +1972,6 @@ QtCore/qsharedpointer.h
 QtCore/qrect.h
 -
 
-/usr/include/x86_64-linux-gnu/qt5/QtGui/qguiapplication.h
-QtGui/qtguiglobal.h
--
-QtCore/qcoreapplication.h
--
-QtGui/qwindowdefs.h
--
-QtGui/qinputmethod.h
--
-QtCore/qlocale.h
--
-QtCore/qpoint.h
--
-QtCore/qsize.h
--
-
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qicon.h
 QtGui/qtguiglobal.h
 -
@@ -2146,12 +2002,6 @@ QtCore/qrect.h
 QtCore/qstring.h
 -
 QtCore/qstringlist.h
--
-
-/usr/include/x86_64-linux-gnu/qt5/QtGui/qinputmethod.h
-QtGui/qtguiglobal.h
--
-QtCore/qobject.h
 -
 
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qkeysequence.h
@@ -2374,10 +2224,6 @@ QtGui/qwindowdefs_win.h
 QtGui/qtguiglobal.h
 -
 
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication
-qapplication.h
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qapplication.h
-
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QButtonGroup
 qbuttongroup.h
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qbuttongroup.h
@@ -2426,10 +2272,6 @@ qslider.h
 qstackedlayout.h
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstackedlayout.h
 
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStyleFactory
-qstylefactory.h
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstylefactory.h
-
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTabWidget
 qtabwidget.h
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtabwidget.h
@@ -2458,24 +2300,6 @@ QtWidgets/qtwidgetsglobal.h
 QtWidgets/qwidget.h
 -
 
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qapplication.h
-QtWidgets/qtwidgetsglobal.h
--
-QtCore/qcoreapplication.h
--
-QtGui/qwindowdefs.h
--
-QtCore/qpoint.h
--
-QtCore/qsize.h
--
-QtGui/qcursor.h
--
-QtWidgets/qdesktopwidget.h
--
-QtGui/qguiapplication.h
--
-
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qboxlayout.h
 QtWidgets/qtwidgetsglobal.h
 -
@@ -2496,12 +2320,6 @@ QtCore/qobject.h
 QtWidgets/qtwidgetsglobal.h
 -
 QtWidgets/qabstractbutton.h
--
-
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qdesktopwidget.h
-QtWidgets/qtwidgetsglobal.h
--
-QtWidgets/qwidget.h
 -
 
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qformlayout.h
@@ -2606,12 +2424,6 @@ QtWidgets/qabstractslider.h
 QtWidgets/qtwidgetsglobal.h
 -
 QtWidgets/qlayout.h
--
-
-/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstylefactory.h
-QtWidgets/qtwidgetsglobal.h
--
-QtCore/qstringlist.h
 -
 
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtabwidget.h

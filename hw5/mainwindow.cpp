@@ -18,8 +18,10 @@ MainWindow::MainWindow(QWidget *parent)
       ridgeRegCheck(nullptr),
       sigmaSlider(nullptr),
       lambdaSlider(nullptr),
+      alphaSlider(nullptr),
       sigmaValueLabel(nullptr),
-      lambdaValueLabel(nullptr)
+      lambdaValueLabel(nullptr),
+      alphaValueLabel(nullptr)
 {
     setWindowTitle("Curve Fitting Visualization");
     resize(1400, 800);
@@ -270,8 +272,7 @@ void MainWindow::setupChaikinControls()
     curveLayout->addWidget(quadraticButton);
     curveLayout->addWidget(cubicButton);
     
-    layout->addWidget(curveGroup);
-    
+    layout->addWidget(curveGroup); 
     // 连接信号 - 选择曲线类型后立即更新
     connect(curveButtonGroup, QOverload<int>::of(&QButtonGroup::buttonClicked), 
             [this](int id) {
@@ -280,41 +281,61 @@ void MainWindow::setupChaikinControls()
             });
     
     // Chaikin细分按钮
-    QPushButton *chaikinButton = new QPushButton("Chaikin Subdivision");
+    QPushButton *chaikinButton = new QPushButton("Chaikin Subdivision(2)");
     connect(chaikinButton, &QPushButton::clicked, polygonCanvas, &PolygonCanvas::performChaikinSubdivision);
-    
-    // 添加还原按钮
-    QPushButton *restoreButton = new QPushButton("Restore Original");
-    connect(restoreButton, &QPushButton::clicked, polygonCanvas, &PolygonCanvas::restoreOriginalPolygon);
     
     // 其他细分方法按钮
     QPushButton *dooSabinButton = new QPushButton("Chaikin Subdivision(3)");
     connect(dooSabinButton, &QPushButton::clicked, polygonCanvas, &PolygonCanvas::performChaikincubedivision);
 
-    QPushButton *catmullClarkButton = new QPushButton("Catmull-Clark (Not Implemented)");
+    QPushButton *catmullClarkButton = new QPushButton("Interpolation Subdivision");
+    connect(catmullClarkButton, &QPushButton::clicked, polygonCanvas, &PolygonCanvas::performInterpolationdivision);
+
     QPushButton *loopButton = new QPushButton("Loop (Not Implemented)");
+
+        // 添加还原按钮
+    QPushButton *restoreButton = new QPushButton("Restore Original");
+    connect(restoreButton, &QPushButton::clicked, polygonCanvas, &PolygonCanvas::restoreOriginalPolygon);
     
     layout->addWidget(chaikinButton);
-    layout->addWidget(restoreButton);
     layout->addWidget(dooSabinButton);
     layout->addWidget(catmullClarkButton);
     layout->addWidget(loopButton);
+    layout->addWidget(restoreButton);
     
     // 连接细分次数变化信号
     connect(polygonCanvas, &PolygonCanvas::subdivisionCountChanged, 
             [chaikinButton, this](int count) {
                 // 达到最大细分次数时禁用按钮
                 chaikinButton->setEnabled(count < 6);
-                
                 // 更新按钮文本
-                chaikinButton->setText(QString("Chaikin Subdivision (%1/6)").arg(count));
-                
+                chaikinButton->setText(QString("Subdivision(2) (%1/6)").arg(count));
+                chaikinButton->setText(QString("Subdivision(3) (%1/6)").arg(count));
                 // 在信息面板显示是否可以添加点
                 polygonCanvas->update();
             });
     
-    layout->addStretch();
+    QGroupBox *paramControlGroup = new QGroupBox("Parameters");
+    QFormLayout *paramControlLayout = new QFormLayout(paramControlGroup);
+    // alpha
+    alphaSlider = new QSlider(Qt::Horizontal);
+    alphaSlider->setRange(0, 100);
+    alphaSlider->setValue(0.05);
+    connect(alphaSlider, &QSlider::valueChanged, [this](int value) {
+        // 将整数转换为浮点数 (0.00-0.25)
+        double alphaValue = value / 100.0;
+        polygonCanvas->setAlpha(alphaValue);
+        updateAlphaValue(value); // 更新显示的值
+    });
     
+    alphaValueLabel = new QLabel("0.05");
+    alphaValueLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    alphaValueLabel->setMinimumWidth(30);
+    
+    paramControlLayout->addRow("alpha:", createSliderLayout(alphaSlider, alphaValueLabel));
+    layout->addWidget(paramControlGroup);
+
+    layout->addStretch();
     stackedControlLayout->addWidget(panel);
 }
 
@@ -571,6 +592,14 @@ void MainWindow::toggleControlPolygonVisibility(bool visible)
         case 3: 
             bSplineCanvas->toggleControlPolygon(visible); 
             break;
+    }
+}
+
+void MainWindow::updateAlphaValue(int value)
+{
+    if (alphaValueLabel) {
+        // 显示为浮点数格式
+        alphaValueLabel->setText(QString::number(value / 400.0, 'f', 2));
     }
 }
 
