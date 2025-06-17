@@ -1,4 +1,0 @@
-/opt/games102/hw4/build/CMakeFiles/edit_cache.dir
-/opt/games102/hw4/build/CMakeFiles/rebuild_cache.dir
-/opt/games102/hw4/build/CMakeFiles/CurveEditorTool.dir
-/opt/games102/hw4/build/CMakeFiles/CurveEditorTool_autogen.dir
