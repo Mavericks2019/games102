@@ -59,7 +59,109 @@ void ObjModelCanvas::loadObjFile(const QString &filePath)
     model.vertices.clear();
     model.faces.clear();
     parseObjFile(filePath);
+    fitObjectToView();
     update();
+}
+
+void ObjModelCanvas::calculateBoundingBox() {
+    if (model.vertices.empty()) {
+        m_minBound = Eigen::Vector3f(0, 0, 0);
+        m_maxBound = Eigen::Vector3f(0, 0, 0);
+        m_center = Eigen::Vector3f(0, 0, 0);
+        m_boundingRadius = 0.0f;
+        return;
+    }
+
+    // 初始化最小最大值
+    m_minBound = model.vertices[0];
+    m_maxBound = model.vertices[0];
+
+    // 计算包围盒
+    for (const Eigen::Vector3f& vertex : model.vertices) {
+        m_minBound = m_minBound.cwiseMin(vertex);
+        m_maxBound = m_maxBound.cwiseMax(vertex);
+    }
+
+    // 计算中心点和包围球半径
+    m_center = (m_minBound + m_maxBound) * 0.5f;
+    m_boundingRadius = (m_maxBound - m_minBound).norm() * 0.5f;
+}
+
+void ObjModelCanvas::fitObjectToView() {
+    calculateBoundingBox();
+    
+    if (model.vertices.empty()) return;
+    
+    // 1. 将包围盒扩大1.5倍
+    const float scaleFactor = 1.5f;
+    Eigen::Vector3f size = (m_maxBound - m_minBound) * scaleFactor;
+    m_minBound = m_center - size * 0.5f;
+    m_maxBound = m_center + size * 0.5f;
+    m_boundingRadius *= scaleFactor;
+
+    // 2. 调整物体位置使包围盒中心位于原点
+    Eigen::Matrix4f translation = Eigen::Matrix4f::Identity();
+    translation.block<3,1>(0,3) = -m_center;
+    for (Eigen::Vector3f& vertex : model.vertices) {
+        Eigen::Vector4f homogenous(vertex.x(), vertex.y(), vertex.z(), 1.0f);
+        homogenous = translation * homogenous;
+        vertex = homogenous.head<3>();
+    }
+    m_center = Eigen::Vector3f(0, 0, 0);
+
+    // 3. 调整相机位置和方向
+    adjustCamera();
+}
+
+void ObjModelCanvas::adjustCamera() {
+    // 计算包围盒尺寸
+    Eigen::Vector3f size = m_maxBound - m_minBound;
+    
+    // 确定最窄方向（找最小尺寸的轴）
+    int minAxis = 0;
+    float minSize = size.x();
+    if (size.y() < minSize) {
+        minSize = size.y();
+        minAxis = 1;
+    }
+    if (size.z() < minSize) {
+        minAxis = 2;
+    }
+
+    // 设置相机位置（沿最窄方向）
+    float distance = m_boundingRadius * 1.5f; // 3倍半径距离
+    Eigen::Vector3f eyePosition;
+    
+    switch (minAxis) {
+    case 0: // X轴最窄
+        eyePosition = Eigen::Vector3f(distance, 0, 0);
+        m_upVector = Eigen::Vector3f(0, 1, 0); // Y轴向上
+        break;
+    case 1: // Y轴最窄
+        eyePosition = Eigen::Vector3f(0, distance, 0);
+        m_upVector = Eigen::Vector3f(0, 0, 1); // Z轴向上
+        break;
+    case 2: // Z轴最窄
+    default:
+        eyePosition = Eigen::Vector3f(0, 0, distance);
+        m_upVector = Eigen::Vector3f(0, 1, 0); // Y轴向上
+        break;
+    }
+
+    // 设置相机参数
+    cameraPosition = eyePosition;
+    cameraTarget = m_center;
+
+    // 自动计算合适的FOV
+    float maxDimension = std::max({size.x(), size.y(), size.z()});
+    float fov = 45.0f * (maxDimension / m_boundingRadius);
+    fov = std::max(30.0f, std::min(fov, 90.0f)); // 限制在30-90度之间
+    this->fov = fov;
+
+    // 重置旋转和缩放
+    rotationX = 0.0f;
+    rotationY = 0.0f;
+    zoom = 1.0f;
 }
 
 void ObjModelCanvas::clearPoints()
@@ -69,32 +171,9 @@ void ObjModelCanvas::clearPoints()
     update();
 }
 
-
-void ObjModelCanvas::resetView()
-{
-    if (!model.vertices.empty()) {
-        // 重新计算模型包围盒
-        Eigen::Vector3f minPoint = model.vertices[0];
-        Eigen::Vector3f maxPoint = model.vertices[0];
-        
-        for (const auto& vertex : model.vertices) {
-            minPoint = minPoint.cwiseMin(vertex);
-            maxPoint = maxPoint.cwiseMax(vertex);
-        }
-        
-        Eigen::Vector3f size = maxPoint - minPoint;
-        float maxSize = std::max({size.x(), size.y(), size.z()});
-        
-        // 根据模型大小调整相机位置
-        adjustCameraPosition(maxSize);
-    } else {
-        cameraPosition = Eigen::Vector3f(0, 0, 2.0f);
-    }
-    
-    rotationX = 0.0f;
-    rotationY = 0.0f;
-    zoom = 1.0f;
-    
+// 重置视图时也调用自适应调整
+void ObjModelCanvas::resetView() {
+    fitObjectToView();
     update();
 }
 
@@ -168,7 +247,7 @@ void ObjModelCanvas::parseObjFile(const QString &filePath)
         // 根据模型大小调整相机位置
         adjustCameraPosition(maxSize);
     }
-    
+    fitObjectToView();
     qDebug() << "Loaded OBJ model with" << model.vertices.size() << "vertices and" << model.faces.size() << "faces";
     update();
 }
@@ -221,7 +300,7 @@ Eigen::Matrix4f ObjModelCanvas::getModelViewProjection() const
     // 视图矩阵 - 添加向上向量
     Eigen::Vector3f eye = cameraPosition;
     Eigen::Vector3f center(0, 0, 0);
-    Eigen::Vector3f up(0, 1, 0);
+    Eigen::Vector3f up = m_upVector;
     
     Eigen::Vector3f f = (center - eye).normalized();
     Eigen::Vector3f s = f.cross(up).normalized();

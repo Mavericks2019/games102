@@ -4,6 +4,7 @@
 #include "basecanvaswidget.h"
 #include <Eigen/Dense>
 #include <vector>
+#include <QVector3D>
 
 class ObjModelCanvas : public BaseCanvasWidget
 {
@@ -35,9 +36,19 @@ private:
     };
     void adjustCameraPosition(float a);
     void parseObjFile(const QString &filePath);
+    void fitObjectToView();
+    void calculateBoundingBox();
+    void adjustCamera();
     Eigen::Matrix4f getModelViewProjection() const;
     QPointF projectVertex(const Eigen::Vector3f& vertex) const;
-    
+
+    Eigen::Vector3f m_minBound; // 包围盒最小值
+    Eigen::Vector3f m_maxBound; // 包围盒最大值
+    Eigen::Vector3f m_center;   // 物体中心点
+    Eigen::Matrix4f m_projection; // 投影矩阵
+    float m_boundingRadius; // 包围球半径
+    Eigen::Vector3f m_upVector; // 相机向上向量
+
     Model model;
     Eigen::Vector3f modelCenter = Eigen::Vector3f::Zero();
     float modelScale = 1.0f;
