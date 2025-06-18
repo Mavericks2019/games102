@@ -57,6 +57,7 @@ signals:
     void pointDeleted();
 
 protected:
+    bool allowPointCreation = true; // 默认允许创建点
     struct Point {
         QPointF pos;
         bool moving = false;

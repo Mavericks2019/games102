@@ -476,8 +476,47 @@ void MainWindow::setupBSplineControls()
 void MainWindow::setupobjControls() {
     QWidget *panel = new QWidget;
     QVBoxLayout *layout = new QVBoxLayout(panel);
+    
+    // 添加OBJ加载按钮
+    QPushButton *loadButton = new QPushButton("Load OBJ File");
+    loadButton->setStyleSheet("background-color: #505050; color: white;");
+    connect(loadButton, &QPushButton::clicked, this, &MainWindow::loadObjModel);
+    
+    // 添加重置视图按钮
+    QPushButton *resetButton = new QPushButton("Reset View");
+    resetButton->setStyleSheet("background-color: #505050; color: white;");
+    connect(resetButton, &QPushButton::clicked, this, &MainWindow::resetObjView);
+    
+    layout->addWidget(loadButton);
+    layout->addWidget(resetButton);
+    
+    // 添加使用说明
+    QLabel *infoLabel = new QLabel(
+        "<b>使用说明:</b><br>"
+        "• 加载OBJ模型后，模型将居中显示<br>"
+        "• 鼠标拖动: 旋转模型<br>"
+        "• 滚轮: 缩放模型<br>"
+        "• 重置视图: 恢复初始视角"
+    );
+    infoLabel->setWordWrap(true);
+    infoLabel->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px;");
+    layout->addWidget(infoLabel);
+    
     layout->addStretch();
+    
     stackedControlLayout->addWidget(panel);
+}
+
+void MainWindow::loadObjModel()
+{
+    QString filePath = QFileDialog::getOpenFileName(this, 
+        "Open OBJ File", 
+        "", 
+        "OBJ Files (*.obj);;All Files (*)");
+    
+    if (!filePath.isEmpty()) {
+        objModelCanvas->loadObjFile(filePath);
+    }
 }
 
 void MainWindow::updateCanvasView(int index)
@@ -647,18 +686,6 @@ void MainWindow::parameterizationMethodChanged(int id)
 void MainWindow::setBSplineDegree(int degree)
 {
     bSplineCanvas->setDegree(degree);
-}
-
-void MainWindow::loadObjModel()
-{
-    QString filePath = QFileDialog::getOpenFileName(this, 
-        "Open OBJ File", 
-        "", 
-        "OBJ Files (*.obj);;All Files (*)");
-    
-    if (!filePath.isEmpty()) {
-        objModelCanvas->loadObjFile(filePath);
-    }
 }
 
 void MainWindow::resetObjView()

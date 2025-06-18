@@ -1,201 +1,269 @@
 #include "objmodelcanvas.h"
-#include <QPainter>
-#include <QMouseEvent>
-#include <QWheelEvent>
 #include <QFile>
 #include <QTextStream>
-#include <QtMath>
+#include <QPainter>
+#include <QWheelEvent>
+#include <cmath>
 #include <QDebug>
-#include <QFileInfo>
+
+using namespace Eigen;
 
 ObjModelCanvas::ObjModelCanvas(QWidget *parent)
     : BaseCanvasWidget(parent)
 {
-    setMinimumSize(800, 600);
-    setMouseTracking(true);
-    rotationMatrix.setToIdentity();
     curveColor = Qt::darkGray;
+    allowPointCreation = false; // 禁用点创建
+    cameraPosition = Eigen::Vector3f(0, 0, 1.5f); // 更靠近屏幕
 }
 
-bool ObjModelCanvas::loadObjFile(const QString &filePath)
+void ObjModelCanvas::drawGrid(QPainter &painter)
 {
-    QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "Failed to open file:" << filePath;
-        return false;
+    // 在OBJ模型模式下不绘制网格
+}
+
+void ObjModelCanvas::drawPoints(QPainter &painter)
+{
+    // 在OBJ模型模式下不绘制点
+}
+
+void ObjModelCanvas::drawCurves(QPainter &painter)
+{
+    if (model.vertices.empty() || model.faces.empty()) return;
+    
+    painter.setRenderHint(QPainter::Antialiasing);
+    painter.setPen(QPen(curveColor, 1));
+    
+    Eigen::Matrix4f mvp = getModelViewProjection();
+    
+    // 绘制所有面
+    for (const Face& face : model.faces) {
+        QPolygonF polygon;
+        for (int vertexIndex : face.vertexIndices) {
+            if (vertexIndex < model.vertices.size()) {
+                Eigen::Vector3f vertex = model.vertices[vertexIndex];
+                QPointF screenPoint = projectVertex(vertex);
+                polygon << screenPoint;
+            }
+        }
+        painter.drawPolygon(polygon);
+    }
+}
+
+void ObjModelCanvas::drawHoverIndicator(QPainter &painter)
+{
+    // 在OBJ模型模式下不绘制悬停指示器
+}
+
+void ObjModelCanvas::loadObjFile(const QString &filePath)
+{
+    model.vertices.clear();
+    model.faces.clear();
+    parseObjFile(filePath);
+    update();
+}
+
+void ObjModelCanvas::resetView()
+{
+    if (!model.vertices.empty()) {
+        // 重新计算模型包围盒
+        Eigen::Vector3f minPoint = model.vertices[0];
+        Eigen::Vector3f maxPoint = model.vertices[0];
+        
+        for (const auto& vertex : model.vertices) {
+            minPoint = minPoint.cwiseMin(vertex);
+            maxPoint = maxPoint.cwiseMax(vertex);
+        }
+        
+        Eigen::Vector3f size = maxPoint - minPoint;
+        float maxSize = std::max({size.x(), size.y(), size.z()});
+        
+        // 根据模型大小调整相机位置
+        adjustCameraPosition(maxSize);
+    } else {
+        cameraPosition = Eigen::Vector3f(0, 0, 2.0f);
     }
     
-    // 重置状态
-    vertices.clear();
-    faces.clear();
-    modelLoaded = false;
-    rotationMatrix.setToIdentity();
-    scaleFactor = 1.0f;
+    rotationX = 0.0f;
+    rotationY = 0.0f;
+    zoom = 1.0f;
+    
+    update();
+}
+
+void ObjModelCanvas::parseObjFile(const QString &filePath)
+{
+    model.vertices.clear();
+    model.faces.clear();
+    
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Failed to open OBJ file:" << filePath;
+        return;
+    }
     
     QTextStream in(&file);
     while (!in.atEnd()) {
         QString line = in.readLine().trimmed();
         if (line.isEmpty() || line.startsWith("#")) continue;
         
-        QStringList parts = line.split(" ", QString::SkipEmptyParts);
-        if (parts.isEmpty()) continue;
+        QStringList tokens = line.split(" ", QString::SkipEmptyParts);
+        if (tokens.isEmpty()) continue;
         
-        QString command = parts[0];
+        QString identifier = tokens[0];
         
-        if (command == "v") { // 顶点
-            if (parts.size() >= 4) {
-                float x = parts[1].toFloat();
-                float y = parts[2].toFloat();
-                float z = parts[3].toFloat();
-                vertices.append(QVector3D(x, y, z));
+        if (identifier == "v") {
+            if (tokens.size() >= 4) {
+                Vector3f vertex;
+                vertex[0] = tokens[1].toFloat();
+                vertex[1] = tokens[2].toFloat();
+                vertex[2] = tokens[3].toFloat();
+                model.vertices.push_back(vertex);
             }
-        }
-        else if (command == "f") { // 面
+        } else if (identifier == "f") {
             Face face;
-            for (int i = 1; i < parts.size(); i++) {
-                QStringList vertexData = parts[i].split("/");
-                int vertexIndex = vertexData[0].toInt() - 1; // OBJ索引从1开始
-                if (vertexIndex >= 0 && vertexIndex < vertices.size()) {
-                    face.vertexIndices.append(vertexIndex);
+            for (int i = 1; i < tokens.size(); i++) {
+                QStringList indices = tokens[i].split("/");
+                if (!indices.isEmpty()) {
+                    int vertexIndex = indices[0].toInt() - 1;
+                    if (vertexIndex >= 0 && vertexIndex < model.vertices.size()) {
+                        face.vertexIndices.push_back(vertexIndex);
+                    }
                 }
             }
-            if (!face.vertexIndices.isEmpty()) {
-                faces.append(face);
+            if (!face.vertexIndices.empty()) {
+                model.faces.push_back(face);
             }
         }
     }
     
     file.close();
     
-    if (!vertices.isEmpty() && !faces.isEmpty()) {
-        calculateBoundingBox();
-        centerAndScaleModel();
-        modelLoaded = true;
+    // 计算模型包围盒
+    if (!model.vertices.empty()) {
+        Eigen::Vector3f minPoint = model.vertices[0];
+        Eigen::Vector3f maxPoint = model.vertices[0];
         
-        // 提取文件名
-        QFileInfo fileInfo(filePath);
-        currentModelName = fileInfo.fileName();
+        for (const auto& vertex : model.vertices) {
+            minPoint = minPoint.cwiseMin(vertex);
+            maxPoint = maxPoint.cwiseMax(vertex);
+        }
         
-        update();
-        return true;
+        modelCenter = (minPoint + maxPoint) * 0.5f;
+        Eigen::Vector3f size = maxPoint - minPoint;
+        float maxSize = std::max({size.x(), size.y(), size.z()});
+        
+        // 将模型中心移动到原点
+        for (auto& vertex : model.vertices) {
+            vertex -= modelCenter;
+        }
+        
+        // 根据模型大小调整相机位置
+        adjustCameraPosition(maxSize);
     }
     
-    return false;
-}
-
-void ObjModelCanvas::resetView()
-{
-    rotationMatrix.setToIdentity();
-    scaleFactor = 1.0f;
-    if (modelLoaded) {
-        centerAndScaleModel();
-    }
+    qDebug() << "Loaded OBJ model with" << model.vertices.size() << "vertices and" << model.faces.size() << "faces";
     update();
 }
 
-void ObjModelCanvas::calculateBoundingBox()
+void ObjModelCanvas::adjustCameraPosition(float modelSize)
 {
-    if (vertices.isEmpty()) return;
-    
-    minBounds = vertices[0];
-    maxBounds = vertices[0];
-    
-    for (const QVector3D &vertex : vertices) {
-        minBounds.setX(qMin(minBounds.x(), vertex.x()));
-        minBounds.setY(qMin(minBounds.y(), vertex.y()));
-        minBounds.setZ(qMin(minBounds.z(), vertex.z()));
+    // 根据模型大小自适应调整相机位置
+    if (modelSize > 0.001f) {
+        // 计算合适的相机距离：模型最大尺寸的1.5倍
+        float distance = modelSize * 1.5f;
         
-        maxBounds.setX(qMax(maxBounds.x(), vertex.x()));
-        maxBounds.setY(qMax(maxBounds.y(), vertex.y()));
-        maxBounds.setZ(qMax(maxBounds.z(), vertex.z()));
+        // 确保相机不会太近或太远
+        distance = std::max(0.5f, std::min(distance, 10.0f));
+        
+        cameraPosition = Eigen::Vector3f(0, 0, distance);
+    } else {
+        // 默认距离
+        cameraPosition = Eigen::Vector3f(0, 0, 2.0f);
     }
     
-    modelCenter = (minBounds + maxBounds) * 0.5f;
+    // 重置视图参数
+    rotationX = 0.0f;
+    rotationY = 0.0f;
+    zoom = 1.0f;
 }
 
-void ObjModelCanvas::centerAndScaleModel()
+Eigen::Matrix4f ObjModelCanvas::getModelViewProjection() const
 {
-    if (vertices.isEmpty()) return;
+    // 模型矩阵 - 旋转和缩放
+    Eigen::Matrix4f modelMatrix = Eigen::Matrix4f::Identity();
     
-    // 计算模型尺寸
-    QVector3D size = maxBounds - minBounds;
-    float maxSize = qMax(size.x(), qMax(size.y(), size.z()));
+    // 围绕Y轴旋转
+    Eigen::Matrix4f rotationYMatrix = Eigen::Matrix4f::Identity();
+    rotationYMatrix(0, 0) = cos(rotationY);
+    rotationYMatrix(0, 2) = sin(rotationY);
+    rotationYMatrix(2, 0) = -sin(rotationY);
+    rotationYMatrix(2, 2) = cos(rotationY);
     
-    // 自动缩放以适应画布
-    if (maxSize > 0) {
-        float canvasSize = qMin(width(), height()) * 0.8f;
-        scaleFactor = canvasSize / maxSize;
+    // 围绕X轴旋转
+    Eigen::Matrix4f rotationXMatrix = Eigen::Matrix4f::Identity();
+    rotationXMatrix(1, 1) = cos(rotationX);
+    rotationXMatrix(1, 2) = -sin(rotationX);
+    rotationXMatrix(2, 1) = sin(rotationX);
+    rotationXMatrix(2, 2) = cos(rotationX);
+    
+    modelMatrix = rotationXMatrix * rotationYMatrix;
+    modelMatrix.block<3, 3>(0, 0) *= zoom;
+    
+    // 视图矩阵
+    Eigen::Matrix4f viewMatrix = Eigen::Matrix4f::Identity();
+    viewMatrix.block<3, 1>(0, 3) = -cameraPosition;
+    
+    // 投影矩阵
+    float aspect = static_cast<float>(width()) / height();
+    float near = 0.1f;
+    float far = 100.0f;
+    float fovRad = fov * M_PI / 180.0f;
+    float tanHalfFov = tan(fovRad / 2.0f);
+    
+    Eigen::Matrix4f projectionMatrix = Eigen::Matrix4f::Zero();
+    projectionMatrix(0, 0) = 1.0f / (aspect * tanHalfFov);
+    projectionMatrix(1, 1) = 1.0f / tanHalfFov;
+    projectionMatrix(2, 2) = -(far + near) / (far - near);
+    projectionMatrix(2, 3) = -2.0f * far * near / (far - near);
+    projectionMatrix(3, 2) = -1.0f;
+    
+    return projectionMatrix * viewMatrix * modelMatrix;
+}
+
+QPointF ObjModelCanvas::projectVertex(const Eigen::Vector3f& vertex) const
+{
+    Eigen::Matrix4f mvp = getModelViewProjection();
+    Eigen::Vector4f homogenousVertex(vertex[0], vertex[1], vertex[2], 1.0f);
+    Eigen::Vector4f transformed = mvp * homogenousVertex;
+    
+    // 透视除法
+    if (transformed[3] != 0.0f) {
+        transformed /= transformed[3];
     }
-}
-
-QPointF ObjModelCanvas::projectToScreen(const QVector3D &point) const
-{
-    // 应用旋转
-    QVector3D rotated = rotationMatrix * (point - modelCenter);
     
-    // 应用缩放
-    rotated *= scaleFactor;
-    
-    // 投影到2D (忽略Z坐标)
-    float x = width() / 2.0f + rotated.x();
-    float y = height() / 2.0f - rotated.y(); // Y轴翻转
+    // 转换为屏幕坐标
+    float x = (transformed[0] + 1.0f) * 0.5f * width();
+    float y = (1.0f - transformed[1]) * 0.5f * height();
     
     return QPointF(x, y);
-}
-
-void ObjModelCanvas::drawCurves(QPainter &painter)
-{
-    if (!modelLoaded) return;
-    
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(QPen(curveColor, 1));
-    
-    // 绘制所有面
-    for (const Face &face : faces) {
-        if (face.vertexIndices.size() < 2) continue;
-        
-        // 绘制多边形边
-        QPointF prevPoint = projectToScreen(vertices[face.vertexIndices.first()]);
-        for (int i = 1; i < face.vertexIndices.size(); i++) {
-            QPointF currentPoint = projectToScreen(vertices[face.vertexIndices[i]]);
-            painter.drawLine(prevPoint, currentPoint);
-            prevPoint = currentPoint;
-        }
-        
-        // 闭合多边形
-        if (face.vertexIndices.size() > 2) {
-            QPointF firstPoint = projectToScreen(vertices[face.vertexIndices.first()]);
-            painter.drawLine(prevPoint, firstPoint);
-        }
-    }
-}
-
-void ObjModelCanvas::drawPoints(QPainter &painter)
-{
-    // 该画板不需要绘制点
-    Q_UNUSED(painter);
 }
 
 void ObjModelCanvas::drawInfoPanel(QPainter &painter)
 {
     painter.setPen(Qt::darkGray);
     painter.setFont(QFont("Arial", 9));
-    
-    QString info = "OBJ Model Viewer";
-    if (modelLoaded) {
-        info += " | " + currentModelName;
-        info += QString(" | Vertices: %1 | Faces: %2").arg(vertices.size()).arg(faces.size());
-        info += " | Scale: " + QString::number(scaleFactor, 'f', 2);
-    } else {
-        info += " | No model loaded";
-    }
-    
+    QString info = QString("OBJ Model - Vertices: %1, Faces: %2")
+                  .arg(model.vertices.size())
+                  .arg(model.faces.size());
     painter.drawText(10, 20, info);
-    
-    // 添加操作提示
-    if (modelLoaded) {
-        painter.drawText(10, height() - 30, "Left drag: Rotate | Wheel: Zoom | Double click: Reset view");
-    }
+}
+
+void ObjModelCanvas::wheelEvent(QWheelEvent *event)
+{
+    float delta = event->angleDelta().y() / 120.0f;
+    zoom *= (1.0f + delta * 0.1f);
+    zoom = std::max(0.1f, std::min(zoom, 5.0f));
+    update();
 }
 
 void ObjModelCanvas::mousePressEvent(QMouseEvent *event)
@@ -207,34 +275,11 @@ void ObjModelCanvas::mousePressEvent(QMouseEvent *event)
 
 void ObjModelCanvas::mouseMoveEvent(QMouseEvent *event)
 {
-    if (!modelLoaded || !(event->buttons() & Qt::LeftButton)) 
-        return;
-    
-    QPoint delta = event->pos() - lastMousePos;
-    lastMousePos = event->pos();
-    
-    // 旋转角度（灵敏度调节）
-    float rotX = delta.y() * 0.5f;
-    float rotY = delta.x() * 0.5f;
-    
-    // 创建旋转矩阵
-    QMatrix4x4 newRotation;
-    newRotation.rotate(rotY, 0.0f, 1.0f, 0.0f); // Y轴旋转
-    newRotation.rotate(rotX, 1.0f, 0.0f, 0.0f); // X轴旋转
-    
-    // 应用新旋转
-    rotationMatrix = newRotation * rotationMatrix;
-    
-    update();
-}
-
-void ObjModelCanvas::wheelEvent(QWheelEvent *event)
-{
-    if (!modelLoaded) return;
-    
-    // 缩放因子
-    float zoomFactor = 1.0f + event->angleDelta().y() * 0.001f;
-    scaleFactor = qBound(0.1f, scaleFactor * zoomFactor, 10.0f);
-    
-    update();
+    if (event->buttons() & Qt::LeftButton) {
+        QPoint delta = event->pos() - lastMousePos;
+        rotationY += delta.x() * 0.01f;
+        rotationX += delta.y() * 0.01f;
+        lastMousePos = event->pos();
+        update();
+    }
 }

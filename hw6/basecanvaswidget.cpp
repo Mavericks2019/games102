@@ -181,7 +181,7 @@ void BaseCanvasWidget::mouseReleaseEvent(QMouseEvent *event)
         if (selectedIndex >= 0) {
             points[selectedIndex].moving = false;
             selectedIndex = -1;
-        } else {
+        } else if (allowPointCreation) { // 只有在允许创建点时添加新点
             // 添加新点 - 新添加的点总是可拖动的
             Point newPoint = {event->pos(), false, true};
             points.append(newPoint);
