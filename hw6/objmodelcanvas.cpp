@@ -5,6 +5,7 @@
 #include <QWheelEvent>
 #include <cmath>
 #include <QDebug>
+#include <QDir>
 
 using namespace Eigen;
 
@@ -182,6 +183,16 @@ void ObjModelCanvas::parseObjFile(const QString &filePath)
     model.vertices.clear();
     model.faces.clear();
     
+    // 确保路径是绝对路径
+    QString absolutePath = filePath;
+    if (!QDir::isAbsolutePath(filePath)) {
+        absolutePath = QDir::current().absoluteFilePath(filePath);
+    }
+    
+    if (!QFile::exists(absolutePath)) {
+        qWarning() << "OBJ file does not exist:" << absolutePath;
+        return;
+    }
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "Failed to open OBJ file:" << filePath;

@@ -508,11 +508,11 @@ void MainWindow::setupobjControls() {
     
     // 添加使用说明
     QLabel *infoLabel = new QLabel(
-        "<b>使用说明:</b><br>"
-        "• 加载OBJ模型后，模型将居中显示<br>"
-        "• 鼠标拖动: 旋转模型<br>"
-        "• 滚轮: 缩放模型<br>"
-        "• 重置视图: 恢复初始视角"
+        "<b>Instructions:</b><br>"
+        "• After loading an OBJ model, it will be centered automatically<br>"
+        "• Mouse drag: Rotate the model<br>"
+        "• Mouse wheel: Zoom in/out<br>"
+        "• Reset View: Restore the initial view"
     );
     infoLabel->setWordWrap(true);
     infoLabel->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px;");
@@ -525,9 +525,22 @@ void MainWindow::setupobjControls() {
 
 void MainWindow::loadObjModel()
 {
+    // 获取当前工作目录
+    QString currentDir = QDir::currentPath();
+    
+    // 尝试在当前目录下查找OBJ文件
+    QDir dir(currentDir);
+    QStringList objFiles = dir.entryList(QStringList() << "*.obj", QDir::Files);
+    
+    // 如果有OBJ文件，使用第一个作为默认选择
+    QString defaultFile;
+    if (!objFiles.isEmpty()) {
+        defaultFile = dir.absoluteFilePath(objFiles.first());
+    }
+    
     QString filePath = QFileDialog::getOpenFileName(this, 
         "Open OBJ File", 
-        "", 
+        defaultFile.isEmpty() ? currentDir : defaultFile,  // 默认选择文件或目录
         "OBJ Files (*.obj);;All Files (*)");
     
     if (!filePath.isEmpty()) {
