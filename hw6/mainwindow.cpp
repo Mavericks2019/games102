@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     curveColors["Bezier"] = Qt::magenta;
     curveColors["B-Spline"] = Qt::darkCyan;
     curveColors["Chaikin"] = Qt::darkYellow; // 添加新的颜色
-    curveColors["OBJ Model"] = Qt::darkGray;
+    curveColors["OBJ Model"] = Qt::red;
     
     // 创建主部件和布局
     QWidget *centralWidget = new QWidget(this);
@@ -474,10 +474,25 @@ void MainWindow::setupBSplineControls()
     stackedControlLayout->addWidget(panel);
 }
 
+void MainWindow::updateObjInfo(int vertices, int faces, int edges)
+{
+    QString info = QString("Vertices: %1 | Faces: %2")
+                  .arg(vertices).arg(faces);
+    objInfoLabel->setText(info);
+}
+
 void MainWindow::setupobjControls() {
     QWidget *panel = new QWidget;
     QVBoxLayout *layout = new QVBoxLayout(panel);
-    
+
+    // 创建OBJ信息标签
+    objInfoLabel = new QLabel("No OBJ model loaded");
+    objInfoLabel->setAlignment(Qt::AlignCenter);
+    objInfoLabel->setFixedHeight(50);
+    objInfoLabel->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px;");
+    objInfoLabel->setWordWrap(true);
+    layout->addWidget(objInfoLabel);
+
     // 添加OBJ加载按钮
     QPushButton *loadButton = new QPushButton("Load OBJ File");
     loadButton->setStyleSheet("background-color: #505050; color: white;");

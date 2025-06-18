@@ -40,7 +40,7 @@ private slots:
     void updateCanvasView(int index);
     void loadObjModel();
     void resetObjView();
-    
+    void updateObjInfo(int vertices, int faces, int edges);
     // 参数曲线方法
     void updateDegreeValue(int value);
     void updateSigmaValue(int value);
@@ -96,7 +96,7 @@ private:
     QSlider *degreeSlider;
     QLabel *degreeValueLabel;
     QLabel *pointInfoLabel;
-    
+    QLabel *objInfoLabel;
     QTimer *deleteMessageTimer;
     QMap<QString, QColor> curveColors;
 };

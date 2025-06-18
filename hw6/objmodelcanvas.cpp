@@ -177,21 +177,22 @@ void ObjModelCanvas::adjustCameraPosition(float modelSize)
 {
     // 根据模型大小自适应调整相机位置
     if (modelSize > 0.001f) {
-        // 计算合适的相机距离：模型最大尺寸的1.5倍
-        float distance = modelSize * 1.5f;
+        // 计算合适的相机距离：模型最大尺寸的2.5倍
+        float distance = modelSize * 2.5f;
         
         // 确保相机不会太近或太远
-        distance = std::max(0.5f, std::min(distance, 10.0f));
+        distance = std::max(0.5f, std::min(distance, 20.0f));
         
         cameraPosition = Eigen::Vector3f(0, 0, distance);
     } else {
         // 默认距离
-        cameraPosition = Eigen::Vector3f(0, 0, 2.0f);
+        cameraPosition = Eigen::Vector3f(0, 0, 5.0f);
     }
     
-    // 重置视图参数
-    rotationX = 0.0f;
-    rotationY = 0.0f;
+    // 设置更宽的视野
+    fov = 60.0f;
+    
+    // 重置缩放
     zoom = 1.0f;
 }
 
@@ -217,11 +218,30 @@ Eigen::Matrix4f ObjModelCanvas::getModelViewProjection() const
     modelMatrix = rotationXMatrix * rotationYMatrix;
     modelMatrix.block<3, 3>(0, 0) *= zoom;
     
-    // 视图矩阵
-    Eigen::Matrix4f viewMatrix = Eigen::Matrix4f::Identity();
-    viewMatrix.block<3, 1>(0, 3) = -cameraPosition;
+    // 视图矩阵 - 添加向上向量
+    Eigen::Vector3f eye = cameraPosition;
+    Eigen::Vector3f center(0, 0, 0);
+    Eigen::Vector3f up(0, 1, 0);
     
-    // 投影矩阵
+    Eigen::Vector3f f = (center - eye).normalized();
+    Eigen::Vector3f s = f.cross(up).normalized();
+    Eigen::Vector3f u = s.cross(f);
+    
+    Eigen::Matrix4f viewMatrix = Eigen::Matrix4f::Identity();
+    viewMatrix(0, 0) = s.x();
+    viewMatrix(0, 1) = s.y();
+    viewMatrix(0, 2) = s.z();
+    viewMatrix(1, 0) = u.x();
+    viewMatrix(1, 1) = u.y();
+    viewMatrix(1, 2) = u.z();
+    viewMatrix(2, 0) = -f.x();
+    viewMatrix(2, 1) = -f.y();
+    viewMatrix(2, 2) = -f.z();
+    viewMatrix(0, 3) = -s.dot(eye);
+    viewMatrix(1, 3) = -u.dot(eye);
+    viewMatrix(2, 3) = f.dot(eye);
+    
+    // 投影矩阵 - 使用透视投影
     float aspect = static_cast<float>(width()) / height();
     float near = 0.1f;
     float far = 100.0f;
@@ -266,11 +286,17 @@ void ObjModelCanvas::drawInfoPanel(QPainter &painter)
     painter.drawText(10, 20, info);
 }
 
+// objmodelcanvas.cpp
 void ObjModelCanvas::wheelEvent(QWheelEvent *event)
 {
     float delta = event->angleDelta().y() / 120.0f;
-    zoom *= (1.0f + delta * 0.1f);
-    zoom = std::max(0.1f, std::min(zoom, 5.0f));
+    float scaleFactor = 1.0f + delta * 0.1f;
+    
+    // 限制缩放范围在0.1到10倍之间
+    float newZoom = zoom * scaleFactor;
+    newZoom = std::max(0.1f, std::min(newZoom, 10.0f));
+    
+    zoom = newZoom;
     update();
 }
 
