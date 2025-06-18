@@ -62,6 +62,14 @@ void ObjModelCanvas::loadObjFile(const QString &filePath)
     update();
 }
 
+void ObjModelCanvas::clearPoints()
+{
+    model.vertices.clear();
+    model.faces.clear();
+    update();
+}
+
+
 void ObjModelCanvas::resetView()
 {
     if (!model.vertices.empty()) {

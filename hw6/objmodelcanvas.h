@@ -10,7 +10,7 @@ class ObjModelCanvas : public BaseCanvasWidget
     Q_OBJECT
 public:
     explicit ObjModelCanvas(QWidget *parent = nullptr);
-    
+    void clearPoints() override;
     void loadObjFile(const QString &filePath);
     void resetView();
     

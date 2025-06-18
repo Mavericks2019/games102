@@ -120,6 +120,7 @@ MainWindow::MainWindow(QWidget *parent)
             case 2: bezierCanvas->clearPoints(); break;
             case 3: bSplineCanvas->clearPoints(); break;
             case 4: polygonCanvas->clearPoints(); break;
+            case 5: objModelCanvas->clearPoints(); break;
         }
     });
     controlLayout->addWidget(clearButton);
