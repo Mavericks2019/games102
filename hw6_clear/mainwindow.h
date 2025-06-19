@@ -6,6 +6,7 @@
 #include <QMap>
 #include <QTabWidget>
 #include <QStackedLayout>
+#include <QCheckBox>
 #include "objmodelcanvas.h"
 
 class BaseCanvasWidget;
