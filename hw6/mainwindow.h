@@ -62,6 +62,7 @@ private:
     void setupBSplineControls();
     void setupChaikinControls();
     void setupobjControls();
+
     
     QTabWidget *tabWidget;
     ParametricCurveCanvas *parametricCanvas;

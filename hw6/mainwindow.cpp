@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
     curveColors["Bezier"] = Qt::magenta;
     curveColors["B-Spline"] = Qt::darkCyan;
     curveColors["Chaikin"] = Qt::darkYellow; // 添加新的颜色
-    curveColors["OBJ Model"] = Qt::red;
+    curveColors["OBJ Model"] = Qt::darkGray;
     
     // 创建主部件和布局
     QWidget *centralWidget = new QWidget(this);
