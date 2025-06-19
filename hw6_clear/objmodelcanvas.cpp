@@ -15,6 +15,7 @@ ObjModelCanvas::ObjModelCanvas(QWidget *parent)
     curveColor = Qt::darkGray;
     allowPointCreation = false; // 禁用点创建
     cameraPosition = Eigen::Vector3f(0, 0, 1.5f); // 更靠近屏幕
+    showFaces = true; // 默认显示面
 }
 
 void ObjModelCanvas::drawGrid(QPainter &painter)
@@ -33,6 +34,15 @@ void ObjModelCanvas::drawCurves(QPainter &painter)
     
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setPen(QPen(curveColor, 1));
+    
+    // 新增：设置画刷（如果显示面）
+    if (showFaces) {
+        QColor fillColor = curveColor;
+        fillColor.setAlpha(50); // 半透明填充
+        painter.setBrush(QBrush(fillColor));
+    } else {
+        painter.setBrush(Qt::NoBrush);
+    }
     
     Eigen::Matrix4f mvp = getModelViewProjection();
     

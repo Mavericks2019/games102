@@ -26,6 +26,7 @@ private slots:
     void updateCanvasView(int index);
     void loadObjModel();
     void resetObjView();
+    void toggleShowFaces(bool show);  // 新增：切换显示面的槽函数
     
 private:
     void setupObjControls();
@@ -43,6 +44,9 @@ private:
     QLabel *objInfoLabel;
     QTimer *deleteMessageTimer;
     QMap<QString, QColor> curveColors;
+    
+    // 新增：显示面的复选框
+    QCheckBox *showFacesCheckbox;
 };
 
 #endif // MAINWINDOW_H

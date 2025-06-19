@@ -15,6 +15,12 @@ public:
     void loadObjFile(const QString &filePath);
     void resetView();
     
+    // 新增：设置是否显示面
+    void setShowFaces(bool show) { 
+        showFaces = show; 
+        update(); 
+    }
+    
 protected:
     void drawGrid(QPainter &painter) override;
     void drawPoints(QPainter &painter) override;
@@ -64,6 +70,9 @@ private:
     float rotationX = 0.0f;
     float rotationY = 0.0f;
     QPoint lastMousePos;
+    
+    // 新增：是否显示面（填充多边形）
+    bool showFaces = true;
 };
 
 #endif // OBJMODELCANVAS_H

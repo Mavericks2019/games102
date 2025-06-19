@@ -108,8 +108,15 @@ void MainWindow::setupObjControls() {
     resetButton->setStyleSheet("background-color: #505050; color: white;");
     connect(resetButton, &QPushButton::clicked, this, &MainWindow::resetObjView);
     
+    // 添加显示面的复选框
+    showFacesCheckbox = new QCheckBox("Show Faces (Fill Polygons)");
+    showFacesCheckbox->setChecked(true); // 默认选中
+    showFacesCheckbox->setStyleSheet("color: white;");
+    connect(showFacesCheckbox, &QCheckBox::toggled, this, &MainWindow::toggleShowFaces);
+    
     layout->addWidget(loadButton);
     layout->addWidget(resetButton);
+    layout->addWidget(showFacesCheckbox);  // 添加复选框到布局
     
     // 添加使用说明
     QLabel *infoLabel = new QLabel(
@@ -126,6 +133,12 @@ void MainWindow::setupObjControls() {
     layout->addStretch();
     
     stackedControlLayout->addWidget(panel);
+}
+
+// 新增：切换显示面的槽函数
+void MainWindow::toggleShowFaces(bool show)
+{
+    objModelCanvas->setShowFaces(show);
 }
 
 void MainWindow::loadObjModel()
