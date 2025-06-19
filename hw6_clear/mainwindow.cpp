@@ -109,14 +109,48 @@ void MainWindow::setupObjControls() {
     connect(resetButton, &QPushButton::clicked, this, &MainWindow::resetObjView);
     
     // 添加显示面的复选框
-    showFacesCheckbox = new QCheckBox("Show Faces (Fill Polygons)");
+    QCheckBox *showFacesCheckbox = new QCheckBox("Show Faces (Fill Polygons)");
     showFacesCheckbox->setChecked(true); // 默认选中
     showFacesCheckbox->setStyleSheet("color: white;");
     connect(showFacesCheckbox, &QCheckBox::toggled, this, &MainWindow::toggleShowFaces);
     
+    // 添加光照控制
+    QGroupBox *lightGroup = new QGroupBox("Lighting Controls");
+    lightGroup->setStyleSheet("QGroupBox { color: white; }");
+    QFormLayout *lightLayout = new QFormLayout(lightGroup);
+    
+    // 环境光强度滑块
+    ambientSlider = new QSlider(Qt::Horizontal);
+    ambientSlider->setRange(0, 100);
+    ambientSlider->setValue(30); // 30% 环境光
+    connect(ambientSlider, &QSlider::valueChanged, this, &MainWindow::updateAmbientIntensity);
+    lightLayout->addRow("Ambient:", ambientSlider);
+    
+    // 漫反射强度滑块
+    diffuseSlider = new QSlider(Qt::Horizontal);
+    diffuseSlider->setRange(0, 100);
+    diffuseSlider->setValue(70); // 70% 漫反射
+    connect(diffuseSlider, &QSlider::valueChanged, this, &MainWindow::updateDiffuseIntensity);
+    lightLayout->addRow("Diffuse:", diffuseSlider);
+    
+    // 镜面反射强度滑块
+    specularSlider = new QSlider(Qt::Horizontal);
+    specularSlider->setRange(0, 100);
+    specularSlider->setValue(40); // 40% 镜面反射
+    connect(specularSlider, &QSlider::valueChanged, this, &MainWindow::updateSpecularIntensity);
+    lightLayout->addRow("Specular:", specularSlider);
+    
+    // 新增：高光指数滑块
+    shininessSlider = new QSlider(Qt::Horizontal);
+    shininessSlider->setRange(1, 256);
+    shininessSlider->setValue(32); // 默认高光指数
+    connect(shininessSlider, &QSlider::valueChanged, this, &MainWindow::updateShininess);
+    lightLayout->addRow("Shininess:", shininessSlider);
+    
     layout->addWidget(loadButton);
     layout->addWidget(resetButton);
-    layout->addWidget(showFacesCheckbox);  // 添加复选框到布局
+    layout->addWidget(showFacesCheckbox);
+    layout->addWidget(lightGroup);
     
     // 添加使用说明
     QLabel *infoLabel = new QLabel(
@@ -124,7 +158,8 @@ void MainWindow::setupObjControls() {
         "• After loading an OBJ model, it will be centered automatically<br>"
         "• Mouse drag: Rotate the model<br>"
         "• Mouse wheel: Zoom in/out<br>"
-        "• Reset View: Restore the initial view"
+        "• Reset View: Restore the initial view<br>"
+        "• Lighting controls: Adjust the appearance"
     );
     infoLabel->setWordWrap(true);
     infoLabel->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px;");
@@ -133,6 +168,29 @@ void MainWindow::setupObjControls() {
     layout->addStretch();
     
     stackedControlLayout->addWidget(panel);
+}
+void MainWindow::updateAmbientIntensity(int value) {
+    objModelCanvas->ambientIntensity = value / 100.0f;
+    objModelCanvas->update();
+}
+
+// 更新漫反射强度
+void MainWindow::updateDiffuseIntensity(int value) {
+    objModelCanvas->diffuseIntensity = value / 100.0f;
+    objModelCanvas->update();
+}
+
+// 更新镜面反射强度
+void MainWindow::updateSpecularIntensity(int value) {
+    objModelCanvas->specularIntensity = value / 100.0f;
+    objModelCanvas->update();
+}
+
+// 新增：更新高光指数
+void MainWindow::updateShininess(int value) {
+    objModelCanvas->shininess = static_cast<float>(value);
+    objModelCanvas->updateFaceColors();  // 更新所有面的颜色
+    objModelCanvas->update();
 }
 
 // 新增：切换显示面的槽函数

@@ -6,6 +6,7 @@
 #include <cmath>
 #include <QDebug>
 #include <QDir>
+#include <algorithm>  // 用于std::sort
 
 using namespace Eigen;
 
@@ -16,6 +17,312 @@ ObjModelCanvas::ObjModelCanvas(QWidget *parent)
     allowPointCreation = false; // 禁用点创建
     cameraPosition = Eigen::Vector3f(0, 0, 1.5f); // 更靠近屏幕
     showFaces = true; // 默认显示面
+    
+    // 初始化光照参数
+    lightPosition = Eigen::Vector3f(1.0f, 1.0f, 1.0f); // 光源位置
+    lightColor = Eigen::Vector3f(1.0f, 1.0f, 1.0f);    // 白光
+    ambientColor = Eigen::Vector3f(0.2f, 0.2f, 0.3f);   // 蓝色环境光
+    
+    // 初始化缓存矩阵
+    cachedViewMatrix = Eigen::Matrix4f::Identity();
+    cachedModelMatrix = Eigen::Matrix4f::Identity();
+}
+
+// 计算所有面的法向量
+void ObjModelCanvas::calculateFaceNormals() {
+    for (Face& face : model.faces) {
+        if (face.vertexIndices.size() < 3) continue;
+        
+        // 获取面的三个顶点
+        const Eigen::Vector3f& v0 = model.vertices[face.vertexIndices[0]];
+        const Eigen::Vector3f& v1 = model.vertices[face.vertexIndices[1]];
+        const Eigen::Vector3f& v2 = model.vertices[face.vertexIndices[2]];
+        
+        // 计算两个边向量
+        Eigen::Vector3f edge1 = v1 - v0;
+        Eigen::Vector3f edge2 = v2 - v0;
+        
+        // 叉积得到法向量并归一化
+        face.normal = edge1.cross(edge2).normalized();
+    }
+}
+
+// 获取模型矩阵（不包含视图和投影）
+Eigen::Matrix4f ObjModelCanvas::getModelMatrix() const {
+    if (modelMatrixDirty) {
+        // 模型矩阵 - 旋转和缩放
+        cachedModelMatrix = Eigen::Matrix4f::Identity();
+        
+        // 围绕Y轴旋转
+        Eigen::Matrix4f rotationYMatrix = Eigen::Matrix4f::Identity();
+        rotationYMatrix(0, 0) = cos(rotationY);
+        rotationYMatrix(0, 2) = sin(rotationY);
+        rotationYMatrix(2, 0) = -sin(rotationY);
+        rotationYMatrix(2, 2) = cos(rotationY);
+        
+        // 围绕X轴旋转
+        Eigen::Matrix4f rotationXMatrix = Eigen::Matrix4f::Identity();
+        rotationXMatrix(1, 1) = cos(rotationX);
+        rotationXMatrix(1, 2) = -sin(rotationX);
+        rotationXMatrix(2, 1) = sin(rotationX);
+        rotationXMatrix(2, 2) = cos(rotationX);
+        
+        cachedModelMatrix = rotationXMatrix * rotationYMatrix;
+        cachedModelMatrix.block<3, 3>(0, 0) *= zoom;
+        
+        modelMatrixDirty = false;
+    }
+    return cachedModelMatrix;
+}
+
+// 获取视图矩阵
+Eigen::Matrix4f ObjModelCanvas::getViewMatrix() const {
+    if (viewMatrixDirty) {
+        // 视图矩阵 - 添加向上向量
+        Eigen::Vector3f eye = cameraPosition;
+        Eigen::Vector3f center = cameraTarget;
+        Eigen::Vector3f up = m_upVector;
+        
+        Eigen::Vector3f f = (center - eye).normalized();
+        Eigen::Vector3f s = f.cross(up).normalized();
+        Eigen::Vector3f u = s.cross(f);
+        
+        cachedViewMatrix = Eigen::Matrix4f::Identity();
+        cachedViewMatrix(0, 0) = s.x();
+        cachedViewMatrix(0, 1) = s.y();
+        cachedViewMatrix(0, 2) = s.z();
+        cachedViewMatrix(1, 0) = u.x();
+        cachedViewMatrix(1, 1) = u.y();
+        cachedViewMatrix(1, 2) = u.z();
+        cachedViewMatrix(2, 0) = -f.x();
+        cachedViewMatrix(2, 1) = -f.y();
+        cachedViewMatrix(2, 2) = -f.z();
+        cachedViewMatrix(0, 3) = -s.dot(eye);
+        cachedViewMatrix(1, 3) = -u.dot(eye);
+        cachedViewMatrix(2, 3) = f.dot(eye);
+        
+        viewMatrixDirty = false;
+    }
+    return cachedViewMatrix;
+}
+
+// 根据法向量计算面颜色
+QColor ObjModelCanvas::calculateFaceColor(const Eigen::Vector3f& normal) const {
+    // 获取模型矩阵和视图矩阵
+    Eigen::Matrix4f modelMatrix = getModelMatrix();
+    Eigen::Matrix4f viewMatrix = getViewMatrix();
+    
+    // 转换法向量到视图空间
+    Eigen::Matrix3f modelViewMatrix3x3 = (viewMatrix * modelMatrix).block<3,3>(0,0);
+    Eigen::Vector3f viewNormal = (modelViewMatrix3x3 * normal).normalized();
+    
+    // 光源方向（归一化）
+    Eigen::Vector3f lightDir = (lightPosition - cameraPosition).normalized();
+    
+    // 视线方向（从物体指向相机）
+    Eigen::Vector3f viewDir = (-cameraPosition).normalized();
+    
+    // 计算漫反射分量
+    float diffuse = std::max(0.0f, viewNormal.dot(lightDir));
+    
+    // 计算半角向量（布林-冯模型）
+    Eigen::Vector3f halfDir = (lightDir + viewDir).normalized();
+    
+    // 计算镜面反射分量
+    float specular = std::pow(std::max(0.0f, viewNormal.dot(halfDir)), shininess);
+    
+    // 组合光照分量
+    Eigen::Vector3f ambientComp = ambientColor * ambientIntensity;
+    Eigen::Vector3f diffuseComp = lightColor * diffuse * diffuseIntensity;
+    Eigen::Vector3f specularComp = lightColor * specular * specularIntensity;
+    
+    // 组合最终颜色
+    Eigen::Vector3f finalColor = ambientComp + diffuseComp + specularComp;
+    
+    // 确保颜色值在0-1范围内
+    finalColor = finalColor.cwiseMax(Eigen::Vector3f::Zero()).cwiseMin(Eigen::Vector3f::Ones());
+    
+    // 转换为QColor
+    return QColor(
+        static_cast<int>(finalColor.x() * 255),
+        static_cast<int>(finalColor.y() * 255),
+        static_cast<int>(finalColor.z() * 255)
+    );
+}
+
+// 更新所有面的颜色
+void ObjModelCanvas::updateFaceColors() {
+    for (Face& face : model.faces) {
+        face.color = calculateFaceColor(face.normal);
+    }
+}
+
+// 更新所有面的深度（到相机的距离）
+void ObjModelCanvas::updateFaceDepths() {
+    Eigen::Matrix4f viewMatrix = getViewMatrix();
+    Eigen::Matrix4f modelMatrix = getModelMatrix();
+    Eigen::Matrix4f modelViewMatrix = viewMatrix * modelMatrix;
+    
+    for (Face& face : model.faces) {
+        // 计算面中心（世界坐标）
+        Eigen::Vector3f center(0,0,0);
+        for (int vertexIndex : face.vertexIndices) {
+            if (vertexIndex < model.vertices.size()) {
+                center += model.vertices[vertexIndex];
+            }
+        }
+        center /= face.vertexIndices.size();
+        
+        // 将中心点变换到视图空间
+        Eigen::Vector4f centerView = modelViewMatrix * Eigen::Vector4f(center.x(), center.y(), center.z(), 1.0f);
+        face.viewCenter = centerView.head<3>();
+        
+        // 计算到相机的距离（深度）
+        face.depth = centerView.z();
+    }
+}
+
+// 按深度排序面（从远到近）
+void ObjModelCanvas::sortFacesByDepth() {
+    std::sort(model.faces.begin(), model.faces.end(), [](const Face& a, const Face& b) {
+        return a.depth > b.depth; // 深度值大的（更负）先绘制（更远）
+    });
+}
+
+void ObjModelCanvas::drawCurves(QPainter &painter)
+{
+    if (model.vertices.empty() || model.faces.empty()) return;
+    
+    painter.setRenderHint(QPainter::Antialiasing);
+    
+    // 更新深度和颜色（如果需要）
+    if (modelMatrixDirty || viewMatrixDirty) {
+        updateFaceDepths();
+        updateFaceColors();
+        sortFacesByDepth();
+    }
+    
+    // 绘制所有面（按深度排序）
+    for (const Face& face : model.faces) {
+        QPolygonF polygon;
+        for (int vertexIndex : face.vertexIndices) {
+            if (vertexIndex < model.vertices.size()) {
+                Eigen::Vector3f vertex = model.vertices[vertexIndex];
+                QPointF screenPoint = projectVertex(vertex);
+                polygon << screenPoint;
+            }
+        }
+        
+        // 设置画笔（边框颜色）
+        painter.setPen(QPen(curveColor, 1));
+        
+        // 设置画刷（面颜色）
+        if (showFaces) {
+            painter.setBrush(QBrush(face.color));
+        } else {
+            painter.setBrush(Qt::NoBrush);
+        }
+        
+        painter.drawPolygon(polygon);
+    }
+}
+
+void ObjModelCanvas::parseObjFile(const QString &filePath)
+{
+    model.vertices.clear();
+    model.faces.clear();
+    
+    // 确保路径是绝对路径
+    QString absolutePath = filePath;
+    if (!QDir::isAbsolutePath(filePath)) {
+        absolutePath = QDir::current().absoluteFilePath(filePath);
+    }
+    
+    if (!QFile::exists(absolutePath)) {
+        qWarning() << "OBJ file does not exist:" << absolutePath;
+        return;
+    }
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Failed to open OBJ file:" << filePath;
+        return;
+    }
+    
+    QTextStream in(&file);
+    while (!in.atEnd()) {
+        QString line = in.readLine().trimmed();
+        if (line.isEmpty() || line.startsWith("#")) continue;
+        
+        QStringList tokens = line.split(" ", QString::SkipEmptyParts);
+        if (tokens.isEmpty()) continue;
+        
+        QString identifier = tokens[0];
+        
+        if (identifier == "v") {
+            if (tokens.size() >= 4) {
+                Vector3f vertex;
+                vertex[0] = tokens[1].toFloat();
+                vertex[1] = tokens[2].toFloat();
+                vertex[2] = tokens[3].toFloat();
+                model.vertices.push_back(vertex);
+            }
+        } else if (identifier == "f") {
+            Face face;
+            for (int i = 1; i < tokens.size(); i++) {
+                QStringList indices = tokens[i].split("/");
+                if (!indices.isEmpty()) {
+                    int vertexIndex = indices[0].toInt() - 1;
+                    if (vertexIndex >= 0 && vertexIndex < model.vertices.size()) {
+                        face.vertexIndices.push_back(vertexIndex);
+                    }
+                }
+            }
+            if (!face.vertexIndices.empty()) {
+                model.faces.push_back(face);
+            }
+        }
+    }
+    
+    file.close();
+    
+    // 计算法向量
+    calculateFaceNormals();
+    
+    // 计算模型包围盒
+    if (!model.vertices.empty()) {
+        Eigen::Vector3f minPoint = model.vertices[0];
+        Eigen::Vector3f maxPoint = model.vertices[0];
+        
+        for (const auto& vertex : model.vertices) {
+            minPoint = minPoint.cwiseMin(vertex);
+            maxPoint = maxPoint.cwiseMax(vertex);
+        }
+        
+        modelCenter = (minPoint + maxPoint) * 0.5f;
+        Eigen::Vector3f size = maxPoint - minPoint;
+        float maxSize = std::max({size.x(), size.y(), size.z()});
+        
+        // 将模型中心移动到原点
+        for (auto& vertex : model.vertices) {
+            vertex -= modelCenter;
+        }
+        
+        // 根据模型大小调整相机位置
+        adjustCameraPosition(maxSize);
+    }
+    
+    // 设置光源位置为包围盒中心上方
+    lightPosition = Eigen::Vector3f(0, m_maxBound.y() + m_boundingRadius * 0.5f, 0);
+    
+    fitObjectToView();
+    
+    // 更新面的颜色和深度
+    updateFaceColors();
+    updateFaceDepths();
+    sortFacesByDepth();
+    
+    qDebug() << "Loaded OBJ model with" << model.vertices.size() << "vertices and" << model.faces.size() << "faces";
+    update();
 }
 
 void ObjModelCanvas::drawGrid(QPainter &painter)
@@ -26,38 +333,6 @@ void ObjModelCanvas::drawGrid(QPainter &painter)
 void ObjModelCanvas::drawPoints(QPainter &painter)
 {
     // 在OBJ模型模式下不绘制点
-}
-
-void ObjModelCanvas::drawCurves(QPainter &painter)
-{
-    if (model.vertices.empty() || model.faces.empty()) return;
-    
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.setPen(QPen(curveColor, 1));
-    
-    // 新增：设置画刷（如果显示面）
-    if (showFaces) {
-        QColor fillColor = curveColor;
-        fillColor.setAlpha(50); // 半透明填充
-        painter.setBrush(QBrush(fillColor));
-    } else {
-        painter.setBrush(Qt::NoBrush);
-    }
-    
-    Eigen::Matrix4f mvp = getModelViewProjection();
-    
-    // 绘制所有面
-    for (const Face& face : model.faces) {
-        QPolygonF polygon;
-        for (int vertexIndex : face.vertexIndices) {
-            if (vertexIndex < model.vertices.size()) {
-                Eigen::Vector3f vertex = model.vertices[vertexIndex];
-                QPointF screenPoint = projectVertex(vertex);
-                polygon << screenPoint;
-            }
-        }
-        painter.drawPolygon(polygon);
-    }
 }
 
 void ObjModelCanvas::drawHoverIndicator(QPainter &painter)
@@ -122,7 +397,15 @@ void ObjModelCanvas::fitObjectToView() {
 
     // 3. 调整相机位置和方向
     adjustCamera();
+    
+    // 4. 设置光源位置为包围盒中心上方
+    lightPosition = Eigen::Vector3f(0, m_maxBound.y() + m_boundingRadius * 0.5f, 0);
+    
+    // 标记矩阵需要更新
+    modelMatrixDirty = true;
+    viewMatrixDirty = true;
 }
+
 
 void ObjModelCanvas::adjustCamera() {
     // 计算包围盒尺寸
@@ -185,91 +468,6 @@ void ObjModelCanvas::clearPoints()
 // 重置视图时也调用自适应调整
 void ObjModelCanvas::resetView() {
     fitObjectToView();
-    update();
-}
-
-void ObjModelCanvas::parseObjFile(const QString &filePath)
-{
-    model.vertices.clear();
-    model.faces.clear();
-    
-    // 确保路径是绝对路径
-    QString absolutePath = filePath;
-    if (!QDir::isAbsolutePath(filePath)) {
-        absolutePath = QDir::current().absoluteFilePath(filePath);
-    }
-    
-    if (!QFile::exists(absolutePath)) {
-        qWarning() << "OBJ file does not exist:" << absolutePath;
-        return;
-    }
-    QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "Failed to open OBJ file:" << filePath;
-        return;
-    }
-    
-    QTextStream in(&file);
-    while (!in.atEnd()) {
-        QString line = in.readLine().trimmed();
-        if (line.isEmpty() || line.startsWith("#")) continue;
-        
-        QStringList tokens = line.split(" ", QString::SkipEmptyParts);
-        if (tokens.isEmpty()) continue;
-        
-        QString identifier = tokens[0];
-        
-        if (identifier == "v") {
-            if (tokens.size() >= 4) {
-                Vector3f vertex;
-                vertex[0] = tokens[1].toFloat();
-                vertex[1] = tokens[2].toFloat();
-                vertex[2] = tokens[3].toFloat();
-                model.vertices.push_back(vertex);
-            }
-        } else if (identifier == "f") {
-            Face face;
-            for (int i = 1; i < tokens.size(); i++) {
-                QStringList indices = tokens[i].split("/");
-                if (!indices.isEmpty()) {
-                    int vertexIndex = indices[0].toInt() - 1;
-                    if (vertexIndex >= 0 && vertexIndex < model.vertices.size()) {
-                        face.vertexIndices.push_back(vertexIndex);
-                    }
-                }
-            }
-            if (!face.vertexIndices.empty()) {
-                model.faces.push_back(face);
-            }
-        }
-    }
-    
-    file.close();
-    
-    // 计算模型包围盒
-    if (!model.vertices.empty()) {
-        Eigen::Vector3f minPoint = model.vertices[0];
-        Eigen::Vector3f maxPoint = model.vertices[0];
-        
-        for (const auto& vertex : model.vertices) {
-            minPoint = minPoint.cwiseMin(vertex);
-            maxPoint = maxPoint.cwiseMax(vertex);
-        }
-        
-        modelCenter = (minPoint + maxPoint) * 0.5f;
-        Eigen::Vector3f size = maxPoint - minPoint;
-        float maxSize = std::max({size.x(), size.y(), size.z()});
-        
-        // 将模型中心移动到原点
-        for (auto& vertex : model.vertices) {
-            vertex -= modelCenter;
-        }
-        
-        // 根据模型大小调整相机位置
-        adjustCameraPosition(maxSize);
-    }
-    fitObjectToView();
-    qDebug() << "Loaded OBJ model with" << model.vertices.size() << "vertices and" << model.faces.size() << "faces";
     update();
 }
 
@@ -386,9 +584,15 @@ void ObjModelCanvas::drawInfoPanel(QPainter &painter)
     painter.drawText(10, 20, info);
 }
 
-// objmodelcanvas.cpp
-void ObjModelCanvas::wheelEvent(QWheelEvent *event)
-{
+// 窗口大小变化时更新
+void ObjModelCanvas::resizeEvent(QResizeEvent *event) {
+    QWidget::resizeEvent(event);
+    // 投影矩阵依赖于窗口大小，所以需要更新
+    viewMatrixDirty = true;
+    update();
+}
+
+void ObjModelCanvas::wheelEvent(QWheelEvent *event) {
     float delta = event->angleDelta().y() / 120.0f;
     float scaleFactor = 1.0f + delta * 0.1f;
     
@@ -397,23 +601,27 @@ void ObjModelCanvas::wheelEvent(QWheelEvent *event)
     newZoom = std::max(0.1f, std::min(newZoom, 10.0f));
     
     zoom = newZoom;
+    
+    // 标记模型矩阵需要更新
+    modelMatrixDirty = true;
     update();
 }
 
-void ObjModelCanvas::mousePressEvent(QMouseEvent *event)
-{
+void ObjModelCanvas::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton) {
         lastMousePos = event->pos();
     }
 }
 
-void ObjModelCanvas::mouseMoveEvent(QMouseEvent *event)
-{
+void ObjModelCanvas::mouseMoveEvent(QMouseEvent *event) {
     if (event->buttons() & Qt::LeftButton) {
         QPoint delta = event->pos() - lastMousePos;
         rotationY += delta.x() * 0.01f;
         rotationX += delta.y() * 0.01f;
         lastMousePos = event->pos();
+        
+        // 标记模型矩阵需要更新
+        modelMatrixDirty = true;
         update();
     }
 }
