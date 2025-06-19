@@ -31,6 +31,12 @@ public:
     // 设置曲线颜色
     void setCurveColor(const QColor &color);
     
+    // 设置背景颜色
+    void setBackgroundColor(const QColor &color) {
+        backgroundColor = color;
+        update();
+    }
+    
     // 事件处理
     void paintEvent(QPaintEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
@@ -56,7 +62,7 @@ signals:
     void noPointHovered();
     void pointDeleted();
 
-protected:
+public:
     bool allowPointCreation = true; // 默认允许创建点
     struct Point {
         QPointF pos;
@@ -68,6 +74,7 @@ protected:
     int hoveredIndex = -1;
     QColor curveColor = Qt::blue;
     bool showCurve = true;
+    QColor backgroundColor = Qt::white; // 背景颜色
 };
 
 #endif // BASECANVASWIDGET_H

@@ -103,8 +103,8 @@ void BaseCanvasWidget::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     
-    // 绘制背景
-    painter.fillRect(rect(), Qt::white);
+    // 绘制背景 - 使用设置的背景颜色
+    painter.fillRect(rect(), backgroundColor);
     
     // 绘制网格
     drawGrid(painter);

@@ -9,6 +9,8 @@
 #include <QStackedLayout>
 #include <QSlider>
 #include <QLabel>
+#include <QComboBox>
+#include <QColorDialog> // 添加颜色对话框支持
 #include "objmodelcanvas.h"
 
 class BaseCanvasWidget;
@@ -21,11 +23,6 @@ class MainWindow : public QMainWindow
     
 public:
     MainWindow(QWidget *parent = nullptr);
-        // 光照控制
-    QSlider *ambientSlider;
-    QSlider *diffuseSlider;
-    QSlider *specularSlider;
-    QSlider *shininessSlider;  // 新增：高光指数滑块
     
 public slots:
     void updatePointInfo(const QPointF& point);
@@ -38,9 +35,11 @@ public slots:
     void updateAmbientIntensity(int value);
     void updateDiffuseIntensity(int value);
     void updateSpecularIntensity(int value);
-    void updateShininess(int value);  // 新增：高光指数控制
+    void updateShininess(int value);
+    void setDrawMode(int index); // 设置绘制模式
+    void changeBackgroundColor(); // 新增：更改背景颜色
     
-private:
+public:
     void setupObjControls();
     
     QTabWidget *tabWidget;
@@ -57,6 +56,17 @@ private:
     QTimer *deleteMessageTimer;
     QMap<QString, QColor> curveColors;
     
+    // 光照控制
+    QSlider *ambientSlider;
+    QSlider *diffuseSlider;
+    QSlider *specularSlider;
+    QSlider *shininessSlider;
+    
+    // 绘制模式选择
+    QComboBox *drawModeComboBox;
+    
+    // 背景颜色按钮
+    QPushButton *bgColorButton;
 };
 
 #endif // MAINWINDOW_H

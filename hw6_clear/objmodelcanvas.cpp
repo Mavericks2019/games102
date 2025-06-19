@@ -9,6 +9,39 @@
 #include <algorithm>  // 用于std::sort
 
 using namespace Eigen;
+using namespace cv;
+
+static bool insideTriangle(float x, float y, const Eigen::Vector4f* v) {
+    Eigen::Vector3f points[3];
+    for (int i = 0; i < 3; i++) {
+        points[i] = Eigen::Vector3f(v[i].x(), v[i].y(), 1.0f);
+    }
+    
+    Eigen::Vector3f p(x, y, 1.0f);
+    
+    Eigen::Vector3f edge0 = points[1] - points[0];
+    Eigen::Vector3f edge1 = points[2] - points[1];
+    Eigen::Vector3f edge2 = points[0] - points[2];
+    
+    Eigen::Vector3f normal0 = edge0.cross(points[0] - p);
+    Eigen::Vector3f normal1 = edge1.cross(points[1] - p);
+    Eigen::Vector3f normal2 = edge2.cross(points[2] - p);
+    
+    return (normal0.dot(normal1)) > 0 && (normal1.dot(normal2)) > 0;
+}
+
+// 计算重心坐标 (修改为使用Eigen::Vector4f)
+static std::tuple<float, float, float> computeBarycentric2D(float x, float y, const Eigen::Vector4f* v) {
+    float c1 = (x * (v[1].y() - v[2].y()) + (v[2].x() - v[1].x()) * y + v[1].x() * v[2].y() - v[2].x() * v[1].y());
+    float c2 = (x * (v[2].y() - v[0].y()) + (v[0].x() - v[2].x()) * y + v[2].x() * v[0].y() - v[0].x() * v[2].y());
+    float c3 = (x * (v[0].y() - v[1].y()) + (v[1].x() - v[0].x()) * y + v[0].x() * v[1].y() - v[1].x() * v[0].y());
+    
+    float denom = c1 + c2 + c3;
+    if (denom == 0) return {0, 0, 0};
+    
+    return {c1 / denom, c2 / denom, c3 / denom};
+}
+
 
 ObjModelCanvas::ObjModelCanvas(QWidget *parent)
     : BaseCanvasWidget(parent)
@@ -26,6 +59,12 @@ ObjModelCanvas::ObjModelCanvas(QWidget *parent)
     // 初始化缓存矩阵
     cachedViewMatrix = Eigen::Matrix4f::Identity();
     cachedModelMatrix = Eigen::Matrix4f::Identity();
+    
+    // 初始化像素缓冲区
+    pixelBuffer = Mat::zeros(600, 800, CV_8UC3);
+    
+    // 初始化深度缓冲区
+    depth_buf.resize(600 * 800, std::numeric_limits<float>::max());
 }
 
 // 计算所有面的法向量
@@ -193,16 +232,25 @@ void ObjModelCanvas::drawCurves(QPainter &painter)
 {
     if (model.vertices.empty() || model.faces.empty()) return;
     
+    // 根据绘制模式选择不同的绘制方法
+    switch (drawMode) {
+        case DrawMode::Triangles:
+            drawTriangles(painter);
+            break;
+        case DrawMode::Pixels:
+            drawPixels(painter);
+            break;
+    }
+}
+
+// 原有的三角形绘制方法
+void ObjModelCanvas::drawTriangles(QPainter &painter)
+{
     painter.setRenderHint(QPainter::Antialiasing);
     
-    // 更新深度和颜色（如果需要）
-    if (modelMatrixDirty || viewMatrixDirty) {
-        updateFaceDepths();
-        updateFaceColors();
-        sortFacesByDepth();
-    }
+    Eigen::Matrix4f mvp = getModelViewProjection();
     
-    // 绘制所有面（按深度排序）
+    // 绘制所有面
     for (const Face& face : model.faces) {
         QPolygonF polygon;
         for (int vertexIndex : face.vertexIndices) {
@@ -226,6 +274,97 @@ void ObjModelCanvas::drawCurves(QPainter &painter)
         painter.drawPolygon(polygon);
     }
 }
+
+// 新增：像素绘制方法
+void ObjModelCanvas::drawPixels(QPainter &painter)
+{
+    // 确保像素缓冲区大小与画布匹配
+    if (pixelBuffer.cols != width() || pixelBuffer.rows != height()) {
+        pixelBuffer = Mat::zeros(height(), width(), CV_8UC3);
+        depth_buf.resize(width() * height(), std::numeric_limits<float>::max());
+    }
+    
+    // 清除像素缓冲区
+    pixelBuffer.setTo(Scalar(0, 0, 0));
+    
+    // 重置深度缓冲区
+    std::fill(depth_buf.begin(), depth_buf.end(), std::numeric_limits<float>::max());
+    
+    // 计算模型视图投影矩阵
+    Eigen::Matrix4f mvp = getModelViewProjection();
+    
+    // 遍历所有面
+    for (const Face& face : model.faces) {
+        // 获取面的三个顶点
+        Eigen::Vector4f v[3];
+        for (int i = 0; i < 3; i++) {
+            int vertexIndex = face.vertexIndices[i];
+            Eigen::Vector4f homogenous(model.vertices[vertexIndex].x(),
+                                     model.vertices[vertexIndex].y(),
+                                     model.vertices[vertexIndex].z(),
+                                     1.0f);
+            v[i] = mvp * homogenous;
+            
+            // 透视除法
+            if (v[i].w() != 0.0f) {
+                v[i].x() /= v[i].w();
+                v[i].y() /= v[i].w();
+                v[i].z() /= v[i].w();
+            }
+            
+            // 视口变换
+            v[i].x() = (v[i].x() + 1.0f) * 0.5f * width();
+            v[i].y() = (1.0f - v[i].y()) * 0.5f * height();
+        }
+        
+        // 计算面的包围盒
+        float minX = std::min({v[0].x(), v[1].x(), v[2].x()});
+        float maxX = std::max({v[0].x(), v[1].x(), v[2].x()});
+        float minY = std::min({v[0].y(), v[1].y(), v[2].y()});
+        float maxY = std::max({v[0].y(), v[1].y(), v[2].y()});
+        
+        // 限制在画布范围内
+        int startX = std::max(0, static_cast<int>(std::floor(minX)));
+        int endX = std::min(width() - 1, static_cast<int>(std::ceil(maxX)));
+        int startY = std::max(0, static_cast<int>(std::floor(minY)));
+        int endY = std::min(height() - 1, static_cast<int>(std::ceil(maxY)));
+        
+        // 遍历包围盒内的所有像素
+        for (int y = startY; y <= endY; y++) {
+            for (int x = startX; x <= endX; x++) {
+                // 检查像素是否在三角形内
+                if (insideTriangle(x + 0.5f, y + 0.5f, v)) {
+                    // 计算重心坐标
+                    auto [alpha, beta, gamma] = computeBarycentric2D(x + 0.5f, y + 0.5f, v);
+                    
+                    // 插值深度值
+                    float z = alpha * v[0].z() + beta * v[1].z() + gamma * v[2].z();
+                    
+                    // 深度测试
+                    int index = y * width() + x;
+                    if (z < depth_buf[index]) {
+                        depth_buf[index] = z;
+                        
+                        // 设置像素颜色
+                        Vec3b color;
+                        color[0] = static_cast<uchar>(face.color.blue());   // B
+                        color[1] = static_cast<uchar>(face.color.green());  // G
+                        color[2] = static_cast<uchar>(face.color.red());    // R
+                        pixelBuffer.at<Vec3b>(y, x) = color;
+                    }
+                }
+            }
+        }
+    }
+    
+    // 将OpenCV图像转换为QImage
+    QImage img(pixelBuffer.data, pixelBuffer.cols, pixelBuffer.rows, 
+              pixelBuffer.step, QImage::Format_RGB888);
+    
+    // 绘制到画布
+    painter.drawImage(0, 0, img.rgbSwapped());
+}
+// 判断点是否在三角形内 (修改为使用Eigen::Vector4f)
 
 void ObjModelCanvas::parseObjFile(const QString &filePath)
 {
@@ -584,11 +723,15 @@ void ObjModelCanvas::drawInfoPanel(QPainter &painter)
     painter.drawText(10, 20, info);
 }
 
-// 窗口大小变化时更新
 void ObjModelCanvas::resizeEvent(QResizeEvent *event) {
     QWidget::resizeEvent(event);
     // 投影矩阵依赖于窗口大小，所以需要更新
     viewMatrixDirty = true;
+    
+    // 重置像素缓冲区和深度缓冲区大小
+    pixelBuffer = Mat::zeros(height(), width(), CV_8UC3);
+    depth_buf.resize(width() * height(), std::numeric_limits<float>::max());
+    
     update();
 }
 

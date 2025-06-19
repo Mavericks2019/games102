@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QFileDialog>
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
@@ -114,6 +115,20 @@ void MainWindow::setupObjControls() {
     showFacesCheckbox->setStyleSheet("color: white;");
     connect(showFacesCheckbox, &QCheckBox::toggled, this, &MainWindow::toggleShowFaces);
     
+    // 绘制模式选择
+    QLabel *drawModeLabel = new QLabel("Draw Mode:");
+    drawModeLabel->setStyleSheet("color: white;");
+    drawModeComboBox = new QComboBox();
+    drawModeComboBox->addItem("Triangles", 0); // Triangles 对应 0
+    drawModeComboBox->addItem("Pixels", 1);    // Pixels 对应 1
+    connect(drawModeComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), 
+            this, &MainWindow::setDrawMode);
+    
+    // 新增：背景颜色按钮
+    bgColorButton = new QPushButton("Change Background Color");
+    bgColorButton->setStyleSheet("background-color: #505050; color: white;");
+    connect(bgColorButton, &QPushButton::clicked, this, &MainWindow::changeBackgroundColor);
+    
     // 添加光照控制
     QGroupBox *lightGroup = new QGroupBox("Lighting Controls");
     lightGroup->setStyleSheet("QGroupBox { color: white; }");
@@ -140,7 +155,7 @@ void MainWindow::setupObjControls() {
     connect(specularSlider, &QSlider::valueChanged, this, &MainWindow::updateSpecularIntensity);
     lightLayout->addRow("Specular:", specularSlider);
     
-    // 新增：高光指数滑块
+    // 高光指数滑块
     shininessSlider = new QSlider(Qt::Horizontal);
     shininessSlider->setRange(1, 256);
     shininessSlider->setValue(32); // 默认高光指数
@@ -150,6 +165,16 @@ void MainWindow::setupObjControls() {
     layout->addWidget(loadButton);
     layout->addWidget(resetButton);
     layout->addWidget(showFacesCheckbox);
+    
+    // 添加绘制模式控件
+    QHBoxLayout *drawModeLayout = new QHBoxLayout();
+    drawModeLayout->addWidget(drawModeLabel);
+    drawModeLayout->addWidget(drawModeComboBox);
+    layout->addLayout(drawModeLayout);
+    
+    // 添加背景颜色按钮
+    layout->addWidget(bgColorButton);
+    
     layout->addWidget(lightGroup);
     
     // 添加使用说明
@@ -159,7 +184,9 @@ void MainWindow::setupObjControls() {
         "• Mouse drag: Rotate the model<br>"
         "• Mouse wheel: Zoom in/out<br>"
         "• Reset View: Restore the initial view<br>"
-        "• Lighting controls: Adjust the appearance"
+        "• Lighting controls: Adjust the appearance<br>"
+        "• Draw Mode: Triangles (faster) or Pixels (slower but more accurate)<br>"
+        "• Change Background: Click the button to set canvas background color"
     );
     infoLabel->setWordWrap(true);
     infoLabel->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px;");
@@ -169,6 +196,40 @@ void MainWindow::setupObjControls() {
     
     stackedControlLayout->addWidget(panel);
 }
+
+
+// 设置绘制模式
+// 设置绘制模式
+void MainWindow::setDrawMode(int index) {
+    int modeValue = drawModeComboBox->itemData(index).toInt();
+    
+    // 将整数转换为枚举值
+    ObjModelCanvas::DrawMode mode;
+    if (modeValue == 0) {
+        mode = ObjModelCanvas::Triangles;
+    } else if (modeValue == 1) {
+        mode = ObjModelCanvas::Pixels;
+    } else {
+        mode = ObjModelCanvas::Triangles;
+    }
+    
+    objModelCanvas->setDrawMode(mode);
+}
+
+void MainWindow::changeBackgroundColor() {
+    QColor color = QColorDialog::getColor(objModelCanvas->backgroundColor, this, "Select Background Color");
+    if (color.isValid()) {
+        objModelCanvas->setBackgroundColor(color);
+        
+        // 更新按钮文本颜色提示
+        QString style = QString("background-color: %1; color: %2;")
+            .arg(color.name())
+            .arg(color.lightness() > 128 ? "black" : "white");
+        bgColorButton->setStyleSheet(style);
+    }
+}
+
+
 void MainWindow::updateAmbientIntensity(int value) {
     objModelCanvas->ambientIntensity = value / 100.0f;
     objModelCanvas->update();
