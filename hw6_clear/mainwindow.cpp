@@ -16,7 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     setWindowTitle("OBJ Model Viewer");
-    resize(1400, 800);
+    resize(1920, 1080);
     
     // 初始化曲线颜色
     curveColors["OBJ Model"] = Qt::darkGray;
@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     controlPanel = new QWidget;
     controlLayout = new QVBoxLayout(controlPanel);
     controlLayout->setAlignment(Qt::AlignTop);
-    controlPanel->setFixedWidth(300);
+    controlPanel->setFixedWidth(400);
     
     // 点信息
     QGroupBox *pointGroup = new QGroupBox("Point Information");
@@ -46,8 +46,7 @@ MainWindow::MainWindow(QWidget *parent)
     pointInfoLabel = new QLabel("Hover over a point to see coordinates");
     pointInfoLabel->setAlignment(Qt::AlignCenter);
     pointInfoLabel->setFixedHeight(50);
-    pointInfoLabel->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px;");
-    pointInfoLabel->setWordWrap(true);
+    pointInfoLabel->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px; font-size: 14px;");    pointInfoLabel->setWordWrap(true);
     
     pointLayout->addWidget(pointInfoLabel);
     controlLayout->addWidget(pointGroup);
@@ -95,8 +94,7 @@ void MainWindow::setupObjControls() {
     objInfoLabel = new QLabel("No OBJ model loaded");
     objInfoLabel->setAlignment(Qt::AlignCenter);
     objInfoLabel->setFixedHeight(50);
-    objInfoLabel->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px;");
-    objInfoLabel->setWordWrap(true);
+    objInfoLabel->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px; font-size: 14px;");    objInfoLabel->setWordWrap(true);
     layout->addWidget(objInfoLabel);
 
     // 添加OBJ加载按钮
@@ -131,7 +129,7 @@ void MainWindow::setupObjControls() {
     
     // 添加光照控制
     QGroupBox *lightGroup = new QGroupBox("Lighting Controls");
-    lightGroup->setStyleSheet("QGroupBox { color: white; }");
+    lightGroup->setStyleSheet("QGroupBox { color: white; font-size: 14px; }");
     QFormLayout *lightLayout = new QFormLayout(lightGroup);
     
     // 环境光强度滑块

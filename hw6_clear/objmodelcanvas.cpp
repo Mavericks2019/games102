@@ -755,7 +755,7 @@ QPointF ObjModelCanvas::projectVertex(const Eigen::Vector3f& vertex) const
 void ObjModelCanvas::drawInfoPanel(QPainter &painter)
 {
     painter.setPen(Qt::darkGray);
-    painter.setFont(QFont("Arial", 9));
+    painter.setFont(QFont("Arial", 12));
     QString info = QString("OBJ Model - Vertices: %1, Faces: %2")
                   .arg(model.vertices.size())
                   .arg(model.faces.size());

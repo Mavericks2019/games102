@@ -6,7 +6,7 @@
 BaseCanvasWidget::BaseCanvasWidget(QWidget *parent)
     : QWidget(parent)
 {
-    setMinimumSize(800, 600);
+    setMinimumSize(1200, 900);
     setMouseTracking(true);
 }
 

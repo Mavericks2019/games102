@@ -8,6 +8,8 @@ int main(int argc, char *argv[])
     
     // Set Fusion style
     QApplication::setStyle(QStyleFactory::create("Fusion"));
+    QFont defaultFont("Arial", 12);  // 从原来的9-10号增大到12号
+    app.setFont(defaultFont);
     
     // Set palette
     QPalette palette;
