@@ -74,7 +74,7 @@ public:
     int hoveredIndex = -1;
     QColor curveColor = Qt::blue;
     bool showCurve = true;
-    QColor backgroundColor = Qt::white; // 背景颜色
+    QColor backgroundColor = Qt::black; // 背景颜色
 };
 
 #endif // BASECANVASWIDGET_H

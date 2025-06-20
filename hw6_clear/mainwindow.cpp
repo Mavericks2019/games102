@@ -111,7 +111,7 @@ void MainWindow::setupObjControls() {
     
     // 添加显示面的复选框
     QCheckBox *showFacesCheckbox = new QCheckBox("Show Faces (Fill Polygons)");
-    showFacesCheckbox->setChecked(true); // 默认选中
+    showFacesCheckbox->setChecked(false); // 默认选中
     showFacesCheckbox->setStyleSheet("color: white;");
     connect(showFacesCheckbox, &QCheckBox::toggled, this, &MainWindow::toggleShowFaces);
     

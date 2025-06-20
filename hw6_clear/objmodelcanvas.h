@@ -103,7 +103,7 @@ public:
     QPoint lastMousePos;
     
     // 是否显示面（填充多边形）
-    bool showFaces = true;
+    bool showFaces = false;
     
     // 绘制模式
     DrawMode drawMode = Triangles; // 默认为三角形模式

@@ -7,6 +7,9 @@
 #include <QDebug>
 #include <QDir>
 #include <algorithm>  // 用于std::sort
+#include <mutex>
+#include <omp.h>
+#include <thread>
 
 using namespace Eigen;
 using namespace cv;
@@ -49,7 +52,7 @@ ObjModelCanvas::ObjModelCanvas(QWidget *parent)
     curveColor = Qt::darkGray;
     allowPointCreation = false; // 禁用点创建
     cameraPosition = Eigen::Vector3f(0, 0, 1.5f); // 更靠近屏幕
-    showFaces = true; // 默认显示面
+    showFaces = false; // 默认显示面
     
     // 初始化光照参数
     lightPosition = Eigen::Vector3f(1.0f, 1.0f, 1.0f); // 光源位置
@@ -247,31 +250,67 @@ void ObjModelCanvas::drawCurves(QPainter &painter)
 void ObjModelCanvas::drawTriangles(QPainter &painter)
 {
     painter.setRenderHint(QPainter::Antialiasing);
-    
-    Eigen::Matrix4f mvp = getModelViewProjection();
-    
-    // 绘制所有面
-    for (const Face& face : model.faces) {
-        QPolygonF polygon;
-        for (int vertexIndex : face.vertexIndices) {
-            if (vertexIndex < model.vertices.size()) {
-                Eigen::Vector3f vertex = model.vertices[vertexIndex];
-                QPointF screenPoint = projectVertex(vertex);
-                polygon << screenPoint;
+    const Eigen::Matrix4f mvp = getModelViewProjection();
+
+    // 1. 预计算所有顶点的投影坐标（线程安全）
+    std::vector<QPointF> projectedVertices(model.vertices.size());
+    #pragma omp parallel for
+    for (int i = 0; i < model.vertices.size(); ++i) {
+        projectedVertices[i] = projectVertex(model.vertices[i]);
+    }
+
+    // 2. 分割三角形列表到多个线程
+    const int numThreads = std::thread::hardware_concurrency();
+    const int trianglesPerThread = model.faces.size() / numThreads + 1;
+
+    // 存储每个线程的离屏绘图表面
+    std::vector<QImage> threadImages(numThreads, QImage(size(), QImage::Format_ARGB32));
+    std::vector<std::thread> threads;
+
+    for (int threadId = 0; threadId < numThreads; ++threadId) {
+        threads.emplace_back([&, threadId]() {
+            // 初始化当前线程的离屏图像
+            QImage &img = threadImages[threadId];
+            img.fill(Qt::transparent);
+            QPainter threadPainter(&img);
+            threadPainter.setRenderHint(QPainter::Antialiasing);
+
+            // 计算当前线程处理的三角形范围
+            const int startIdx = threadId * trianglesPerThread;
+            const int endIdx = std::min(startIdx + trianglesPerThread, static_cast<int>(model.faces.size()));
+
+            // 绘制分配给当前线程的三角形
+            for (int faceIdx = startIdx; faceIdx < endIdx; ++faceIdx) {
+                const Face& face = model.faces[faceIdx];
+                QPolygonF polygon;
+                for (int vertexIndex : face.vertexIndices) {
+                    if (vertexIndex < projectedVertices.size()) {
+                        polygon << projectedVertices[vertexIndex];
+                    }
+                }
+
+                // 设置绘图属性
+                threadPainter.setPen(QPen(curveColor, 1));
+                if (showFaces) {
+                    threadPainter.setBrush(QBrush(face.color));
+                } else {
+                    threadPainter.setBrush(Qt::NoBrush);
+                }
+
+                // 在离屏图像上绘制
+                threadPainter.drawPolygon(polygon);
             }
-        }
-        
-        // 设置画笔（边框颜色）
-        painter.setPen(QPen(curveColor, 1));
-        
-        // 设置画刷（面颜色）
-        if (showFaces) {
-            painter.setBrush(QBrush(face.color));
-        } else {
-            painter.setBrush(Qt::NoBrush);
-        }
-        
-        painter.drawPolygon(polygon);
+        });
+    }
+
+    // 3. 等待所有线程完成
+    for (auto& thread : threads) {
+        thread.join();
+    }
+
+    // 4. 合并所有离屏图像到主画布
+    for (const QImage& img : threadImages) {
+        painter.drawImage(0, 0, img);
     }
 }
 
