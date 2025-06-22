@@ -314,96 +314,137 @@ void ObjModelCanvas::drawTriangles(QPainter &painter)
     }
 }
 
-// 新增：像素绘制方法
 void ObjModelCanvas::drawPixels(QPainter &painter)
 {
-    // 确保像素缓冲区大小与画布匹配
+    // 确保主缓冲区大小正确
     if (pixelBuffer.cols != width() || pixelBuffer.rows != height()) {
         pixelBuffer = Mat::zeros(height(), width(), CV_8UC3);
         depth_buf.resize(width() * height(), std::numeric_limits<float>::max());
     }
     
-    // 清除像素缓冲区
+    // 重置主缓冲区
     pixelBuffer.setTo(Scalar(0, 0, 0));
-    
-    // 重置深度缓冲区
     std::fill(depth_buf.begin(), depth_buf.end(), std::numeric_limits<float>::max());
     
-    // 计算模型视图投影矩阵
+    // 预计算MVP矩阵
     Eigen::Matrix4f mvp = getModelViewProjection();
     
-    // 遍历所有面
-    for (const Face& face : model.faces) {
-        // 获取面的三个顶点
-        Eigen::Vector4f v[3];
-        for (int i = 0; i < 3; i++) {
-            int vertexIndex = face.vertexIndices[i];
-            Eigen::Vector4f homogenous(model.vertices[vertexIndex].x(),
-                                     model.vertices[vertexIndex].y(),
-                                     model.vertices[vertexIndex].z(),
-                                     1.0f);
-            v[i] = mvp * homogenous;
+    // 多线程渲染设置
+    const int numThreads = std::max(1, static_cast<int>(std::thread::hardware_concurrency()));
+    const int trianglesPerThread = model.faces.size() / numThreads + 1;
+    std::vector<std::thread> threads;
+    std::vector<Mat> threadPixelBuffers(numThreads);
+    std::vector<std::vector<float>> threadDepthBufs(numThreads);
+
+    // 初始化线程局部缓冲区
+    for (int i = 0; i < numThreads; ++i) {
+        threadPixelBuffers[i] = Mat::zeros(height(), width(), CV_8UC3);
+        threadDepthBufs[i].resize(width() * height(), std::numeric_limits<float>::max());
+    }
+
+    // 启动渲染线程
+    for (int threadId = 0; threadId < numThreads; ++threadId) {
+        threads.emplace_back([&, threadId]() {
+            const int startIdx = threadId * trianglesPerThread;
+            const int endIdx = std::min(startIdx + trianglesPerThread, static_cast<int>(model.faces.size()));
             
-            // 透视除法
-            if (v[i].w() != 0.0f) {
-                v[i].x() /= v[i].w();
-                v[i].y() /= v[i].w();
-                v[i].z() /= v[i].w();
-            }
+            Mat& localPixelBuffer = threadPixelBuffers[threadId];
+            std::vector<float>& localDepthBuf = threadDepthBufs[threadId];
             
-            // 视口变换
-            v[i].x() = (v[i].x() + 1.0f) * 0.5f * width();
-            v[i].y() = (1.0f - v[i].y()) * 0.5f * height();
-        }
-        
-        // 计算面的包围盒
-        float minX = std::min({v[0].x(), v[1].x(), v[2].x()});
-        float maxX = std::max({v[0].x(), v[1].x(), v[2].x()});
-        float minY = std::min({v[0].y(), v[1].y(), v[2].y()});
-        float maxY = std::max({v[0].y(), v[1].y(), v[2].y()});
-        
-        // 限制在画布范围内
-        int startX = std::max(0, static_cast<int>(std::floor(minX)));
-        int endX = std::min(width() - 1, static_cast<int>(std::ceil(maxX)));
-        int startY = std::max(0, static_cast<int>(std::floor(minY)));
-        int endY = std::min(height() - 1, static_cast<int>(std::ceil(maxY)));
-        
-        // 遍历包围盒内的所有像素
-        for (int y = startY; y <= endY; y++) {
-            for (int x = startX; x <= endX; x++) {
-                // 检查像素是否在三角形内
-                if (insideTriangle(x + 0.5f, y + 0.5f, v)) {
-                    // 计算重心坐标
-                    auto [alpha, beta, gamma] = computeBarycentric2D(x + 0.5f, y + 0.5f, v);
+            for (int faceIdx = startIdx; faceIdx < endIdx; ++faceIdx) {
+                const Face& face = model.faces[faceIdx];
+                Eigen::Vector4f v[3];
+                
+                // 顶点变换 (与原始逻辑相同)
+                for (int i = 0; i < 3; i++) {
+                    int vertexIndex = face.vertexIndices[i];
+                    Eigen::Vector4f homogenous(
+                        model.vertices[vertexIndex].x(),
+                        model.vertices[vertexIndex].y(),
+                        model.vertices[vertexIndex].z(),
+                        1.0f
+                    );
+                    v[i] = mvp * homogenous;
                     
-                    // 插值深度值
-                    float z = alpha * v[0].z() + beta * v[1].z() + gamma * v[2].z();
+                    if (v[i].w() != 0.0f) {
+                        v[i].x() /= v[i].w();
+                        v[i].y() /= v[i].w();
+                        v[i].z() /= v[i].w();
+                    }
                     
-                    // 深度测试
-                    int index = y * width() + x;
-                    if (z < depth_buf[index]) {
-                        depth_buf[index] = z;
+                    v[i].x() = (v[i].x() + 1.0f) * 0.5f * width();
+                    v[i].y() = (1.0f - v[i].y()) * 0.5f * height();
+                }
+                
+                // 计算包围盒
+                float minX = std::min({v[0].x(), v[1].x(), v[2].x()});
+                float maxX = std::max({v[0].x(), v[1].x(), v[2].x()});
+                float minY = std::min({v[0].y(), v[1].y(), v[2].y()});
+                float maxY = std::max({v[0].y(), v[1].y(), v[2].y()});
+                
+                int startX = std::max(0, static_cast<int>(std::floor(minX)));
+                int endX = std::min(width() - 1, static_cast<int>(std::ceil(maxX)));
+                int startY = std::max(0, static_cast<int>(std::floor(minY)));
+                int endY = std::min(height() - 1, static_cast<int>(std::ceil(maxY)));
+                
+                // 光栅化三角形
+                for (int y = startY; y <= endY; y++) {
+                    for (int x = startX; x <= endX; x++) {
+                        const float px = x + 0.5f;
+                        const float py = y + 0.5f;
                         
-                        // 设置像素颜色
-                        Vec3b color;
-                        color[0] = static_cast<uchar>(face.color.blue());   // B
-                        color[1] = static_cast<uchar>(face.color.green());  // G
-                        color[2] = static_cast<uchar>(face.color.red());    // R
-                        pixelBuffer.at<Vec3b>(y, x) = color;
+                        if (insideTriangle(px, py, v)) {
+                            auto [alpha, beta, gamma] = computeBarycentric2D(px, py, v);
+                            float z = alpha * v[0].z() + beta * v[1].z() + gamma * v[2].z();
+                            
+                            int index = y * width() + x;
+                            if (z < localDepthBuf[index]) {
+                                localDepthBuf[index] = z;
+                                
+                                Vec3b color;
+                                color[0] = static_cast<uchar>(face.color.blue());
+                                color[1] = static_cast<uchar>(face.color.green());
+                                color[2] = static_cast<uchar>(face.color.red());
+                                localPixelBuffer.at<Vec3b>(y, x) = color;
+                            }
+                        }
                     }
                 }
+            }
+        });
+    }
+    
+    // 等待所有线程完成
+    for (auto& thread : threads) {
+        thread.join();
+    }
+    
+    // 合并线程结果 (深度测试最终合并)
+    for (int y = 0; y < height(); y++) {
+        for (int x = 0; x < width(); x++) {
+            int index = y * width() + x;
+            float minDepth = depth_buf[index];
+            Vec3b finalColor(0, 0, 0);
+            
+            for (int t = 0; t < numThreads; t++) {
+                if (threadDepthBufs[t][index] < minDepth) {
+                    minDepth = threadDepthBufs[t][index];
+                    finalColor = threadPixelBuffers[t].at<Vec3b>(y, x);
+                }
+            }
+            
+            if (minDepth < depth_buf[index]) {
+                depth_buf[index] = minDepth;
+                pixelBuffer.at<Vec3b>(y, x) = finalColor;
             }
         }
     }
     
-    // 将OpenCV图像转换为QImage
+    // 渲染到画布
     QImage img(pixelBuffer.data, pixelBuffer.cols, pixelBuffer.rows, 
               pixelBuffer.step, QImage::Format_RGB888);
-    
-    // 绘制到画布
     painter.drawImage(0, 0, img.rgbSwapped());
 }
-// 判断点是否在三角形内 (修改为使用Eigen::Vector4f)
 
 void ObjModelCanvas::parseObjFile(const QString &filePath)
 {

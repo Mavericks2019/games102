@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/ObjViewer.dir/ObjViewer_autogen/mocs_compilation.cpp.o CMakeFiles/ObjViewer.dir/main.cpp.o  -o ObjViewer  /usr/lib/x86_64-linux-gnu/libQt5OpenGL.so.5.12.8 -lGL /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.12.8 /usr/lib/x86_64-linux-gnu/libQt5Gui.so.5.12.8 /usr/lib/x86_64-linux-gnu/libQt5Core.so.5.12.8 

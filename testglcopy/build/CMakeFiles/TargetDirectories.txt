@@ -1,0 +1,8 @@
+/opt/games102/testglcopy/build/CMakeFiles/install/local.dir
+/opt/games102/testglcopy/build/CMakeFiles/install.dir
+/opt/games102/testglcopy/build/CMakeFiles/list_install_components.dir
+/opt/games102/testglcopy/build/CMakeFiles/rebuild_cache.dir
+/opt/games102/testglcopy/build/CMakeFiles/edit_cache.dir
+/opt/games102/testglcopy/build/CMakeFiles/install/strip.dir
+/opt/games102/testglcopy/build/CMakeFiles/ObjViewer.dir
+/opt/games102/testglcopy/build/CMakeFiles/ObjViewer_autogen.dir
