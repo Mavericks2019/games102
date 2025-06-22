@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(ObjViewer)
+project(objViewer)
 
 # 设置C++标准
 set(CMAKE_CXX_STANDARD 11)
@@ -16,6 +16,8 @@ find_package(Qt5 COMPONENTS Widgets OpenGL REQUIRED)
 # 添加可执行文件
 add_executable(${PROJECT_NAME}
     main.cpp
+    glwidget.cpp
+    glwidget.h
 )
 
 # 链接Qt库
