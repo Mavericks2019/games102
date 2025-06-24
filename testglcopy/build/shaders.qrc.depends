@@ -1,0 +1,9 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource>
+    <file>shaders/wireframe.vert</file>
+    <file>shaders/wireframe.frag</file>
+    <file>shaders/blinnphong.vert</file>
+    <file>shaders/blinnphong.frag</file>
+</qresource>
+</RCC>
