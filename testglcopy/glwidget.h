@@ -16,8 +16,13 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 public:
-    enum RenderMode { Wireframe, BlinnPhong };
-
+    enum RenderMode { 
+    Wireframe, 
+    BlinnPhong, 
+    GaussianCurvature,
+    MeanCurvature,
+    MaxCurvature 
+};
     explicit GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
 
@@ -40,10 +45,13 @@ protected:
 public:
     void initializeShaders();
     void calculateNormals();
-
+    void calculateCurvatures();
+    
     // OpenGL资源
     QOpenGLShaderProgram wireframeProgram;
     QOpenGLShaderProgram blinnPhongProgram;
+    QOpenGLShaderProgram curvatureProgram;
+
     QOpenGLVertexArrayObject vao;
     QOpenGLBuffer vbo;
     QOpenGLBuffer ebo;
@@ -55,6 +63,11 @@ public:
     std::vector<unsigned int> faces;
     std::vector<unsigned int> edges;
     std::set<uint64_t> uniqueEdges;
+
+    // 曲率数据
+    std::vector<float> gaussianCurvatures;
+    std::vector<float> meanCurvatures;
+    std::vector<float> maxCurvatures;
 
     // 视图参数
     float rotationX, rotationY;

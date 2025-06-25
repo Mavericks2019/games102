@@ -229,6 +229,9 @@ void GLWidget::loadOBJ(const QString &path)
     
     // 计算法线
     calculateNormals();
+
+    // 计算曲率
+    calculateCurvatures();
     
     qDebug() << "Loaded OBJ file:" << path;
     qDebug() << "Vertices:" << vertexCount << "Faces:" << faceCount;
@@ -239,11 +242,9 @@ void GLWidget::loadOBJ(const QString &path)
     modelLoaded = true;
     
     // 更新OpenGL缓冲区
-    if (vao.isCreated()) {
-        makeCurrent();
-        initializeShaders();
-        doneCurrent();
-    }
+    makeCurrent();
+    initializeShaders();  // 只需重新初始化着色器
+    doneCurrent();
     
     // 重置视图参数
     rotationX = rotationY = 0;
@@ -259,6 +260,12 @@ void GLWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE); // 启用多重采样抗锯齿
 
+    // 创建缓冲区和VAO - 只在这里创建一次
+    vao.create();
+    vbo.create();
+    ebo.create();
+    faceEbo.create();
+
     initializeShaders();
 }
 
@@ -271,7 +278,23 @@ void GLWidget::initializeShaders()
     if (blinnPhongProgram.isLinked()) {
         blinnPhongProgram.removeAllShaders();
     }
+    // 曲率着色器程序
+    if (curvatureProgram.isLinked()) {
+        curvatureProgram.removeAllShaders();
+    }
     
+    if (!curvatureProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/curvature.vert")) {
+        qWarning() << "Curvature vertex shader error:" << curvatureProgram.log();
+    }
+    
+    if (!curvatureProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/curvature.frag")) {
+        qWarning() << "Curvature fragment shader error:" << curvatureProgram.log();
+    }
+    
+    if (!curvatureProgram.link()) {
+        qWarning() << "Curvature shader link error:" << curvatureProgram.log();
+    }
+
     // 线框着色器程序
     if (!wireframeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/wireframe.vert")) {
         qWarning() << "Vertex shader error:" << wireframeProgram.log();
@@ -297,11 +320,6 @@ void GLWidget::initializeShaders()
     if (!blinnPhongProgram.link()) {
         qWarning() << "Blinn-Phong shader link error:" << blinnPhongProgram.log();
     }
-
-    // 创建VBO和VAO
-    vao.create();
-    vbo.create();
-    ebo.create();
 
     vao.bind();
     vbo.bind();
@@ -345,6 +363,98 @@ void GLWidget::initializeShaders()
     faceEbo.create();
     faceEbo.bind();
     faceEbo.allocate(faces.data(), faces.size() * sizeof(unsigned int));
+}
+
+void GLWidget::calculateCurvatures()
+{
+    gaussianCurvatures.clear();
+    meanCurvatures.clear();
+    maxCurvatures.clear();
+    
+    if (vertices.empty() || faces.empty()) return;
+    
+    // 初始化曲率存储
+    gaussianCurvatures.resize(vertices.size() / 3, 0.0f);
+    meanCurvatures.resize(vertices.size() / 3, 0.0f);
+    maxCurvatures.resize(vertices.size() / 3, 0.0f);
+    
+    // 计算每个面的曲率贡献
+    for (size_t i = 0; i < faces.size(); i += 3) {
+        unsigned int idx1 = faces[i];
+        unsigned int idx2 = faces[i+1];
+        unsigned int idx3 = faces[i+2];
+        
+        QVector3D v1(vertices[idx1*3], vertices[idx1*3+1], vertices[idx1*3+2]);
+        QVector3D v2(vertices[idx2*3], vertices[idx2*3+1], vertices[idx2*3+2]);
+        QVector3D v3(vertices[idx3*3], vertices[idx3*3+1], vertices[idx3*3+2]);
+        
+        // 计算三角形的边向量
+        QVector3D e1 = v2 - v1;
+        QVector3D e2 = v3 - v1;
+        QVector3D e3 = v3 - v2;
+        
+        // 计算边长
+        float a = e1.length();
+        float b = e2.length();
+        float c = e3.length();
+        
+        // 计算三角形面积
+        float area = QVector3D::crossProduct(e1, e2).length() / 2.0f;
+        float inv_area = (area > 0.0001f) ? 1.0f / area : 0.0f;
+        
+        // 计算角度
+        float angle1 = acos(QVector3D::dotProduct(-e1, e2) / (a * b));
+        float angle2 = acos(QVector3D::dotProduct(e1, e3) / (a * c));
+        float angle3 = acos(QVector3D::dotProduct(-e2, -e3) / (b * c));
+        
+        // 高斯曲率贡献 (角度欠量)
+        float gaussian = 3.0f * M_PI - (angle1 + angle2 + angle3);
+        
+        // 分配曲率到顶点
+        gaussianCurvatures[idx1] += gaussian * inv_area;
+        gaussianCurvatures[idx2] += gaussian * inv_area;
+        gaussianCurvatures[idx3] += gaussian * inv_area;
+        
+        // 平均曲率近似 (周长/面积)
+        float perimeter = a + b + c;
+        float mean = perimeter * inv_area;
+        
+        meanCurvatures[idx1] += mean;
+        meanCurvatures[idx2] += mean;
+        meanCurvatures[idx3] += mean;
+    }
+    
+    // 后处理 - 计算最终曲率值
+    for (size_t i = 0; i < gaussianCurvatures.size(); i++) {
+        // 高斯曲率
+        gaussianCurvatures[i] = fabs(gaussianCurvatures[i]);
+        
+        // 平均曲率
+        meanCurvatures[i] = fabs(meanCurvatures[i]);
+        
+        // 最大曲率近似
+        maxCurvatures[i] = gaussianCurvatures[i] + meanCurvatures[i];
+    }
+    
+    // 归一化曲率值到 [0,1] 范围
+    auto normalize = [](std::vector<float>& values) {
+        if (values.empty()) return;
+        
+        auto minmax = std::minmax_element(values.begin(), values.end());
+        float minVal = *minmax.first;
+        float maxVal = *minmax.second;
+        float range = maxVal - minVal;
+        
+        if (range > 0) {
+            for (float& val : values) {
+                val = (val - minVal) / range;
+            }
+        }
+    };
+    
+    normalize(gaussianCurvatures);
+    normalize(meanCurvatures);
+    normalize(maxCurvatures);
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -392,7 +502,33 @@ void GLWidget::paintGL()
 
         vao.release();
         wireframeProgram.release();
-    } else {
+    }  else if (currentRenderMode == GaussianCurvature || 
+               currentRenderMode == MeanCurvature || 
+               currentRenderMode == MaxCurvature) {
+        // 曲率可视化模式
+        curvatureProgram.bind();
+        vao.bind();
+        faceEbo.bind();
+        
+        // 设置多边形填充
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        
+        // 设置变换矩阵
+        curvatureProgram.setUniformValue("model", model);
+        curvatureProgram.setUniformValue("view", view);
+        curvatureProgram.setUniformValue("projection", projection);
+        curvatureProgram.setUniformValue("normalMatrix", normalMatrix);
+        
+        // 设置曲率类型
+        curvatureProgram.setUniformValue("curvatureType", static_cast<int>(currentRenderMode));
+        
+        // 绘制模型
+        glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, 0);
+        
+        faceEbo.release();
+        vao.release();
+        curvatureProgram.release();
+    }else{
         // 布林冯模式
         blinnPhongProgram.bind();
         vao.bind();

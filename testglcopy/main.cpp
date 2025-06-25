@@ -15,6 +15,7 @@
 #include <QFileInfo>
 #include <QSlider>
 #include <QColorDialog>
+#include <QRadioButton>
 
 int main(int argc, char *argv[])
 {
@@ -111,29 +112,48 @@ int main(int argc, char *argv[])
     });
     objControlLayout->addWidget(loadButton);
     
-    // 添加渲染模式切换按钮
-    QPushButton *renderModeButton = new QPushButton("Switch to Solid Rendering");
-    renderModeButton->setStyleSheet(
-        "QPushButton {"
-        "   background-color: #505050;"
-        "   color: white;"
-        "   border: none;"
-        "   padding: 10px 20px;"
-        "   font-size: 16px;"
-        "   border-radius: 5px;"
-        "}"
-        "QPushButton:hover { background-color: #606060; }"
-    );
-    QObject::connect(renderModeButton, &QPushButton::clicked, [glWidget, renderModeButton]() {
-        if (glWidget->currentRenderMode == GLWidget::Wireframe) {
-            glWidget->setRenderMode(GLWidget::BlinnPhong);
-            renderModeButton->setText("Switch to Wireframe Rendering");
-        } else {
-            glWidget->setRenderMode(GLWidget::Wireframe);
-            renderModeButton->setText("Switch to Solid Rendering");
-        }
+    // 创建渲染模式选择组
+    QGroupBox *renderModeGroup = new QGroupBox("Rendering Mode");
+    QVBoxLayout *renderModeLayout = new QVBoxLayout(renderModeGroup);
+    
+    QRadioButton *wireframeRadio = new QRadioButton("Wireframe");
+    QRadioButton *solidRadio = new QRadioButton("Solid (Blinn-Phong)");
+    QRadioButton *gaussianRadio = new QRadioButton("Gaussian Curvature");
+    QRadioButton *meanRadio = new QRadioButton("Mean Curvature");
+    QRadioButton *maxRadio = new QRadioButton("Max Curvature");
+    
+    wireframeRadio->setChecked(true);
+    
+    // 添加到布局
+    renderModeLayout->addWidget(wireframeRadio);
+    renderModeLayout->addWidget(solidRadio);
+    renderModeLayout->addWidget(gaussianRadio);
+    renderModeLayout->addWidget(meanRadio);
+    renderModeLayout->addWidget(maxRadio);
+    
+    // 连接信号
+    QObject::connect(wireframeRadio, &QRadioButton::clicked, [glWidget]() {
+        glWidget->setRenderMode(GLWidget::Wireframe);
     });
-    objControlLayout->addWidget(renderModeButton);
+    
+    QObject::connect(solidRadio, &QRadioButton::clicked, [glWidget]() {
+        glWidget->setRenderMode(GLWidget::BlinnPhong);
+    });
+    
+    QObject::connect(gaussianRadio, &QRadioButton::clicked, [glWidget]() {
+        glWidget->setRenderMode(GLWidget::GaussianCurvature);
+    });
+    
+    QObject::connect(meanRadio, &QRadioButton::clicked, [glWidget]() {
+        glWidget->setRenderMode(GLWidget::MeanCurvature);
+    });
+    
+    QObject::connect(maxRadio, &QRadioButton::clicked, [glWidget]() {
+        glWidget->setRenderMode(GLWidget::MaxCurvature);
+    });
+    
+    // 添加到控制面板
+    objControlLayout->addWidget(renderModeGroup);
     
     // 添加重置视图按钮
     QPushButton *resetButton = new QPushButton("Reset View");
