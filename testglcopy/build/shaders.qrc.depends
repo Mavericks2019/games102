@@ -5,5 +5,7 @@
     <file>shaders/wireframe.frag</file>
     <file>shaders/blinnphong.vert</file>
     <file>shaders/blinnphong.frag</file>
+    <file>shaders/curvature.vert</file>
+    <file>shaders/curvature.frag</file>
 </qresource>
 </RCC>

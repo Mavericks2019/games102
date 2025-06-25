@@ -61,6 +61,8 @@ qrc_shaders.cpp: ../shaders/wireframe.vert
 qrc_shaders.cpp: ../shaders/wireframe.frag
 qrc_shaders.cpp: ../shaders/blinnphong.vert
 qrc_shaders.cpp: ../shaders/blinnphong.frag
+qrc_shaders.cpp: ../shaders/curvature.vert
+qrc_shaders.cpp: ../shaders/curvature.frag
 qrc_shaders.cpp: shaders.qrc.depends
 qrc_shaders.cpp: ../shaders.qrc
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/opt/games102/testglcopy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating qrc_shaders.cpp"
