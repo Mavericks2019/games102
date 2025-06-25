@@ -7,6 +7,7 @@
 #include <QSurfaceFormat>
 #include <QVector3D>
 #include <QtMath>
+#include <QResource>
 
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
     vbo(QOpenGLBuffer::VertexBuffer),
@@ -272,23 +273,11 @@ void GLWidget::initializeShaders()
     }
     
     // 线框着色器程序
-    if (!wireframeProgram.addShaderFromSourceCode(QOpenGLShader::Vertex,
-        "#version 120\n"
-        "attribute vec3 aPos;\n"
-        "uniform mat4 model;\n"
-        "uniform mat4 view;\n"
-        "uniform mat4 projection;\n"
-        "void main() {\n"
-        "   gl_Position = projection * view * model * vec4(aPos, 1.0);\n"
-        "}\n")) {
+    if (!wireframeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/wireframe.vert")) {
         qWarning() << "Vertex shader error:" << wireframeProgram.log();
     }
     
-    if (!wireframeProgram.addShaderFromSourceCode(QOpenGLShader::Fragment,
-        "#version 120\n"
-        "void main() {\n"
-        "   gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n" // 白色线条
-        "}\n")) {
+    if (!wireframeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/wireframe.frag")) {
         qWarning() << "Fragment shader error:" << wireframeProgram.log();
     }
     
@@ -297,53 +286,11 @@ void GLWidget::initializeShaders()
     }
     
     // 布林冯着色器程序
-    if (!blinnPhongProgram.addShaderFromSourceCode(QOpenGLShader::Vertex,
-        "#version 120\n"
-        "attribute vec3 aPos;\n"
-        "attribute vec3 aNormal;\n"
-        "uniform mat4 model;\n"
-        "uniform mat4 view;\n"
-        "uniform mat4 projection;\n"
-        "uniform mat3 normalMatrix;\n"
-        "varying vec3 FragPos;\n"
-        "varying vec3 Normal;\n"
-        "void main() {\n"
-        "   FragPos = vec3(model * vec4(aPos, 1.0));\n"
-        "   Normal = normalMatrix * aNormal;\n"
-        "   gl_Position = projection * view * vec4(FragPos, 1.0);\n"
-        "}\n")) {
+    if (!blinnPhongProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/blinnphong.vert")) {
         qWarning() << "Blinn-Phong vertex shader error:" << blinnPhongProgram.log();
     }
     
-    if (!blinnPhongProgram.addShaderFromSourceCode(QOpenGLShader::Fragment,
-        "#version 120\n"
-        "varying vec3 FragPos;\n"
-        "varying vec3 Normal;\n"
-        "uniform vec3 lightPos;\n"
-        "uniform vec3 viewPos;\n"
-        "uniform vec3 lightColor;\n"
-        "uniform vec3 objectColor;\n"
-        "void main() {\n"
-        "   // 环境光\n"
-        "   float ambientStrength = 0.1;\n"
-        "   vec3 ambient = ambientStrength * lightColor;\n"
-        "   \n"
-        "   // 漫反射\n"
-        "   vec3 norm = normalize(Normal);\n"
-        "   vec3 lightDir = normalize(lightPos - FragPos);\n"
-        "   float diff = max(dot(norm, lightDir), 0.0);\n"
-        "   vec3 diffuse = diff * lightColor;\n"
-        "   \n"
-        "   // 镜面反射 (Blinn-Phong)\n"
-        "   float specularStrength = 0.5;\n"
-        "   vec3 viewDir = normalize(viewPos - FragPos);\n"
-        "   vec3 halfwayDir = normalize(lightDir + viewDir);\n"
-        "   float spec = pow(max(dot(norm, halfwayDir), 0.0), 32.0);\n"
-        "   vec3 specular = specularStrength * spec * lightColor;\n"
-        "   \n"
-        "   vec3 result = (ambient + diffuse + specular) * objectColor;\n"
-        "   gl_FragColor = vec4(result, 1.0);\n"
-        "}\n")) {
+    if (!blinnPhongProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/blinnphong.frag")) {
         qWarning() << "Blinn-Phong fragment shader error:" << blinnPhongProgram.log();
     }
     

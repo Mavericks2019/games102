@@ -13,11 +13,17 @@ set(CMAKE_AUTOUIC ON)
 # 查找Qt5组件
 find_package(Qt5 COMPONENTS Widgets OpenGL REQUIRED)
 
+# 添加着色器资源文件
+qt5_add_resources(RESOURCE_FILES
+    shaders.qrc
+)
+
 # 添加可执行文件
 add_executable(${PROJECT_NAME}
     main.cpp
     glwidget.cpp
     glwidget.h
+    ${RESOURCE_FILES}
 )
 
 # 链接Qt库
