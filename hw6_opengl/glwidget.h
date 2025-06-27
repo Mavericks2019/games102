@@ -60,12 +60,14 @@ public:
     // 模型数据
     std::vector<float> vertices;
     std::vector<float> normals;
-    std::vector<float> gaussianCurvatures;  // 存储高斯曲率
-    std::vector<float> meanCurvatures;      // 存储平均曲率
-    std::vector<float> maxCurvatures;       // 存储最大曲率
     std::vector<unsigned int> faces;
     std::vector<unsigned int> edges;
     std::set<uint64_t> uniqueEdges;
+
+    // 曲率数据
+    std::vector<float> gaussianCurvatures;
+    std::vector<float> meanCurvatures;
+    std::vector<float> maxCurvatures;
 
     // 视图参数
     float rotationX, rotationY;
