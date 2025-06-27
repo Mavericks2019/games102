@@ -58,8 +58,11 @@ void GLWidget::setRenderMode(RenderMode mode)
 {
     currentRenderMode = mode;
     if (modelLoaded) {
+        // 重新计算曲率，以更新vertexCurvatures
+        calculateCurvatures();
+        
         makeCurrent();
-        initializeShaders();
+        initializeShaders();  // 更新着色器和缓冲区
         doneCurrent();
     }
     update();
@@ -78,6 +81,10 @@ void GLWidget::loadOBJ(const QString &path)
     edges.clear();
     uniqueEdges.clear();
     normals.clear();
+    gaussianCurvatures.clear();
+    meanCurvatures.clear();
+    maxCurvatures.clear();
+    vertexCurvatures.clear(); // 清空曲率数据
     modelLoaded = false;
     
     // 临时存储原始顶点数据
@@ -233,6 +240,10 @@ void GLWidget::loadOBJ(const QString &path)
     // 计算曲率
     calculateCurvatures();
     
+    // 初始化顶点曲率值
+    vertexCurvatures.resize(vertices.size() / 3, 0.0f);
+    // 注意：在calculateCurvatures中已经根据当前模式设置了vertexCurvatures
+    
     qDebug() << "Loaded OBJ file:" << path;
     qDebug() << "Vertices:" << vertexCount << "Faces:" << faceCount;
     qDebug() << "Edges:" << edges.size() / 2;
@@ -327,9 +338,11 @@ void GLWidget::initializeShaders()
     // 分配缓冲区
     int vertexSize = vertices.size() * sizeof(float);
     int normalSize = normals.size() * sizeof(float);
-    vbo.allocate(vertexSize + normalSize);
+    int curvatureSize = vertexCurvatures.size() * sizeof(float);
+    vbo.allocate(vertexSize + normalSize + curvatureSize);
     vbo.write(0, vertices.data(), vertexSize);
     vbo.write(vertexSize, normals.data(), normalSize);
+    vbo.write(vertexSize + normalSize, vertexCurvatures.data(), curvatureSize);
     
     // 设置线框着色器属性
     wireframeProgram.bind();
@@ -353,6 +366,28 @@ void GLWidget::initializeShaders()
     if (normalLoc != -1) {
         blinnPhongProgram.enableAttributeArray(normalLoc);
         blinnPhongProgram.setAttributeBuffer(normalLoc, GL_FLOAT, vertexSize, 3, 3 * sizeof(float));
+    }
+
+    // 设置曲率着色器属性
+    curvatureProgram.bind();
+    posLoc = curvatureProgram.attributeLocation("aPos");
+    if (posLoc != -1) {
+        curvatureProgram.enableAttributeArray(posLoc);
+        curvatureProgram.setAttributeBuffer(posLoc, GL_FLOAT, 0, 3, 3 * sizeof(float));
+    }
+    
+    normalLoc = curvatureProgram.attributeLocation("aNormal");
+    if (normalLoc != -1) {
+        curvatureProgram.enableAttributeArray(normalLoc);
+        curvatureProgram.setAttributeBuffer(normalLoc, GL_FLOAT, vertexSize, 3, 3 * sizeof(float));
+    }
+    
+    int curvatureLoc = curvatureProgram.attributeLocation("aCurvature");
+    if (curvatureLoc != -1) {
+        curvatureProgram.enableAttributeArray(curvatureLoc);
+        curvatureProgram.setAttributeBuffer(curvatureLoc, GL_FLOAT, vertexSize + normalSize, 1, sizeof(float));
+    } else {
+        qWarning() << "Failed to find attribute location for aCurvature in curvature shader";
     }
 
     ebo.bind();
@@ -455,6 +490,27 @@ void GLWidget::calculateCurvatures()
     normalize(gaussianCurvatures);
     normalize(meanCurvatures);
     normalize(maxCurvatures);
+    
+    // 根据当前渲染模式设置顶点曲率值
+    if (vertexCurvatures.size() != gaussianCurvatures.size()) {
+        vertexCurvatures.resize(gaussianCurvatures.size());
+    }
+    for (size_t i = 0; i < vertexCurvatures.size(); i++) {
+        switch (currentRenderMode) {
+        case GaussianCurvature:
+            vertexCurvatures[i] = gaussianCurvatures[i];
+            break;
+        case MeanCurvature:
+            vertexCurvatures[i] = meanCurvatures[i];
+            break;
+        case MaxCurvature:
+            vertexCurvatures[i] = maxCurvatures[i];
+            break;
+        default:
+            vertexCurvatures[i] = 0.0f;
+            break;
+        }
+    }
 }
 
 void GLWidget::resizeGL(int w, int h)

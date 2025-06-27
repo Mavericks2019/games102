@@ -68,6 +68,9 @@ public:
     std::vector<float> gaussianCurvatures;
     std::vector<float> meanCurvatures;
     std::vector<float> maxCurvatures;
+    
+    // 添加：顶点曲率值
+    std::vector<float> vertexCurvatures;
 
     // 视图参数
     float rotationX, rotationY;
