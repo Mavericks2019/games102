@@ -1,30 +1,28 @@
 #version 120
 varying vec3 FragPos;
 varying vec3 Normal;
+varying float vCurvature;   // 接收插值的曲率值
+
 uniform int curvatureType;
 
 vec3 mapToColor(float value) {
-    // 蓝色 (低曲率) -> 青色 -> 绿色 -> 黄色 -> 红色 (高曲率)
-    if (value < 0.25) {
-        return vec3(0.0, value * 4.0, 1.0);
-    } else if (value < 0.5) {
-        return vec3(0.0, 1.0, 1.0 - (value - 0.25) * 4.0);
-    } else if (value < 0.75) {
-        return vec3((value - 0.5) * 4.0, 1.0, 0.0);
+    // 使用平滑的颜色过渡
+    vec3 lowColor = vec3(0.0, 0.0, 1.0);    // 蓝色 (低曲率)
+    vec3 midColor = vec3(0.0, 1.0, 0.0);    // 绿色 (中曲率)
+    vec3 highColor = vec3(1.0, 0.0, 0.0);   // 红色 (高曲率)
+    
+    if (value < 0.5) {
+        float t = value * 2.0;
+        return mix(lowColor, midColor, t);
     } else {
-        return vec3(1.0, 1.0 - (value - 0.75) * 4.0, 0.0);
+        float t = (value - 0.5) * 2.0;
+        return mix(midColor, highColor, t);
     }
 }
 
 void main() {
-    // 基于法线计算简单曲率
-    vec3 norm = normalize(Normal);
-    
-    // 计算法线在屏幕空间的变化率
-    vec3 dndx = dFdx(norm);
-    vec3 dndy = dFdy(norm);
-    
-    float curvature = length(dndx) + length(dndy);
+    // 使用插值的曲率值
+    float curvature = vCurvature;
     
     // 应用非线性缩放增强视觉效果
     curvature = pow(curvature * 5.0, 0.7);
