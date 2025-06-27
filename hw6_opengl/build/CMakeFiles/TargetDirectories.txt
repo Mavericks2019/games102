@@ -1,8 +1,8 @@
-/opt/games102/testglcopy/build/CMakeFiles/install/strip.dir
-/opt/games102/testglcopy/build/CMakeFiles/install/local.dir
-/opt/games102/testglcopy/build/CMakeFiles/install.dir
-/opt/games102/testglcopy/build/CMakeFiles/list_install_components.dir
-/opt/games102/testglcopy/build/CMakeFiles/rebuild_cache.dir
-/opt/games102/testglcopy/build/CMakeFiles/edit_cache.dir
-/opt/games102/testglcopy/build/CMakeFiles/objViewer.dir
-/opt/games102/testglcopy/build/CMakeFiles/objViewer_autogen.dir
+/opt/games102/hw6_opengl/build/CMakeFiles/install/strip.dir
+/opt/games102/hw6_opengl/build/CMakeFiles/install/local.dir
+/opt/games102/hw6_opengl/build/CMakeFiles/install.dir
+/opt/games102/hw6_opengl/build/CMakeFiles/list_install_components.dir
+/opt/games102/hw6_opengl/build/CMakeFiles/rebuild_cache.dir
+/opt/games102/hw6_opengl/build/CMakeFiles/edit_cache.dir
+/opt/games102/hw6_opengl/build/CMakeFiles/objViewer.dir
+/opt/games102/hw6_opengl/build/CMakeFiles/objViewer_autogen.dir

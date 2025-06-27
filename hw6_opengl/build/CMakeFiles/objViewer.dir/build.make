@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /opt/games102/testglcopy
+CMAKE_SOURCE_DIR = /opt/games102/hw6_opengl
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /opt/games102/testglcopy/build
+CMAKE_BINARY_DIR = /opt/games102/hw6_opengl/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/objViewer.dir/depend.make
@@ -65,60 +65,60 @@ qrc_shaders.cpp: ../shaders/curvature.vert
 qrc_shaders.cpp: ../shaders/curvature.frag
 qrc_shaders.cpp: shaders.qrc.depends
 qrc_shaders.cpp: ../shaders.qrc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/opt/games102/testglcopy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating qrc_shaders.cpp"
-	/usr/lib/qt5/bin/rcc --name shaders --output /opt/games102/testglcopy/build/qrc_shaders.cpp /opt/games102/testglcopy/shaders.qrc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/opt/games102/hw6_opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating qrc_shaders.cpp"
+	/usr/lib/qt5/bin/rcc --name shaders --output /opt/games102/hw6_opengl/build/qrc_shaders.cpp /opt/games102/hw6_opengl/shaders.qrc
 
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: CMakeFiles/objViewer.dir/flags.make
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: objViewer_autogen/mocs_compilation.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/testglcopy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o -c /opt/games102/testglcopy/build/objViewer_autogen/mocs_compilation.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/hw6_opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o -c /opt/games102/hw6_opengl/build/objViewer_autogen/mocs_compilation.cpp
 
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/testglcopy/build/objViewer_autogen/mocs_compilation.cpp > CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/hw6_opengl/build/objViewer_autogen/mocs_compilation.cpp > CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.i
 
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/testglcopy/build/objViewer_autogen/mocs_compilation.cpp -o CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/hw6_opengl/build/objViewer_autogen/mocs_compilation.cpp -o CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.s
 
 CMakeFiles/objViewer.dir/main.cpp.o: CMakeFiles/objViewer.dir/flags.make
 CMakeFiles/objViewer.dir/main.cpp.o: ../main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/testglcopy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/objViewer.dir/main.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/main.cpp.o -c /opt/games102/testglcopy/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/hw6_opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/objViewer.dir/main.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/main.cpp.o -c /opt/games102/hw6_opengl/main.cpp
 
 CMakeFiles/objViewer.dir/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/main.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/testglcopy/main.cpp > CMakeFiles/objViewer.dir/main.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/hw6_opengl/main.cpp > CMakeFiles/objViewer.dir/main.cpp.i
 
 CMakeFiles/objViewer.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/main.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/testglcopy/main.cpp -o CMakeFiles/objViewer.dir/main.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/hw6_opengl/main.cpp -o CMakeFiles/objViewer.dir/main.cpp.s
 
 CMakeFiles/objViewer.dir/glwidget.cpp.o: CMakeFiles/objViewer.dir/flags.make
 CMakeFiles/objViewer.dir/glwidget.cpp.o: ../glwidget.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/testglcopy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/objViewer.dir/glwidget.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget.cpp.o -c /opt/games102/testglcopy/glwidget.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/hw6_opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/objViewer.dir/glwidget.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget.cpp.o -c /opt/games102/hw6_opengl/glwidget.cpp
 
 CMakeFiles/objViewer.dir/glwidget.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/glwidget.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/testglcopy/glwidget.cpp > CMakeFiles/objViewer.dir/glwidget.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/hw6_opengl/glwidget.cpp > CMakeFiles/objViewer.dir/glwidget.cpp.i
 
 CMakeFiles/objViewer.dir/glwidget.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/glwidget.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/testglcopy/glwidget.cpp -o CMakeFiles/objViewer.dir/glwidget.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/hw6_opengl/glwidget.cpp -o CMakeFiles/objViewer.dir/glwidget.cpp.s
 
 CMakeFiles/objViewer.dir/qrc_shaders.cpp.o: CMakeFiles/objViewer.dir/flags.make
 CMakeFiles/objViewer.dir/qrc_shaders.cpp.o: qrc_shaders.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/testglcopy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/objViewer.dir/qrc_shaders.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/qrc_shaders.cpp.o -c /opt/games102/testglcopy/build/qrc_shaders.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/hw6_opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/objViewer.dir/qrc_shaders.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/qrc_shaders.cpp.o -c /opt/games102/hw6_opengl/build/qrc_shaders.cpp
 
 CMakeFiles/objViewer.dir/qrc_shaders.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/qrc_shaders.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/testglcopy/build/qrc_shaders.cpp > CMakeFiles/objViewer.dir/qrc_shaders.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/hw6_opengl/build/qrc_shaders.cpp > CMakeFiles/objViewer.dir/qrc_shaders.cpp.i
 
 CMakeFiles/objViewer.dir/qrc_shaders.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/qrc_shaders.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/testglcopy/build/qrc_shaders.cpp -o CMakeFiles/objViewer.dir/qrc_shaders.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/hw6_opengl/build/qrc_shaders.cpp -o CMakeFiles/objViewer.dir/qrc_shaders.cpp.s
 
 # Object files for target objViewer
 objViewer_OBJECTS = \
@@ -140,7 +140,7 @@ objViewer: /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.12.8
 objViewer: /usr/lib/x86_64-linux-gnu/libQt5Gui.so.5.12.8
 objViewer: /usr/lib/x86_64-linux-gnu/libQt5Core.so.5.12.8
 objViewer: CMakeFiles/objViewer.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/opt/games102/testglcopy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable objViewer"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/opt/games102/hw6_opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable objViewer"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/objViewer.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -153,6 +153,6 @@ CMakeFiles/objViewer.dir/clean:
 .PHONY : CMakeFiles/objViewer.dir/clean
 
 CMakeFiles/objViewer.dir/depend: qrc_shaders.cpp
-	cd /opt/games102/testglcopy/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /opt/games102/testglcopy /opt/games102/testglcopy /opt/games102/testglcopy/build /opt/games102/testglcopy/build /opt/games102/testglcopy/build/CMakeFiles/objViewer.dir/DependInfo.cmake --color=$(COLOR)
+	cd /opt/games102/hw6_opengl/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /opt/games102/hw6_opengl /opt/games102/hw6_opengl /opt/games102/hw6_opengl/build /opt/games102/hw6_opengl/build /opt/games102/hw6_opengl/build/CMakeFiles/objViewer.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/objViewer.dir/depend
 

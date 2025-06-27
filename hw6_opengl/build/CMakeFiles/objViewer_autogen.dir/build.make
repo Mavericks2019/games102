@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /opt/games102/testglcopy
+CMAKE_SOURCE_DIR = /opt/games102/hw6_opengl
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /opt/games102/testglcopy/build
+CMAKE_BINARY_DIR = /opt/games102/hw6_opengl/build
 
 # Utility rule file for objViewer_autogen.
 
@@ -54,8 +54,8 @@ CMAKE_BINARY_DIR = /opt/games102/testglcopy/build
 include CMakeFiles/objViewer_autogen.dir/progress.make
 
 CMakeFiles/objViewer_autogen:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/opt/games102/testglcopy/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target objViewer"
-	/usr/bin/cmake -E cmake_autogen /opt/games102/testglcopy/build/CMakeFiles/objViewer_autogen.dir/AutogenInfo.json ""
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/opt/games102/hw6_opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC and UIC for target objViewer"
+	/usr/bin/cmake -E cmake_autogen /opt/games102/hw6_opengl/build/CMakeFiles/objViewer_autogen.dir/AutogenInfo.json ""
 
 objViewer_autogen: CMakeFiles/objViewer_autogen
 objViewer_autogen: CMakeFiles/objViewer_autogen.dir/build.make
@@ -72,6 +72,6 @@ CMakeFiles/objViewer_autogen.dir/clean:
 .PHONY : CMakeFiles/objViewer_autogen.dir/clean
 
 CMakeFiles/objViewer_autogen.dir/depend:
-	cd /opt/games102/testglcopy/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /opt/games102/testglcopy /opt/games102/testglcopy /opt/games102/testglcopy/build /opt/games102/testglcopy/build /opt/games102/testglcopy/build/CMakeFiles/objViewer_autogen.dir/DependInfo.cmake --color=$(COLOR)
+	cd /opt/games102/hw6_opengl/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /opt/games102/hw6_opengl /opt/games102/hw6_opengl /opt/games102/hw6_opengl/build /opt/games102/hw6_opengl/build /opt/games102/hw6_opengl/build/CMakeFiles/objViewer_autogen.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/objViewer_autogen.dir/depend
 

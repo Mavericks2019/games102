@@ -1,21 +1,21 @@
 {
-	"BUILD_DIR" : "/opt/games102/testglcopy/build/objViewer_autogen",
-	"CMAKE_BINARY_DIR" : "/opt/games102/testglcopy/build",
-	"CMAKE_CURRENT_BINARY_DIR" : "/opt/games102/testglcopy/build",
-	"CMAKE_CURRENT_SOURCE_DIR" : "/opt/games102/testglcopy",
+	"BUILD_DIR" : "/opt/games102/hw6_opengl/build/objViewer_autogen",
+	"CMAKE_BINARY_DIR" : "/opt/games102/hw6_opengl/build",
+	"CMAKE_CURRENT_BINARY_DIR" : "/opt/games102/hw6_opengl/build",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/opt/games102/hw6_opengl",
 	"CMAKE_EXECUTABLE" : "/usr/bin/cmake",
-	"CMAKE_SOURCE_DIR" : "/opt/games102/testglcopy",
+	"CMAKE_SOURCE_DIR" : "/opt/games102/hw6_opengl",
 	"HEADERS" : 
 	[
 		[
-			"/opt/games102/testglcopy/glwidget.h",
+			"/opt/games102/hw6_opengl/glwidget.h",
 			"MU",
 			"EWIEGA46WW/moc_glwidget.cpp"
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
-	"INCLUDE_DIR" : "/opt/games102/testglcopy/build/objViewer_autogen/include",
-	"MOC_COMPILATION_FILE" : "/opt/games102/testglcopy/build/objViewer_autogen/mocs_compilation.cpp",
+	"INCLUDE_DIR" : "/opt/games102/hw6_opengl/build/objViewer_autogen/include",
+	"MOC_COMPILATION_FILE" : "/opt/games102/hw6_opengl/build/objViewer_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
 		"QT_CORE_LIB",
@@ -58,20 +58,20 @@
 		"-c",
 		"/usr/share/cmake-3.16/Modules/CMakeCXXCompilerABI.cpp"
 	],
-	"MOC_PREDEFS_FILE" : "/opt/games102/testglcopy/build/objViewer_autogen/moc_predefs.h",
+	"MOC_PREDEFS_FILE" : "/opt/games102/hw6_opengl/build/objViewer_autogen/moc_predefs.h",
 	"MOC_RELAXED_MODE" : false,
 	"MOC_SKIP" : [],
 	"MULTI_CONFIG" : false,
 	"PARALLEL" : 10,
-	"PARSE_CACHE_FILE" : "/opt/games102/testglcopy/build/CMakeFiles/objViewer_autogen.dir/ParseCache.txt",
+	"PARSE_CACHE_FILE" : "/opt/games102/hw6_opengl/build/CMakeFiles/objViewer_autogen.dir/ParseCache.txt",
 	"QT_MOC_EXECUTABLE" : "/usr/lib/qt5/bin/moc",
 	"QT_UIC_EXECUTABLE" : "/usr/lib/qt5/bin/uic",
 	"QT_VERSION_MAJOR" : 5,
-	"SETTINGS_FILE" : "/opt/games102/testglcopy/build/CMakeFiles/objViewer_autogen.dir/AutogenUsed.txt",
+	"SETTINGS_FILE" : "/opt/games102/hw6_opengl/build/CMakeFiles/objViewer_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
-		[ "/opt/games102/testglcopy/glwidget.cpp", "MU" ],
-		[ "/opt/games102/testglcopy/main.cpp", "MU" ]
+		[ "/opt/games102/hw6_opengl/glwidget.cpp", "MU" ],
+		[ "/opt/games102/hw6_opengl/main.cpp", "MU" ]
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],
