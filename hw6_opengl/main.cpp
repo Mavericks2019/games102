@@ -16,6 +16,7 @@
 #include <QSlider>
 #include <QColorDialog>
 #include <QRadioButton>
+#include <QCheckBox>
 
 int main(int argc, char *argv[])
 {
@@ -155,6 +156,40 @@ int main(int argc, char *argv[])
     // 添加到控制面板
     objControlLayout->addWidget(renderModeGroup);
     
+    // 添加线框叠加选项
+    QCheckBox *wireframeOverlayCheckbox = new QCheckBox("Show Wireframe Overlay");
+    wireframeOverlayCheckbox->setStyleSheet("color: white;");
+    QObject::connect(wireframeOverlayCheckbox, &QCheckBox::stateChanged, [glWidget](int state) {
+        glWidget->setShowWireframeOverlay(state == Qt::Checked);
+    });
+    objControlLayout->addWidget(wireframeOverlayCheckbox);
+    
+    // 添加线框颜色选择按钮
+    QPushButton *lineColorButton = new QPushButton("Change Wireframe Color");
+    lineColorButton->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #505050;"
+        "   color: white;"
+        "   border: none;"
+        "   padding: 10px 20px;"
+        "   font-size: 16px;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:hover { background-color: #606060; }"
+    );
+    QObject::connect(lineColorButton, &QPushButton::clicked, [glWidget, &mainWindow]() {
+        QColor color = QColorDialog::getColor(Qt::red, &mainWindow, "Select Wireframe Color");
+        if (color.isValid()) {
+            glWidget->setWireframeColor(QVector4D(
+                color.redF(), 
+                color.greenF(), 
+                color.blueF(), 
+                1.0f
+            ));
+        }
+    });
+    objControlLayout->addWidget(lineColorButton);
+    
     // 添加重置视图按钮
     QPushButton *resetButton = new QPushButton("Reset View");
     resetButton->setStyleSheet(
@@ -182,7 +217,8 @@ int main(int argc, char *argv[])
         "• Arrow keys: Fine-tune rotation<br>"
         "• '+'/'-' keys: Zoom in/out<br>"
         "• 'R' key: Reset view<br>"
-        "• Switch between wireframe and solid rendering"
+        "• Switch between wireframe and solid rendering<br>"
+        "• Enable wireframe overlay to see model structure"
     );
     infoLabel->setWordWrap(true);
     infoLabel->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px; font-size: 14px;");

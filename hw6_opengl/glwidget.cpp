@@ -12,7 +12,8 @@
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
     vbo(QOpenGLBuffer::VertexBuffer),
     ebo(QOpenGLBuffer::IndexBuffer),
-    faceEbo(QOpenGLBuffer::IndexBuffer)
+    faceEbo(QOpenGLBuffer::IndexBuffer),
+    showWireframeOverlay(false)
 {
     // 设置多重采样格式
     QSurfaceFormat format;
@@ -26,6 +27,19 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
     isDragging = false;
     bgColor = QColor(0, 0, 0); // 初始化背景色为黑色
     currentRenderMode = Wireframe;
+    wireframeColor = QVector4D(1.0f, 0.0f, 0.0f, 1.0f); // 红色线框
+}
+
+void GLWidget::setShowWireframeOverlay(bool show)
+{
+    showWireframeOverlay = show;
+    update();
+}
+
+void GLWidget::setWireframeColor(const QVector4D& color)
+{
+    wireframeColor = color;
+    update();
 }
 
 GLWidget::~GLWidget()
@@ -541,6 +555,9 @@ void GLWidget::paintGL()
     
     QMatrix3x3 normalMatrix = model.normalMatrix();
 
+    GLint oldPolygonMode[2];
+    glGetIntegerv(GL_POLYGON_MODE, oldPolygonMode);
+
     if (currentRenderMode == Wireframe) {
         // 线框模式
         wireframeProgram.bind();
@@ -552,66 +569,105 @@ void GLWidget::paintGL()
         wireframeProgram.setUniformValue("model", model);
         wireframeProgram.setUniformValue("view", view);
         wireframeProgram.setUniformValue("projection", projection);
+        wireframeProgram.setUniformValue("lineColor", wireframeColor); // 设置线框颜色
 
         // 绘制模型 - 使用线框模式 (GL_LINES)
         glDrawElements(GL_LINES, edges.size(), GL_UNSIGNED_INT, 0);
 
         vao.release();
         wireframeProgram.release();
-    }  else if (currentRenderMode == GaussianCurvature || 
+    }
+    else 
+    {
+        if (currentRenderMode == GaussianCurvature || 
                currentRenderMode == MeanCurvature || 
                currentRenderMode == MaxCurvature) {
-        // 曲率可视化模式
-        curvatureProgram.bind();
-        vao.bind();
-        faceEbo.bind();
-        
-        // 设置多边形填充
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        
-        // 设置变换矩阵
-        curvatureProgram.setUniformValue("model", model);
-        curvatureProgram.setUniformValue("view", view);
-        curvatureProgram.setUniformValue("projection", projection);
-        curvatureProgram.setUniformValue("normalMatrix", normalMatrix);
-        
-        // 设置曲率类型
-        curvatureProgram.setUniformValue("curvatureType", static_cast<int>(currentRenderMode));
-        
-        // 绘制模型
-        glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, 0);
-        
-        faceEbo.release();
-        vao.release();
-        curvatureProgram.release();
-    }else{
-        // 布林冯模式
-        blinnPhongProgram.bind();
-        vao.bind();
-        faceEbo.bind();
+            // 曲率可视化模式
+            curvatureProgram.bind();
+            vao.bind();
+            faceEbo.bind();
+            
+            // 设置多边形填充
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            
+            // 设置变换矩阵
+            curvatureProgram.setUniformValue("model", model);
+            curvatureProgram.setUniformValue("view", view);
+            curvatureProgram.setUniformValue("projection", projection);
+            curvatureProgram.setUniformValue("normalMatrix", normalMatrix);
+            
+            // 设置曲率类型
+            curvatureProgram.setUniformValue("curvatureType", static_cast<int>(currentRenderMode));
+            
+            // 绘制模型
+            glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, 0);
+            
+            faceEbo.release();
+            vao.release();
+            curvatureProgram.release();
+        } else {
+            // 布林冯模式
+            blinnPhongProgram.bind();
+            vao.bind();
+            faceEbo.bind();
 
-        // 启用多边形填充
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            // 启用多边形填充
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-        // 设置变换矩阵
-        blinnPhongProgram.setUniformValue("model", model);
-        blinnPhongProgram.setUniformValue("view", view);
-        blinnPhongProgram.setUniformValue("projection", projection);
-        blinnPhongProgram.setUniformValue("normalMatrix", normalMatrix);
-        
-        // 设置光照参数
-        blinnPhongProgram.setUniformValue("lightPos", QVector3D(2.0f, 2.0f, 2.0f));
-        blinnPhongProgram.setUniformValue("viewPos", QVector3D(0.0f, 0.0f, 5.0f));
-        blinnPhongProgram.setUniformValue("lightColor", QVector3D(1.0f, 1.0f, 1.0f));
-        blinnPhongProgram.setUniformValue("objectColor", QVector3D(0.7f, 0.7f, 0.8f));
+            // 设置变换矩阵
+            blinnPhongProgram.setUniformValue("model", model);
+            blinnPhongProgram.setUniformValue("view", view);
+            blinnPhongProgram.setUniformValue("projection", projection);
+            blinnPhongProgram.setUniformValue("normalMatrix", normalMatrix);
+            
+            // 设置光照参数
+            blinnPhongProgram.setUniformValue("lightPos", QVector3D(2.0f, 2.0f, 2.0f));
+            blinnPhongProgram.setUniformValue("viewPos", QVector3D(0.0f, 0.0f, 5.0f));
+            blinnPhongProgram.setUniformValue("lightColor", QVector3D(1.0f, 1.0f, 1.0f));
+            blinnPhongProgram.setUniformValue("objectColor", QVector3D(0.7f, 0.7f, 0.8f));
 
-        // 绘制模型 - 使用面模式 (GL_TRIANGLES)
-        glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, 0);
+            // 绘制模型
+            glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, 0);
 
-        faceEbo.release();
-        vao.release();
-        blinnPhongProgram.release();
+            faceEbo.release();
+            vao.release();
+            blinnPhongProgram.release();
+        }
+            // 如果启用了线框叠加
+        if (showWireframeOverlay) {
+            // 启用多边形偏移以避免深度冲突
+            glEnable(GL_POLYGON_OFFSET_LINE);
+            glPolygonOffset(-1.0, -1.0);
+            
+            // 设置线框模式
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            glLineWidth(1.5f);
+            
+            // 使用线框着色器
+            wireframeProgram.bind();
+            vao.bind();
+            ebo.bind();
+
+            wireframeProgram.setUniformValue("model", model);
+            wireframeProgram.setUniformValue("view", view);
+            wireframeProgram.setUniformValue("projection", projection);
+            wireframeProgram.setUniformValue("lineColor", wireframeColor); // 设置线框颜色为红色
+
+            // 绘制线框
+            glDrawElements(GL_LINES, edges.size(), GL_UNSIGNED_INT, 0);
+            
+            ebo.release();
+            vao.release();
+            wireframeProgram.release();
+            
+            // 禁用多边形偏移
+            glDisable(GL_POLYGON_OFFSET_LINE);
+        }
+
     }
+    // 恢复原始多边形模式
+    glPolygonMode(GL_FRONT, oldPolygonMode[0]);
+    glPolygonMode(GL_BACK, oldPolygonMode[1]);
 }
 
 void GLWidget::keyPressEvent(QKeyEvent *event)

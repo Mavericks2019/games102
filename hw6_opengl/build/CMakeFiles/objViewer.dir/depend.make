@@ -280,6 +280,7 @@ CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qve
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qwindowdefs.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qwindowdefs_win.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication
+CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QCheckBox
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QColorDialog
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QFileDialog
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QFormLayout
@@ -301,6 +302,7 @@ CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qabstractslider.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qapplication.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qboxlayout.h
+CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qcheckbox.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qcolordialog.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qdesktopwidget.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qdialog.h

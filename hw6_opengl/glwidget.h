@@ -46,7 +46,10 @@ public:
     void initializeShaders();
     void calculateNormals();
     void calculateCurvatures();
-    
+    void setShowWireframeOverlay(bool show);
+    void setWireframeColor(const QVector4D& color);
+    bool showWireframeOverlay;
+    QVector4D wireframeColor; // 线框颜色
     // OpenGL资源
     QOpenGLShaderProgram wireframeProgram;
     QOpenGLShaderProgram blinnPhongProgram;
