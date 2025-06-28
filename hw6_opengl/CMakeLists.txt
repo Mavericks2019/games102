@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project(objViewer)
 
 # 设置C++标准
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # 自动处理Qt的moc、uic、rcc
