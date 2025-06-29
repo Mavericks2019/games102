@@ -451,7 +451,6 @@ void GLWidget::calculateCurvaturesHemesh() {
         meanCurvatures[i] = hemVertices[i]->meanCurvature;
         maxCurvatures[i] = hemVertices[i]->maxCurvature;
     }
-    std::cout << "#####" << std::endl;
     // 根据当前渲染模式设置顶点曲率值
     if (vertexCurvatures.size() != gaussianCurvatures.size()) {
         vertexCurvatures.resize(gaussianCurvatures.size());
