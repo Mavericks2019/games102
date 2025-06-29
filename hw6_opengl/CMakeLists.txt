@@ -25,6 +25,8 @@ add_executable(${PROJECT_NAME}
     glwidget.h
     adjacencygraph.cpp
     adjacencygraph.h
+    hmesh.cpp       # 新增
+    hmesh.h         # 新增
     ${RESOURCE_FILES}
 )
 

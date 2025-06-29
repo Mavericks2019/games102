@@ -12,6 +12,7 @@
 #include <vector>
 #include <set>
 #include "adjacencygraph.h"
+#include "hmesh.h"
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -47,6 +48,8 @@ public:
     void initializeShaders();
     void calculateNormals();
     void calculateCurvatures();
+    void calculateCurvaturesHemesh();
+    void calculateCurvaturesAdjacency();
     void setShowWireframeOverlay(bool show);
     void setWireframeColor(const QVector4D& color);
     bool showWireframeOverlay;
@@ -89,6 +92,8 @@ public:
 
     private:
     AdjacencyGraph adjacencyGraph;
+    HMesh m_hemesh;
+    bool m_useHalfEdgeForCurvature = true;
 };
 
 #endif // GLWIDGET_H

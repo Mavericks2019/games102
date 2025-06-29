@@ -4,6 +4,7 @@ file(REMOVE_RECURSE
   "objViewer_autogen"
   "CMakeFiles/objViewer.dir/adjacencygraph.cpp.o"
   "CMakeFiles/objViewer.dir/glwidget.cpp.o"
+  "CMakeFiles/objViewer.dir/hmesh.cpp.o"
   "CMakeFiles/objViewer.dir/main.cpp.o"
   "CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o"
   "CMakeFiles/objViewer.dir/qrc_shaders.cpp.o"

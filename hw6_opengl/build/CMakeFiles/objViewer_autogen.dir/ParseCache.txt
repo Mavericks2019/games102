@@ -5,3 +5,5 @@
 /opt/games102/hw6_opengl/glwidget.cpp
 /opt/games102/hw6_opengl/main.cpp
 /opt/games102/hw6_opengl/adjacencygraph.h
+/opt/games102/hw6_opengl/hmesh.h
+/opt/games102/hw6_opengl/hmesh.cpp

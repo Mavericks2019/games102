@@ -236,6 +236,33 @@ glwidget.cpp.s:
 	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/glwidget.cpp.s
 .PHONY : glwidget.cpp.s
 
+hmesh.o: hmesh.cpp.o
+
+.PHONY : hmesh.o
+
+# target to build an object file
+hmesh.cpp.o:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/hmesh.cpp.o
+.PHONY : hmesh.cpp.o
+
+hmesh.i: hmesh.cpp.i
+
+.PHONY : hmesh.i
+
+# target to preprocess a source file
+hmesh.cpp.i:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/hmesh.cpp.i
+.PHONY : hmesh.cpp.i
+
+hmesh.s: hmesh.cpp.s
+
+.PHONY : hmesh.s
+
+# target to generate assembly for a file
+hmesh.cpp.s:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/hmesh.cpp.s
+.PHONY : hmesh.cpp.s
+
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -337,6 +364,9 @@ help:
 	@echo "... glwidget.o"
 	@echo "... glwidget.i"
 	@echo "... glwidget.s"
+	@echo "... hmesh.o"
+	@echo "... hmesh.i"
+	@echo "... hmesh.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

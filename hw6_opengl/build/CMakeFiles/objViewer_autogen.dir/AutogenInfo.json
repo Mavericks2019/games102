@@ -16,7 +16,8 @@
 			"/opt/games102/hw6_opengl/glwidget.h",
 			"MU",
 			"EWIEGA46WW/moc_glwidget.cpp"
-		]
+		],
+		[ "/opt/games102/hw6_opengl/hmesh.h", "MU", "EWIEGA46WW/moc_hmesh.cpp" ]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
 	"INCLUDE_DIR" : "/opt/games102/hw6_opengl/build/objViewer_autogen/include",
@@ -77,6 +78,7 @@
 	[
 		[ "/opt/games102/hw6_opengl/adjacencygraph.cpp", "MU" ],
 		[ "/opt/games102/hw6_opengl/glwidget.cpp", "MU" ],
+		[ "/opt/games102/hw6_opengl/hmesh.cpp", "MU" ],
 		[ "/opt/games102/hw6_opengl/main.cpp", "MU" ]
 	],
 	"UIC_OPTIONS" : [],

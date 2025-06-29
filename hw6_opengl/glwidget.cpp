@@ -9,6 +9,8 @@
 #include <QtMath>
 #include <QResource>
 #include <algorithm>
+#include <iostream>
+
 
 #define EPSILON 1E-4F 
 
@@ -417,7 +419,62 @@ void GLWidget::initializeShaders()
     faceEbo.allocate(faces.data(), faces.size() * sizeof(unsigned int));
 }
 
-void GLWidget::calculateCurvatures()
+void GLWidget::calculateCurvatures() {
+    if (m_useHalfEdgeForCurvature) {
+        calculateCurvaturesHemesh();
+    } else {
+        calculateCurvaturesAdjacency();
+    }
+}
+
+// 添加新的曲率计算函数
+void GLWidget::calculateCurvaturesHemesh() {
+    gaussianCurvatures.clear();
+    meanCurvatures.clear();
+    maxCurvatures.clear();
+    
+    if (vertices.empty() || faces.empty()) return;
+    
+    // 构建半边数据结构
+    m_hemesh.build(vertices, faces);
+    m_hemesh.calculateCurvatures();
+    
+    // 获取曲率数据
+    size_t vertexCount = vertices.size() / 3;
+    gaussianCurvatures.resize(vertexCount);
+    meanCurvatures.resize(vertexCount);
+    maxCurvatures.resize(vertexCount);
+    
+    const auto& hemVertices = m_hemesh.getVertices();
+    for (size_t i = 0; i < vertexCount; i++) {
+        gaussianCurvatures[i] = hemVertices[i]->gaussianCurvature;
+        meanCurvatures[i] = hemVertices[i]->meanCurvature;
+        maxCurvatures[i] = hemVertices[i]->maxCurvature;
+    }
+    std::cout << "#####" << std::endl;
+    // 根据当前渲染模式设置顶点曲率值
+    if (vertexCurvatures.size() != gaussianCurvatures.size()) {
+        vertexCurvatures.resize(gaussianCurvatures.size());
+    }
+    for (size_t i = 0; i < vertexCurvatures.size(); i++) {
+        switch (currentRenderMode) {
+        case GaussianCurvature:
+            vertexCurvatures[i] = gaussianCurvatures[i];
+            break;
+        case MeanCurvature:
+            vertexCurvatures[i] = meanCurvatures[i];
+            break;
+        case MaxCurvature:
+            vertexCurvatures[i] = maxCurvatures[i];
+            break;
+        default:
+            vertexCurvatures[i] = 0.0f;
+            break;
+        }
+    }
+}
+
+void GLWidget::calculateCurvaturesAdjacency()
 {
     gaussianCurvatures.clear();
     meanCurvatures.clear();
