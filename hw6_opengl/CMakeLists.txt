@@ -23,6 +23,8 @@ add_executable(${PROJECT_NAME}
     main.cpp
     glwidget.cpp
     glwidget.h
+    adjacencygraph.cpp
+    adjacencygraph.h
     ${RESOURCE_FILES}
 )
 

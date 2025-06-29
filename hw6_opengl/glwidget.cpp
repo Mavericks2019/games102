@@ -426,7 +426,8 @@ void GLWidget::calculateCurvatures()
     if (vertices.empty() || faces.empty()) return;
     
     // 构建邻接图
-    buildAdjacency();
+    adjacencyGraph.build(vertices, faces);
+    const auto& adjacency = adjacencyGraph.getAdjacency();
     
     // 自定义余切计算函数
     auto cotangent = [](const QVector3D& v1, const QVector3D& v2) -> float {
@@ -479,7 +480,7 @@ void GLWidget::calculateCurvatures()
     for (size_t i = 0; i < vertexCount; i++) {
         if (adjacency[i].adjacentFaces.empty()) continue;
         
-        for (size_t faceIdx : adjacency[i].adjacentFaces) {
+        for (size_t faceIdx : (adjacency[i].adjacentFaces)) {
             size_t faceStart = faceIdx * 3;
             unsigned int idx1 = faces[faceStart];
             unsigned int idx2 = faces[faceStart+1];
@@ -538,7 +539,7 @@ void GLWidget::calculateCurvatures()
         
         // 使用邻接图计算高斯曲率
         float angleSum = 0.0f;
-        for (size_t faceIdx : adjacency[i].adjacentFaces) {
+        for (size_t faceIdx : (adjacency[i].adjacentFaces)) {
             size_t faceStart = faceIdx * 3;
             unsigned int idx1 = faces[faceStart];
             unsigned int idx2 = faces[faceStart+1];
@@ -921,42 +922,5 @@ void GLWidget::calculateNormals()
         normals[i]   = n.x();
         normals[i+1] = n.y();
         normals[i+2] = n.z();
-    }
-}
-
-void GLWidget::buildAdjacency()
-{
-    size_t vertexCount = vertices.size() / 3;
-    adjacency.clear();
-    adjacency.resize(vertexCount);
-    
-    // 遍历所有面，建立邻接关系
-    for (size_t i = 0; i < faces.size(); i += 3) {
-        unsigned int idx1 = faces[i];
-        unsigned int idx2 = faces[i+1];
-        unsigned int idx3 = faces[i+2];
-        size_t faceIndex = i / 3;
-        
-        // 添加邻接关系
-        adjacency[idx1].neighbors.push_back(idx2);
-        adjacency[idx1].neighbors.push_back(idx3);
-        adjacency[idx1].adjacentFaces.push_back(faceIndex);
-        
-        adjacency[idx2].neighbors.push_back(idx1);
-        adjacency[idx2].neighbors.push_back(idx3);
-        adjacency[idx2].adjacentFaces.push_back(faceIndex);
-        
-        adjacency[idx3].neighbors.push_back(idx1);
-        adjacency[idx3].neighbors.push_back(idx2);
-        adjacency[idx3].adjacentFaces.push_back(faceIndex);
-    }
-    
-    // 去除重复的邻接顶点
-    for (auto& adj : adjacency) {
-        std::sort(adj.neighbors.begin(), adj.neighbors.end());
-        auto last = std::unique(adj.neighbors.begin(), adj.neighbors.end());
-        adj.neighbors.erase(last, adj.neighbors.end());
-        
-        // 邻接面已经唯一，不需要去重
     }
 }

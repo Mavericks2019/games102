@@ -11,6 +11,7 @@
 #include <QColor>
 #include <vector>
 #include <set>
+#include "adjacencygraph.h"
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -87,13 +88,7 @@ public:
     QPoint lastMousePos;
 
     private:
-    struct VertexAdjacency {
-        std::vector<size_t> neighbors;        // 邻接顶点索引
-        std::vector<size_t> adjacentFaces;    // 邻接三角形索引
-    };
-    std::vector<VertexAdjacency> adjacency;   // 顶点邻接图
-    
-    void buildAdjacency();  // 构建邻接图函数
+    AdjacencyGraph adjacencyGraph;
 };
 
 #endif // GLWIDGET_H

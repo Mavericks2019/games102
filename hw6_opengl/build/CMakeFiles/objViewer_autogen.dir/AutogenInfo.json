@@ -8,6 +8,11 @@
 	"HEADERS" : 
 	[
 		[
+			"/opt/games102/hw6_opengl/adjacencygraph.h",
+			"MU",
+			"EWIEGA46WW/moc_adjacencygraph.cpp"
+		],
+		[
 			"/opt/games102/hw6_opengl/glwidget.h",
 			"MU",
 			"EWIEGA46WW/moc_glwidget.cpp"
@@ -70,6 +75,7 @@
 	"SETTINGS_FILE" : "/opt/games102/hw6_opengl/build/CMakeFiles/objViewer_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
+		[ "/opt/games102/hw6_opengl/adjacencygraph.cpp", "MU" ],
 		[ "/opt/games102/hw6_opengl/glwidget.cpp", "MU" ],
 		[ "/opt/games102/hw6_opengl/main.cpp", "MU" ]
 	],

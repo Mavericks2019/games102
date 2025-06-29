@@ -182,6 +182,33 @@ objViewer_autogen/fast:
 	$(MAKE) -f CMakeFiles/objViewer_autogen.dir/build.make CMakeFiles/objViewer_autogen.dir/build
 .PHONY : objViewer_autogen/fast
 
+adjacencygraph.o: adjacencygraph.cpp.o
+
+.PHONY : adjacencygraph.o
+
+# target to build an object file
+adjacencygraph.cpp.o:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/adjacencygraph.cpp.o
+.PHONY : adjacencygraph.cpp.o
+
+adjacencygraph.i: adjacencygraph.cpp.i
+
+.PHONY : adjacencygraph.i
+
+# target to preprocess a source file
+adjacencygraph.cpp.i:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/adjacencygraph.cpp.i
+.PHONY : adjacencygraph.cpp.i
+
+adjacencygraph.s: adjacencygraph.cpp.s
+
+.PHONY : adjacencygraph.s
+
+# target to generate assembly for a file
+adjacencygraph.cpp.s:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/adjacencygraph.cpp.s
+.PHONY : adjacencygraph.cpp.s
+
 glwidget.o: glwidget.cpp.o
 
 .PHONY : glwidget.o
@@ -304,6 +331,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... objViewer"
 	@echo "... objViewer_autogen"
+	@echo "... adjacencygraph.o"
+	@echo "... adjacencygraph.i"
+	@echo "... adjacencygraph.s"
 	@echo "... glwidget.o"
 	@echo "... glwidget.i"
 	@echo "... glwidget.s"

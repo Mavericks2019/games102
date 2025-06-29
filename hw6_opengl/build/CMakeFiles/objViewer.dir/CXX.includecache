@@ -6,6 +6,12 @@
 
 #IncludeRegexTransform: 
 
+/opt/games102/hw6_opengl/adjacencygraph.h
+vector
+-
+cstddef
+-
+
 /opt/games102/hw6_opengl/glwidget.cpp
 glwidget.h
 /opt/games102/hw6_opengl/glwidget.h
@@ -51,6 +57,8 @@ vector
 -
 set
 -
+adjacencygraph.h
+/opt/games102/hw6_opengl/adjacencygraph.h
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/QDebug
 qdebug.h
