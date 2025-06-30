@@ -52,6 +52,7 @@ public:
     
     // 计算网格曲率
     void calculateCurvatures();
+    bool isBoundaryVertex(HVertex* vertex);
     
     // 获取顶点曲率数据
     const std::vector<HVertex*>& getVertices() const { return m_vertices; }

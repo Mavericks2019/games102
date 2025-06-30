@@ -111,9 +111,37 @@ float HMesh::cotangent(const QVector3D& v1, const QVector3D& v2) {
     return dot / (crossLength + EPSILON);
 }
 
+// 检查顶点是否在边界上
+bool HMesh::isBoundaryVertex(HVertex* vertex) {
+    if (!vertex->edge) return true; // 无连接边
+    
+    HEdge* start = vertex->edge;
+    HEdge* edge = start;
+    
+    // 遍历顶点的所有邻接半边
+    do {
+        // 如果找到没有配对的半边，说明在边界上
+        if (!edge->twin) {
+            return true;
+        }
+        
+        // 移动到下一个邻接半边
+        edge = edge->twin->next;
+    } while (edge && edge != start);
+    
+    // 如果没有回到起点，说明是边界顶点
+    return edge != start;
+}
+
 // 计算顶点的混合面积
 float HMesh::calculateMixedArea(HVertex* vertex) {
     float area = 0.0f;
+    
+    // 边界顶点直接返回0
+    if (isBoundaryVertex(vertex)) {
+        return area;
+    }
+    
     if (!vertex->edge) return area; // 确保起点半边有效
 
     HEdge* startEdge = vertex->edge;
@@ -197,6 +225,15 @@ void HMesh::calculateCurvatures() {
     // 计算高斯曲率和平均曲率
     for (size_t i = 0; i < m_vertices.size(); i++) {
         HVertex* vertex = m_vertices[i];
+        
+        // 跳过边界顶点
+        if (isBoundaryVertex(vertex)) {
+            vertex->gaussianCurvature = 0.0f;
+            vertex->meanCurvature = 0.0f;
+            vertex->maxCurvature = 0.0f;
+            continue;
+        }
+        
         if (mixedAreas[i] < EPSILON) continue;
         
         // 计算角度和 (用于高斯曲率)
