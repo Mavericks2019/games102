@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <iostream>
 
-
 #define EPSILON 1E-4F 
 
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
@@ -104,6 +103,7 @@ void GLWidget::loadOBJ(const QString &path)
     meanCurvatures.clear();
     maxCurvatures.clear();
     vertexCurvatures.clear(); // 清空曲率数据
+    originalVertices.clear(); // 清空原始顶点
     modelLoaded = false;
     
     // 临时存储原始顶点数据
@@ -242,6 +242,11 @@ void GLWidget::loadOBJ(const QString &path)
         float x = rawVertices[i] - center.x();
         float y = rawVertices[i+1] - center.y();
         float z = rawVertices[i+2] - center.z();
+        
+        // 保存原始顶点位置（未缩放）
+        originalVertices.push_back(x);
+        originalVertices.push_back(y);
+        originalVertices.push_back(z);
         
         // 缩放
         x *= scaleFactor;
@@ -979,4 +984,125 @@ void GLWidget::calculateNormals()
         normals[i+1] = n.y();
         normals[i+2] = n.z();
     }
+}
+
+// 执行极小曲面迭代
+void GLWidget::performMinimalSurfaceIteration(int iterations, float lambda) {
+    if (!modelLoaded || vertices.empty()) return;
+    
+    // 确保半边网格已经构建
+    if (m_hemesh.getVertices().empty()) {
+        m_hemesh.build(vertices, faces);
+    }
+    
+    // 计算每个顶点的混合面积
+    std::vector<float> mixedAreas(m_hemesh.getVertices().size(), 0.0f);
+    for (size_t i = 0; i < m_hemesh.getVertices().size(); i++) {
+        mixedAreas[i] = m_hemesh.calculateMixedArea(m_hemesh.getVertices()[i]);
+    }
+    
+    for (int iter = 0; iter < iterations; iter++) {
+        // 计算每个顶点的平均曲率向量
+        std::vector<QVector3D> meanCurvatureVectors(m_hemesh.getVertices().size(), QVector3D(0,0,0));
+        
+        for (size_t i = 0; i < m_hemesh.getVertices().size(); i++) {
+            HVertex* vertex = m_hemesh.getVertices()[i];
+            if (m_hemesh.isBoundaryVertex(vertex)) continue; // 跳过边界顶点
+            
+            QVector3D meanCurvatureVec(0,0,0);
+            HEdge* startEdge = vertex->edge;
+            if (!startEdge) continue;
+            
+            HEdge* edge = startEdge;
+            do {
+                if (!edge || !edge->face) {
+                    if (edge && edge->twin) edge = edge->twin->next;
+                    else edge = nullptr;
+                    continue;
+                }
+                
+                HEdge* e0 = edge;
+                HEdge* e1 = e0->next;
+                if (!e1) {
+                    edge = (edge->twin) ? edge->twin->next : nullptr;
+                    continue;
+                }
+                
+                HEdge* e2 = e1->next;
+                if (!e2) {
+                    edge = (edge->twin) ? edge->twin->next : nullptr;
+                    continue;
+                }
+                
+                if (!e0->vertex || !e1->vertex || !e2->vertex) {
+                    edge = (edge->twin) ? edge->twin->next : nullptr;
+                    continue;
+                }
+                
+                // 获取三角形顶点
+                QVector3D v0 = e0->vertex->position;
+                QVector3D v1 = e1->vertex->position;
+                QVector3D v2 = e2->vertex->position;
+                
+                // 计算余切权重
+                QVector3D edgeVec = v1 - v0;
+                QVector3D oppVec = v2 - v0;
+                float cotWeight = m_hemesh.cotangent(edgeVec, oppVec);
+                
+                // 累加到平均曲率向量
+                meanCurvatureVec += cotWeight * (v1 - v0);
+                
+                // 移动到下一个邻接半边
+                edge = (edge->twin) ? edge->twin->next : nullptr;
+            } while (edge && edge != startEdge);
+            
+            meanCurvatureVectors[i] = meanCurvatureVec;
+        }
+        
+        // 更新顶点位置
+        for (size_t i = 0; i < m_hemesh.getVertices().size(); i++) {
+            HVertex* vertex = m_hemesh.getVertices()[i];
+            if (m_hemesh.isBoundaryVertex(vertex)) continue; // 边界顶点不动
+            
+            // 计算法线方向（使用平均曲率向量方向）
+            QVector3D H = meanCurvatureVectors[i];
+            float H_length = H.length();
+            if (H_length < EPSILON) continue;
+            
+            QVector3D n = H.normalized();
+            
+            // 更新顶点位置：v_new = v_old - λ * (H / (2A))
+            // 其中 H 是平均曲率向量，A 是混合面积
+            float A = mixedAreas[i];
+            if (A > EPSILON) {
+                vertex->position -= lambda * (H / (2.0f * A));
+            }
+        }
+    }
+    
+    // 更新vertices数组
+    for (size_t i = 0; i < m_hemesh.getVertices().size(); i++) {
+        vertices[i*3]   = m_hemesh.getVertices()[i]->position.x();
+        vertices[i*3+1] = m_hemesh.getVertices()[i]->position.y();
+        vertices[i*3+2] = m_hemesh.getVertices()[i]->position.z();
+    }
+    
+    // 重新计算法线和曲率
+    calculateNormals();
+    calculateCurvatures();
+    
+    // 更新OpenGL缓冲区
+    makeCurrent();
+    vbo.bind();
+    int vertexSize = vertices.size() * sizeof(float);
+    int normalSize = normals.size() * sizeof(float);
+    int curvatureSize = vertexCurvatures.size() * sizeof(float);
+    vbo.allocate(vertexSize + normalSize + curvatureSize);
+    vbo.write(0, vertices.data(), vertexSize);
+    vbo.write(vertexSize, normals.data(), normalSize);
+    vbo.write(vertexSize + normalSize, vertexCurvatures.data(), curvatureSize);
+    vbo.release();
+    doneCurrent();
+    
+    update();
 }

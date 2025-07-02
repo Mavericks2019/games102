@@ -19,12 +19,12 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 public:
     enum RenderMode { 
-    Wireframe, 
-    BlinnPhong, 
-    GaussianCurvature,
-    MeanCurvature,
-    MaxCurvature 
-};
+        Wireframe, 
+        BlinnPhong, 
+        GaussianCurvature,
+        MeanCurvature,
+        MaxCurvature 
+    };
     explicit GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
 
@@ -33,6 +33,7 @@ public:
     void setBackgroundColor(const QColor& color);
     void setRenderMode(RenderMode mode);
     void loadOBJ(const QString &path);
+    void performMinimalSurfaceIteration(int iterations, float lambda); // 新增极小曲面迭代函数
 
 protected:
     void initializeGL() override;
@@ -53,8 +54,8 @@ public:
     void setShowWireframeOverlay(bool show);
     void setWireframeColor(const QVector4D& color);
     bool showWireframeOverlay;
-    QVector4D wireframeColor; // 线框颜色
     // OpenGL资源
+    QVector4D wireframeColor;
     QOpenGLShaderProgram wireframeProgram;
     QOpenGLShaderProgram blinnPhongProgram;
     QOpenGLShaderProgram curvatureProgram;
@@ -76,7 +77,7 @@ public:
     std::vector<float> meanCurvatures;
     std::vector<float> maxCurvatures;
     
-    // 添加：顶点曲率值
+    // 顶点曲率值
     std::vector<float> vertexCurvatures;
 
     // 视图参数
@@ -94,6 +95,11 @@ public:
     AdjacencyGraph adjacencyGraph;
     HMesh m_hemesh;
     bool m_useHalfEdgeForCurvature = true;
+    
+    // 极小曲面迭代相关
+    std::vector<float> originalVertices; // 保存原始顶点位置
+    bool isIterating = false;
+    int iterationCount = 0;
 };
 
 #endif // GLWIDGET_H

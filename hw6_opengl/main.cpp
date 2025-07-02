@@ -17,6 +17,8 @@
 #include <QColorDialog>
 #include <QRadioButton>
 #include <QCheckBox>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
 
 int main(int argc, char *argv[])
 {
@@ -207,6 +209,48 @@ int main(int argc, char *argv[])
         glWidget->resetView();
     });
     objControlLayout->addWidget(resetButton);
+    
+    // 添加极小曲面迭代控制组
+    QGroupBox *minimalSurfaceGroup = new QGroupBox("Minimal Surface Iteration");
+    minimalSurfaceGroup->setStyleSheet("QGroupBox { color: white; font-size: 14px; }");
+    QFormLayout *minimalLayout = new QFormLayout(minimalSurfaceGroup);
+    
+    // 迭代次数
+    QSpinBox *iterationsSpinBox = new QSpinBox;
+    iterationsSpinBox->setRange(1, 1000);
+    iterationsSpinBox->setValue(10);
+    minimalLayout->addRow("Iterations:", iterationsSpinBox);
+    
+    // 步长参数
+    QDoubleSpinBox *lambdaSpinBox = new QDoubleSpinBox;
+    lambdaSpinBox->setRange(0.0001, 0.1);
+    lambdaSpinBox->setValue(0.01);
+    lambdaSpinBox->setSingleStep(0.001);
+    lambdaSpinBox->setDecimals(4);
+    minimalLayout->addRow("Step Size (λ):", lambdaSpinBox);
+    
+    // 应用迭代按钮
+    QPushButton *applyIterationButton = new QPushButton("Apply Iteration");
+    applyIterationButton->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #505050;"
+        "   color: white;"
+        "   border: none;"
+        "   padding: 10px 20px;"
+        "   font-size: 16px;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:hover { background-color: #606060; }"
+    );
+    QObject::connect(applyIterationButton, &QPushButton::clicked, [glWidget, iterationsSpinBox, lambdaSpinBox]() {
+        glWidget->performMinimalSurfaceIteration(
+            iterationsSpinBox->value(),
+            lambdaSpinBox->value()
+        );
+    });
+    minimalLayout->addRow(applyIterationButton);
+    
+    objControlLayout->addWidget(minimalSurfaceGroup);
     
     // 添加使用说明
     QLabel *infoLabel = new QLabel(

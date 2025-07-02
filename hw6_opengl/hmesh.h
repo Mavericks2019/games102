@@ -57,17 +57,17 @@ public:
     // 获取顶点曲率数据
     const std::vector<HVertex*>& getVertices() const { return m_vertices; }
     
-private:
+    // 计算余切值 (公开)
+    float cotangent(const QVector3D& v1, const QVector3D& v2);
+    
+public:
     // 计算顶点的混合面积
     float calculateMixedArea(HVertex* vertex);
     
     // 计算两个向量之间的角度
     float angleBetween(const QVector3D& v1, const QVector3D& v2);
     
-    // 计算余切值
-    float cotangent(const QVector3D& v1, const QVector3D& v2);
-    
-private:
+public:
     std::vector<HVertex*> m_vertices;  // 所有顶点
     std::vector<HEdge*>   m_edges;     // 所有半边
     std::vector<HFace*>   m_faces;     // 所有面

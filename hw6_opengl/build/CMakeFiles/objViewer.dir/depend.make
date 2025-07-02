@@ -247,6 +247,7 @@ CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qp
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qrect.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qrefcount.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qregexp.h
+CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qregularexpression.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qscopedpointer.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qset.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qshareddata.h
@@ -320,6 +321,7 @@ CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qtg
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qtguiglobal.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qtouchdevice.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qtransform.h
+CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qvalidator.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qvector2d.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qvector3d.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qvector4d.h
@@ -328,6 +330,7 @@ CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qwi
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QCheckBox
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QColorDialog
+CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QDoubleSpinBox
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QFileDialog
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QFormLayout
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QGroupBox
@@ -339,6 +342,7 @@ CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QPushButton
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QRadioButton
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QSlider
+CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QSpinBox
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStackedLayout
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStyleFactory
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTabWidget
@@ -346,6 +350,7 @@ CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QWidget
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qabstractbutton.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qabstractslider.h
+CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qabstractspinbox.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qapplication.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qboxlayout.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qcheckbox.h
@@ -366,6 +371,7 @@ CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qradiobutton.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qsizepolicy.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qslider.h
+CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qspinbox.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstackedlayout.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstylefactory.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtabwidget.h
