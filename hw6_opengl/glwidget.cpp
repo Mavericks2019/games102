@@ -1016,43 +1016,44 @@ void GLWidget::performMinimalSurfaceIteration(int iterations, float lambda) {
             HEdge* edge = startEdge;
             do {
                 if (!edge || !edge->face) {
-                    if (edge && edge->twin) edge = edge->twin->next;
-                    else edge = nullptr;
+                    edge = (edge && edge->twin) ? edge->twin->next : nullptr;
                     continue;
                 }
                 
+                // 获取当前三角形三条边
                 HEdge* e0 = edge;
                 HEdge* e1 = e0->next;
-                if (!e1) {
+                HEdge* e2 = (e1) ? e1->next : nullptr;
+                
+                // 确保三角形完整
+                if (!e1 || !e2 || !e0->vertex || !e1->vertex || !e2->vertex) {
                     edge = (edge->twin) ? edge->twin->next : nullptr;
                     continue;
                 }
                 
-                HEdge* e2 = e1->next;
-                if (!e2) {
-                    edge = (edge->twin) ? edge->twin->next : nullptr;
-                    continue;
-                }
+                // 获取三角形顶点位置
+                QVector3D v0 = vertex->position;       // 中心顶点
+                QVector3D v1 = e0->vertex->position;   // 邻接顶点1
+                QVector3D v2 = e1->vertex->position;   // 邻接顶点2
+                // qDebug() << "Vertex positions:";
+                // qDebug() << "v0: (" << v0.x() << ", " << v0.y() << ", " << v0.z() << ")";
+                // qDebug() << "v1: (" << v1.x() << ", " << v1.y() << ", " << v1.z() << ")"; 
+                // qDebug() << "v2: (" << v2.x() << ", " << v2.y() << ", " << v2.z() << ")";
+                // 计算边v0v1所对角的余切（在v2处）
+                QVector3D vec1 = v0 - v2;  // 向量v2->v0
+                QVector3D vec2 = v1 - v2;  // 向量v2->v1
+                float cot_alpha = m_hemesh.cotangent(vec1, vec2);
                 
-                if (!e0->vertex || !e1->vertex || !e2->vertex) {
-                    edge = (edge->twin) ? edge->twin->next : nullptr;
-                    continue;
-                }
+                // 计算边v0v2所对角的余切（在v1处）
+                QVector3D vec3 = v0 - v1;  // 向量v1->v0
+                QVector3D vec4 = v2 - v1;  // 向量v1->v2
+                float cot_beta = m_hemesh.cotangent(vec3, vec4);
                 
-                // 获取三角形顶点
-                QVector3D v0 = e0->vertex->position;
-                QVector3D v1 = e1->vertex->position;
-                QVector3D v2 = e2->vertex->position;
+                // 累加到平均曲率向量 (使用余切权重)
+                meanCurvatureVec += cot_alpha * (v1 - v0);
+                meanCurvatureVec += cot_beta * (v2 - v0);
                 
-                // 计算余切权重
-                QVector3D edgeVec = v1 - v0;
-                QVector3D oppVec = v2 - v0;
-                float cotWeight = m_hemesh.cotangent(edgeVec, oppVec);
-                
-                // 累加到平均曲率向量
-                meanCurvatureVec += cotWeight * (v1 - v0);
-                
-                // 移动到下一个邻接半边
+                // 移动到下一个邻接三角形
                 edge = (edge->twin) ? edge->twin->next : nullptr;
             } while (edge && edge != startEdge);
             
@@ -1062,36 +1063,37 @@ void GLWidget::performMinimalSurfaceIteration(int iterations, float lambda) {
         // 更新顶点位置
         for (size_t i = 0; i < m_hemesh.getVertices().size(); i++) {
             HVertex* vertex = m_hemesh.getVertices()[i];
-            if (m_hemesh.isBoundaryVertex(vertex)) continue; // 边界顶点不动
+            if (m_hemesh.isBoundaryVertex(vertex)) continue;
             
-            // 计算法线方向（使用平均曲率向量方向）
             QVector3D H = meanCurvatureVectors[i];
             float H_length = H.length();
-            if (H_length < EPSILON) continue;
+            if (H_length < 1e-6f) continue;  // 防止零向量
             
-            QVector3D n = H.normalized();
-            
-            // 更新顶点位置：v_new = v_old - λ * (H / (2A))
-            // 其中 H 是平均曲率向量，A 是混合面积
             float A = mixedAreas[i];
-            if (A > EPSILON) {
-                vertex->position -= lambda * (H / (2.0f * A));
+            std::cout << A << std::endl;
+            if (A > 1e-6f) {
+                // 更新公式: v_new = v_old - λ * (H / (2A))
+                qDebug() << "Vertex positions:";
+                qDebug() << "vertex->position" << vertex->position.x() << ", " << vertex->position.y() << ", " << vertex->position.z() << ")";
+                vertex->position += lambda * (H / (2.0f * A));
+                qDebug() << "Vertex positions:";
+                qDebug() << "vertex->position" << vertex->position.x() << ", " << vertex->position.y() << ", " << vertex->position.z() << ")";
             }
         }
     }
     
-    // 更新vertices数组
+    // 更新vertices数组（保持不变）
     for (size_t i = 0; i < m_hemesh.getVertices().size(); i++) {
         vertices[i*3]   = m_hemesh.getVertices()[i]->position.x();
         vertices[i*3+1] = m_hemesh.getVertices()[i]->position.y();
         vertices[i*3+2] = m_hemesh.getVertices()[i]->position.z();
     }
     
-    // 重新计算法线和曲率
+    // 重新计算法线和曲率（保持不变）
     calculateNormals();
     calculateCurvatures();
     
-    // 更新OpenGL缓冲区
+    // 更新OpenGL缓冲区（保持不变）
     makeCurrent();
     vbo.bind();
     int vertexSize = vertices.size() * sizeof(float);
