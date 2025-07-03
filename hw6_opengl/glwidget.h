@@ -60,6 +60,7 @@ public:
     void calculateCurvaturesOpenMesh();
     void setShowWireframeOverlay(bool show);
     void setWireframeColor(const QVector4D& color);
+    OpenMesh::Vec3f computeMeanCurvatureVector(OpenMesh::VertexHandle vh);
     bool showWireframeOverlay;
     // OpenGL资源
     QVector4D wireframeColor;
