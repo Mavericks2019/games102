@@ -14,27 +14,26 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt5 COMPONENTS Widgets OpenGL REQUIRED)
 
 # 添加着色器资源文件
-qt5_add_resources(RESOURCE_FILES
-    shaders.qrc
-)
+set(SHADER_RESOURCES shaders.qrc)
+qt5_add_resources(RESOURCE_FILES ${SHADER_RESOURCES})
+
+find_package(OpenMesh REQUIRED)
 
 # 添加可执行文件
 add_executable(${PROJECT_NAME}
     main.cpp
     glwidget.cpp
     glwidget.h
-    adjacencygraph.cpp
-    adjacencygraph.h
-    hmesh.cpp       # 新增
-    hmesh.h         # 新增
     ${RESOURCE_FILES}
+
 )
 
-# 链接Qt库
+# 链接库
 target_link_libraries(${PROJECT_NAME}
     Qt5::Widgets
     Qt5::OpenGL
     GL
+    OpenMeshCore
 )
 
 # 设置安装路径

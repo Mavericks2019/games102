@@ -11,8 +11,16 @@
 #include <QColor>
 #include <vector>
 #include <set>
-#include "adjacencygraph.h"
-#include "hmesh.h"
+#include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
+
+// 定义OpenMesh网格类型
+struct MyTraits : public OpenMesh::DefaultTraits {
+    VertexAttributes(OpenMesh::Attributes::Normal | 
+                     OpenMesh::Attributes::Status);
+    FaceAttributes(OpenMesh::Attributes::Normal | 
+                   OpenMesh::Attributes::Status);
+};
+typedef OpenMesh::TriMesh_ArrayKernelT<MyTraits> Mesh;
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
@@ -33,7 +41,7 @@ public:
     void setBackgroundColor(const QColor& color);
     void setRenderMode(RenderMode mode);
     void loadOBJ(const QString &path);
-    void performMinimalSurfaceIteration(int iterations, float lambda); // 新增极小曲面迭代函数
+    void performMinimalSurfaceIteration(int iterations, float lambda);
 
 protected:
     void initializeGL() override;
@@ -49,8 +57,7 @@ public:
     void initializeShaders();
     void calculateNormals();
     void calculateCurvatures();
-    void calculateCurvaturesHemesh();
-    void calculateCurvaturesAdjacency();
+    void calculateCurvaturesOpenMesh();
     void setShowWireframeOverlay(bool show);
     void setWireframeColor(const QVector4D& color);
     bool showWireframeOverlay;
@@ -91,15 +98,11 @@ public:
     bool isDragging;
     QPoint lastMousePos;
 
-    private:
-    AdjacencyGraph adjacencyGraph;
-    HMesh m_hemesh;
-    bool m_useHalfEdgeForCurvature = true;
+private:
+    Mesh openMesh; // 使用OpenMesh替代原有HMesh
     
     // 极小曲面迭代相关
     std::vector<float> originalVertices; // 保存原始顶点位置
-    bool isIterating = false;
-    int iterationCount = 0;
 };
 
 #endif // GLWIDGET_H

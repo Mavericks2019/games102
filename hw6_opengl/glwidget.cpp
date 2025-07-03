@@ -10,8 +10,12 @@
 #include <QResource>
 #include <algorithm>
 #include <iostream>
+#include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
+#include <OpenMesh/Tools/Smoother/JacobiLaplaceSmootherT.hh>
 
 #define EPSILON 1E-4F 
+
+using namespace OpenMesh;
 
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
     vbo(QOpenGLBuffer::VertexBuffer),
@@ -105,6 +109,7 @@ void GLWidget::loadOBJ(const QString &path)
     vertexCurvatures.clear(); // 清空曲率数据
     originalVertices.clear(); // 清空原始顶点
     modelLoaded = false;
+    openMesh.clear(); // 清空OpenMesh
     
     // 临时存储原始顶点数据
     std::vector<float> rawVertices;
@@ -425,252 +430,108 @@ void GLWidget::initializeShaders()
 }
 
 void GLWidget::calculateCurvatures() {
-    if (m_useHalfEdgeForCurvature) {
-        calculateCurvaturesHemesh();
-    } else {
-        calculateCurvaturesAdjacency();
-    }
+    calculateCurvaturesOpenMesh();
 }
 
-// 添加新的曲率计算函数
-void GLWidget::calculateCurvaturesHemesh() {
+// 使用OpenMesh计算曲率
+void GLWidget::calculateCurvaturesOpenMesh() {
     gaussianCurvatures.clear();
     meanCurvatures.clear();
     maxCurvatures.clear();
     
     if (vertices.empty() || faces.empty()) return;
     
-    // 构建半边数据结构
-    m_hemesh.build(vertices, faces);
-    m_hemesh.calculateCurvatures();
+    // 构建OpenMesh网格
+    openMesh.clear();
     
-    // 获取曲率数据
-    size_t vertexCount = vertices.size() / 3;
-    gaussianCurvatures.resize(vertexCount);
-    meanCurvatures.resize(vertexCount);
-    maxCurvatures.resize(vertexCount);
-    
-    const auto& hemVertices = m_hemesh.getVertices();
-    for (size_t i = 0; i < vertexCount; i++) {
-        gaussianCurvatures[i] = hemVertices[i]->gaussianCurvature;
-        meanCurvatures[i] = hemVertices[i]->meanCurvature;
-        maxCurvatures[i] = hemVertices[i]->maxCurvature;
+    // 添加顶点
+    for (size_t i = 0; i < vertices.size(); i += 3) {
+        openMesh.add_vertex(Mesh::Point(vertices[i], vertices[i+1], vertices[i+2]));
     }
-    // 根据当前渲染模式设置顶点曲率值
-    if (vertexCurvatures.size() != gaussianCurvatures.size()) {
-        vertexCurvatures.resize(gaussianCurvatures.size());
+    
+    // 添加面
+    for (size_t i = 0; i < faces.size(); i += 3) {
+        std::vector<Mesh::VertexHandle> faceVertices;
+        faceVertices.push_back(Mesh::VertexHandle(faces[i]));
+        faceVertices.push_back(Mesh::VertexHandle(faces[i+1]));
+        faceVertices.push_back(Mesh::VertexHandle(faces[i+2]));
+        openMesh.add_face(faceVertices);
     }
-    for (size_t i = 0; i < vertexCurvatures.size(); i++) {
-        switch (currentRenderMode) {
-        case GaussianCurvature:
-            vertexCurvatures[i] = gaussianCurvatures[i];
-            break;
-        case MeanCurvature:
-            vertexCurvatures[i] = meanCurvatures[i];
-            break;
-        case MaxCurvature:
-            vertexCurvatures[i] = maxCurvatures[i];
-            break;
-        default:
-            vertexCurvatures[i] = 0.0f;
-            break;
-        }
-    }
-}
-
-void GLWidget::calculateCurvaturesAdjacency()
-{
-    gaussianCurvatures.clear();
-    meanCurvatures.clear();
-    maxCurvatures.clear();
     
-    if (vertices.empty() || faces.empty()) return;
+    // 请求顶点法线
+    openMesh.request_vertex_normals();
+    openMesh.request_face_normals();
     
-    // 构建邻接图
-    adjacencyGraph.build(vertices, faces);
-    const auto& adjacency = adjacencyGraph.getAdjacency();
+    // 计算法线
+    openMesh.update_face_normals();
+    openMesh.update_vertex_normals();
     
-    // 自定义余切计算函数
-    auto cotangent = [](const QVector3D& v1, const QVector3D& v2) -> float {
-        float dot = QVector3D::dotProduct(v1, v2);
-        QVector3D cross = QVector3D::crossProduct(v1, v2);
-        float crossLength = cross.length();
-        return dot / (crossLength + 1e-6f); // 避免除以零
-    };
-    
-    // 自定义角度计算函数
-    auto angle = [](const QVector3D& v1, const QVector3D& v2) -> float {
-        float dot = QVector3D::dotProduct(v1, v2);
-        float len1 = v1.length();
-        float len2 = v2.length();
-        
-        if (len1 < 1e-6f || len2 < 1e-6f) return 0.0f;
-        
-        float cosTheta = dot / (len1 * len2);
-        cosTheta = std::clamp(cosTheta, -1.0f, 1.0f);
-        return std::acos(cosTheta);
-    };
-    
-    // 初始化曲率存储
+    // 计算曲率
     size_t vertexCount = vertices.size() / 3;
     gaussianCurvatures.resize(vertexCount, 0.0f);
     meanCurvatures.resize(vertexCount, 0.0f);
     maxCurvatures.resize(vertexCount, 0.0f);
     
-    // 计算每个顶点的混合面积 (类似GetAmixed函数)
-    std::vector<float> A_mixed(vertexCount, 0.0f);
-    
-    // 首先计算每个三角形的面积
-    std::vector<float> triangleAreas(faces.size() / 3, 0.0f);
-    for (size_t i = 0; i < faces.size(); i += 3) {
-        unsigned int idx1 = faces[i];
-        unsigned int idx2 = faces[i+1];
-        unsigned int idx3 = faces[i+2];
+    // 计算高斯曲率
+    for (auto vh : openMesh.vertices()) {
+        float angleDefect = 2 * M_PI;
+        float area = 0.0f;
         
-        QVector3D v1(vertices[idx1*3], vertices[idx1*3+1], vertices[idx1*3+2]);
-        QVector3D v2(vertices[idx2*3], vertices[idx2*3+1], vertices[idx2*3+2]);
-        QVector3D v3(vertices[idx3*3], vertices[idx3*3+1], vertices[idx3*3+2]);
-        
-        QVector3D edge1 = v2 - v1;
-        QVector3D edge2 = v3 - v1;
-        float area = QVector3D::crossProduct(edge1, edge2).length() / 2.0f;
-        triangleAreas[i/3] = area;
-    }
-    
-    // 使用邻接图计算混合面积
-    for (size_t i = 0; i < vertexCount; i++) {
-        if (adjacency[i].adjacentFaces.empty()) continue;
-        
-        for (size_t faceIdx : (adjacency[i].adjacentFaces)) {
-            size_t faceStart = faceIdx * 3;
-            unsigned int idx1 = faces[faceStart];
-            unsigned int idx2 = faces[faceStart+1];
-            unsigned int idx3 = faces[faceStart+2];
-            
-            QVector3D v1(vertices[idx1*3], vertices[idx1*3+1], vertices[idx1*3+2]);
-            QVector3D v2(vertices[idx2*3], vertices[idx2*3+1], vertices[idx2*3+2]);
-            QVector3D v3(vertices[idx3*3], vertices[idx3*3+1], vertices[idx3*3+2]);
-            
-            float area = triangleAreas[faceIdx];
-            
-            if (area < EPSILON) continue;
-            
-            // 检查是否为钝角三角形
-            float dot1 = QVector3D::dotProduct(v2 - v1, v3 - v1);
-            float dot2 = QVector3D::dotProduct(v1 - v2, v3 - v2);
-            float dot3 = QVector3D::dotProduct(v1 - v3, v2 - v3);
-            
-            // 非钝角三角形
-            if (dot1 >= 0 && dot2 >= 0 && dot3 >= 0) {
-                // 计算余切权重
-                float cotA = cotangent(v2 - v1, v3 - v1);
-                float cotB = cotangent(v3 - v2, v1 - v2);
-                float cotC = cotangent(v1 - v3, v2 - v3);
-                
-                // 更新顶点混合面积
-                if (i == idx1) {
-                    A_mixed[i] += (cotB + cotC) * (v2 - v1).lengthSquared() / 8.0f;
-                } else if (i == idx2) {
-                    A_mixed[i] += (cotA + cotC) * (v3 - v2).lengthSquared() / 8.0f;
-                } else if (i == idx3) {
-                    A_mixed[i] += (cotA + cotB) * (v1 - v3).lengthSquared() / 8.0f;
-                }
-            } else {
-                // 钝角三角形
-                if (dot1 < 0) {
-                    // 在v1处为钝角
-                    if (i == idx1) A_mixed[i] += area / 2.0f;
-                    else if (i == idx2 || i == idx3) A_mixed[i] += area / 4.0f;
-                } else if (dot2 < 0) {
-                    // 在v2处为钝角
-                    if (i == idx2) A_mixed[i] += area / 2.0f;
-                    else if (i == idx1 || i == idx3) A_mixed[i] += area / 4.0f;
-                } else {
-                    // 在v3处为钝角
-                    if (i == idx3) A_mixed[i] += area / 2.0f;
-                    else if (i == idx1 || i == idx2) A_mixed[i] += area / 4.0f;
-                }
-            }
-        }
-    }
-    
-    // 计算高斯曲率和平均曲率
-    for (size_t i = 0; i < vertexCount; i++) {
-        if (A_mixed[i] < EPSILON) continue;
-        
-        // 使用邻接图计算高斯曲率
-        float angleSum = 0.0f;
-        for (size_t faceIdx : (adjacency[i].adjacentFaces)) {
-            size_t faceStart = faceIdx * 3;
-            unsigned int idx1 = faces[faceStart];
-            unsigned int idx2 = faces[faceStart+1];
-            unsigned int idx3 = faces[faceStart+2];
-            
-            QVector3D v1(vertices[idx1*3], vertices[idx1*3+1], vertices[idx1*3+2]);
-            QVector3D v2(vertices[idx2*3], vertices[idx2*3+1], vertices[idx2*3+2]);
-            QVector3D v3(vertices[idx3*3], vertices[idx3*3+1], vertices[idx3*3+2]);
-            
+        for (auto vf_it = openMesh.vf_begin(vh); vf_it != openMesh.vf_end(vh); ++vf_it) {
             // 计算角度
-            if (i == idx1) {
-                QVector3D vec1 = v2 - v1;
-                QVector3D vec2 = v3 - v1;
-                angleSum += angle(vec1, vec2);
-            } else if (i == idx2) {
-                QVector3D vec1 = v1 - v2;
-                QVector3D vec2 = v3 - v2;
-                angleSum += angle(vec1, vec2);
-            } else if (i == idx3) {
-                QVector3D vec1 = v1 - v3;
-                QVector3D vec2 = v2 - v3;
-                angleSum += angle(vec1, vec2);
+            auto heh = openMesh.halfedge_handle(*vf_it);
+            while (openMesh.to_vertex_handle(heh) != vh) {
+                heh = openMesh.next_halfedge_handle(heh);
             }
-        }
-        
-        gaussianCurvatures[i] = (2 * M_PI - angleSum) / A_mixed[i];
-        
-        // 使用邻接图计算平均曲率
-        QVector3D meanCurvature(0, 0, 0);
-        for (size_t j = 0; j < adjacency[i].neighbors.size(); j++) {
-            size_t neighborIdx = adjacency[i].neighbors[j];
-            QVector3D vi(vertices[i*3], vertices[i*3+1], vertices[i*3+2]);
-            QVector3D vj(vertices[neighborIdx*3], vertices[neighborIdx*3+1], vertices[neighborIdx*3+2]);
             
-            // 查找共享边
-            for (size_t faceIdx : adjacency[i].adjacentFaces) {
-                size_t faceStart = faceIdx * 3;
-                unsigned int idx1 = faces[faceStart];
-                unsigned int idx2 = faces[faceStart+1];
-                unsigned int idx3 = faces[faceStart+2];
+            auto v1 = openMesh.point(openMesh.from_vertex_handle(heh));
+            auto v2 = openMesh.point(openMesh.to_vertex_handle(heh));
+            auto heh_next = openMesh.next_halfedge_handle(heh);
+            auto v3 = openMesh.point(openMesh.to_vertex_handle(heh_next));
+            
+            auto vec1 = (v1 - v2).normalize();
+            auto vec2 = (v3 - v2).normalize();
+            float angle = acos(std::max(-1.0f, std::min(1.0f, dot(vec1, vec2))));
+            angleDefect -= angle;
+            
+            // 计算三角形面积
+            auto cross = (v1 - v2) % (v3 - v2);
+            area += cross.length() / 6.0f;
+        }
+        
+        if (area > EPSILON) {
+            gaussianCurvatures[vh.idx()] = angleDefect / area;
+        }
+    }
+    
+    // 计算平均曲率
+    for (auto vh : openMesh.vertices()) {
+        Mesh::Point laplace(0, 0, 0);
+        float area = 0.0f;
+        
+        for (auto voh_it = openMesh.voh_begin(vh); voh_it != openMesh.voh_end(vh); ++voh_it) {
+            if (!openMesh.is_boundary(*voh_it)) {
+                auto v1 = openMesh.point(vh);
+                auto v2 = openMesh.point(openMesh.to_vertex_handle(*voh_it));
+                auto v3 = openMesh.point(openMesh.to_vertex_handle(
+                    openMesh.next_halfedge_handle(*voh_it)));
+                auto v4 = openMesh.point(openMesh.to_vertex_handle(
+                    openMesh.next_halfedge_handle(openMesh.opposite_halfedge_handle(*voh_it))));
                 
-                // 检查是否包含邻居顶点
-                if (neighborIdx != idx1 && neighborIdx != idx2 && neighborIdx != idx3) continue;
+                auto e = v2 - v1;
+                auto cot1 = 1.0f / tan(acos(std::max(-1.0f, std::min(1.0f, 
+                    dot((v3 - v1).normalize(), (v3 - v2).normalize())))));
+                auto cot2 = 1.0f / tan(acos(std::max(-1.0f, std::min(1.0f, 
+                    dot((v4 - v1).normalize(), (v4 - v2).normalize())))));
                 
-                // 找到对边顶点
-                unsigned int oppIdx = idx1;
-                if (i == idx1) {
-                    if (neighborIdx == idx2) oppIdx = idx3;
-                    else oppIdx = idx2;
-                } else if (i == idx2) {
-                    if (neighborIdx == idx1) oppIdx = idx3;
-                    else oppIdx = idx1;
-                } else {
-                    if (neighborIdx == idx1) oppIdx = idx2;
-                    else oppIdx = idx1;
-                }
-                
-                QVector3D v_opp(vertices[oppIdx*3], vertices[oppIdx*3+1], vertices[oppIdx*3+2]);
-                
-                // 计算余切权重
-                QVector3D edge1 = v_opp - vi;
-                QVector3D edge2 = v_opp - vj;
-                
-                float cotWeight = cotangent(edge1, edge2);
-                meanCurvature += cotWeight * (vj - vi);
-                break;
+                laplace += (cot1 + cot2) * e;
+                area += e.length() * (cot1 + cot2) / 4.0f;
             }
         }
         
-        meanCurvatures[i] = meanCurvature.length() / (2.0f * A_mixed[i]);
+        if (area > EPSILON) {
+            meanCurvatures[vh.idx()] = laplace.length() / (2.0f * area);
+        }
     }
     
     // 计算最大曲率
@@ -718,6 +579,10 @@ void GLWidget::calculateCurvaturesAdjacency()
             break;
         }
     }
+    
+    // 释放法线
+    openMesh.release_vertex_normals();
+    openMesh.release_face_normals();
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -986,114 +851,60 @@ void GLWidget::calculateNormals()
     }
 }
 
-// 执行极小曲面迭代
+// 执行极小曲面迭代 (使用OpenMesh)
 void GLWidget::performMinimalSurfaceIteration(int iterations, float lambda) {
     if (!modelLoaded || vertices.empty()) return;
     
-    // 确保半边网格已经构建
-    if (m_hemesh.getVertices().empty()) {
-        m_hemesh.build(vertices, faces);
+    // 构建OpenMesh网格
+    openMesh.clear();
+    
+    // 添加顶点
+    for (size_t i = 0; i < vertices.size(); i += 3) {
+        openMesh.add_vertex(Mesh::Point(vertices[i], vertices[i+1], vertices[i+2]));
     }
     
-    // 计算每个顶点的混合面积
-    std::vector<float> mixedAreas(m_hemesh.getVertices().size(), 0.0f);
-    for (size_t i = 0; i < m_hemesh.getVertices().size(); i++) {
-        mixedAreas[i] = m_hemesh.calculateMixedArea(m_hemesh.getVertices()[i]);
+    // 添加面
+    for (size_t i = 0; i < faces.size(); i += 3) {
+        std::vector<Mesh::VertexHandle> faceVertices;
+        faceVertices.push_back(Mesh::VertexHandle(faces[i]));
+        faceVertices.push_back(Mesh::VertexHandle(faces[i+1]));
+        faceVertices.push_back(Mesh::VertexHandle(faces[i+2]));
+        openMesh.add_face(faceVertices);
     }
     
-    for (int iter = 0; iter < iterations; iter++) {
-        // 计算每个顶点的平均曲率向量
-        std::vector<QVector3D> meanCurvatureVectors(m_hemesh.getVertices().size(), QVector3D(0,0,0));
-        
-        for (size_t i = 0; i < m_hemesh.getVertices().size(); i++) {
-            HVertex* vertex = m_hemesh.getVertices()[i];
-            if (m_hemesh.isBoundaryVertex(vertex)) continue; // 跳过边界顶点
-            
-            QVector3D meanCurvatureVec(0,0,0);
-            HEdge* startEdge = vertex->edge;
-            if (!startEdge) continue;
-            
-            HEdge* edge = startEdge;
-            do {
-                if (!edge || !edge->face) {
-                    edge = (edge && edge->twin) ? edge->twin->next : nullptr;
-                    continue;
-                }
-                
-                // 获取当前三角形三条边
-                HEdge* e0 = edge;
-                HEdge* e1 = e0->next;
-                HEdge* e2 = (e1) ? e1->next : nullptr;
-                
-                // 确保三角形完整
-                if (!e1 || !e2 || !e0->vertex || !e1->vertex || !e2->vertex) {
-                    edge = (edge->twin) ? edge->twin->next : nullptr;
-                    continue;
-                }
-                
-                // 获取三角形顶点位置
-                QVector3D v0 = vertex->position;       // 中心顶点
-                QVector3D v1 = e0->vertex->position;   // 邻接顶点1
-                QVector3D v2 = e1->vertex->position;   // 邻接顶点2
-                // qDebug() << "Vertex positions:";
-                // qDebug() << "v0: (" << v0.x() << ", " << v0.y() << ", " << v0.z() << ")";
-                // qDebug() << "v1: (" << v1.x() << ", " << v1.y() << ", " << v1.z() << ")"; 
-                // qDebug() << "v2: (" << v2.x() << ", " << v2.y() << ", " << v2.z() << ")";
-                // 计算边v0v1所对角的余切（在v2处）
-                QVector3D vec1 = v0 - v2;  // 向量v2->v0
-                QVector3D vec2 = v1 - v2;  // 向量v2->v1
-                float cot_alpha = m_hemesh.cotangent(vec1, vec2);
-                
-                // 计算边v0v2所对角的余切（在v1处）
-                QVector3D vec3 = v0 - v1;  // 向量v1->v0
-                QVector3D vec4 = v2 - v1;  // 向量v1->v2
-                float cot_beta = m_hemesh.cotangent(vec3, vec4);
-                
-                // 累加到平均曲率向量 (使用余切权重)
-                meanCurvatureVec += cot_alpha * (v1 - v0);
-                meanCurvatureVec += cot_beta * (v2 - v0);
-                
-                // 移动到下一个邻接三角形
-                edge = (edge->twin) ? edge->twin->next : nullptr;
-            } while (edge && edge != startEdge);
-            
-            meanCurvatureVectors[i] = meanCurvatureVec;
-        }
-        
-        // 更新顶点位置
-        for (size_t i = 0; i < m_hemesh.getVertices().size(); i++) {
-            HVertex* vertex = m_hemesh.getVertices()[i];
-            if (m_hemesh.isBoundaryVertex(vertex)) continue;
-            
-            QVector3D H = meanCurvatureVectors[i];
-            float H_length = H.length();
-            if (H_length < 1e-6f) continue;  // 防止零向量
-            
-            float A = mixedAreas[i];
-            std::cout << A << std::endl;
-            if (A > 1e-6f) {
-                // 更新公式: v_new = v_old - λ * (H / (2A))
-                qDebug() << "Vertex positions:";
-                qDebug() << "vertex->position" << vertex->position.x() << ", " << vertex->position.y() << ", " << vertex->position.z() << ")";
-                vertex->position += lambda * (H / (2.0f * A));
-                qDebug() << "Vertex positions:";
-                qDebug() << "vertex->position" << vertex->position.x() << ", " << vertex->position.y() << ", " << vertex->position.z() << ")";
-            }
-        }
+    // 请求顶点法线
+    openMesh.request_vertex_normals();
+    openMesh.request_face_normals();
+    
+    // 计算法线
+    openMesh.update_face_normals();
+    openMesh.update_vertex_normals();
+    
+    // 创建平滑器
+    Smoother::JacobiLaplaceSmootherT<Mesh> smoother(openMesh);
+    
+    // 执行平滑
+    for (int i = 0; i < iterations; ++i) {
+        smoother.smooth(lambda);
     }
     
-    // 更新vertices数组（保持不变）
-    for (size_t i = 0; i < m_hemesh.getVertices().size(); i++) {
-        vertices[i*3]   = m_hemesh.getVertices()[i]->position.x();
-        vertices[i*3+1] = m_hemesh.getVertices()[i]->position.y();
-        vertices[i*3+2] = m_hemesh.getVertices()[i]->position.z();
+    // 更新顶点位置
+    for (auto vh : openMesh.vertices()) {
+        auto p = openMesh.point(vh);
+        vertices[vh.idx() * 3] = p[0];
+        vertices[vh.idx() * 3 + 1] = p[1];
+        vertices[vh.idx() * 3 + 2] = p[2];
     }
     
-    // 重新计算法线和曲率（保持不变）
+    // 释放法线
+    openMesh.release_vertex_normals();
+    openMesh.release_face_normals();
+    
+    // 重新计算法线和曲率
     calculateNormals();
     calculateCurvatures();
     
-    // 更新OpenGL缓冲区（保持不变）
+    // 更新OpenGL缓冲区
     makeCurrent();
     vbo.bind();
     int vertexSize = vertices.size() * sizeof(float);

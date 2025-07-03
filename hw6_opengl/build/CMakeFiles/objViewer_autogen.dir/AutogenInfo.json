@@ -8,16 +8,10 @@
 	"HEADERS" : 
 	[
 		[
-			"/opt/games102/hw6_opengl/adjacencygraph.h",
-			"MU",
-			"EWIEGA46WW/moc_adjacencygraph.cpp"
-		],
-		[
 			"/opt/games102/hw6_opengl/glwidget.h",
 			"MU",
 			"EWIEGA46WW/moc_glwidget.cpp"
-		],
-		[ "/opt/games102/hw6_opengl/hmesh.h", "MU", "EWIEGA46WW/moc_hmesh.cpp" ]
+		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
 	"INCLUDE_DIR" : "/opt/games102/hw6_opengl/build/objViewer_autogen/include",
@@ -45,11 +39,11 @@
 		"/usr/include/x86_64-linux-gnu/qt5/QtCore",
 		"/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++",
 		"/usr/include/x86_64-linux-gnu/qt5/QtOpenGL",
+		"/usr/local/include",
 		"/usr/include/c++/9",
 		"/usr/include/x86_64-linux-gnu/c++/9",
 		"/usr/include/c++/9/backward",
 		"/usr/lib/gcc/x86_64-linux-gnu/9/include",
-		"/usr/local/include",
 		"/usr/include/x86_64-linux-gnu",
 		"/usr/include"
 	],
@@ -76,9 +70,7 @@
 	"SETTINGS_FILE" : "/opt/games102/hw6_opengl/build/CMakeFiles/objViewer_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
-		[ "/opt/games102/hw6_opengl/adjacencygraph.cpp", "MU" ],
 		[ "/opt/games102/hw6_opengl/glwidget.cpp", "MU" ],
-		[ "/opt/games102/hw6_opengl/hmesh.cpp", "MU" ],
 		[ "/opt/games102/hw6_opengl/main.cpp", "MU" ]
 	],
 	"UIC_OPTIONS" : [],
