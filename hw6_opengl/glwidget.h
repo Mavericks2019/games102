@@ -60,7 +60,10 @@ public:
     void calculateCurvaturesOpenMesh();
     void setShowWireframeOverlay(bool show);
     void setWireframeColor(const QVector4D& color);
-    OpenMesh::Vec3f computeMeanCurvatureVector(OpenMesh::VertexHandle vh);
+    Mesh::Point computeMeanCurvatureVector(Mesh& mesh, const Mesh::VertexHandle& vh, float A_mixed);
+    float triangleArea(const Mesh::Point& p0, const Mesh::Point& p1, const Mesh::Point& p2);
+    float calculateMixedArea(Mesh& mesh, const Mesh::VertexHandle& vh, const std::vector<bool>& isBoundary);
+    void updateMeshFromOpenMesh();
     bool showWireframeOverlay;
     // OpenGL资源
     QVector4D wireframeColor;
