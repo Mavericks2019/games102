@@ -894,23 +894,42 @@ void GLWidget::performMinimalSurfaceIteration(int iterations, float lambda) {
         }
     }
     
-    // 预计算所有顶点的混合面积
-    std::vector<float> mixedAreas(openMesh.n_vertices(), 0.0f);
-    for (auto vh : openMesh.vertices()) {
-        mixedAreas[vh.idx()] = calculateMixedArea(vh);
-    }
-
     // 执行迭代
-    for (int iter = 0; iter < iterations; iter++) {        
-        // 计算每个顶点的平均曲率向量
+    for (int iter = 0; iter < iterations; iter++) {
+        // 存储每个顶点的新位置
+        std::vector<Mesh::Point> newPositions(openMesh.n_vertices());
+        
+        // 计算每个顶点的新位置
         for (auto vh : openMesh.vertices()) {
-            if (isBoundary[vh.idx()]) continue;
-            float A_mixed = mixedAreas[vh.idx()];
-            if (A_mixed < EPSILON) continue;
+            unsigned int idx = vh.idx();
             
-            Mesh::Point H = computeMeanCurvatureVector(vh);
-            Mesh::Point newPos = openMesh.point(vh) - lambda * H;
-            openMesh.set_point(vh, newPos);
+            // 边界顶点保持固定
+            if (isBoundary[idx]) {
+                newPositions[idx] = openMesh.point(vh);
+                continue;
+            }
+            
+            // 计算邻接顶点的平均位置
+            Mesh::Point sum(0, 0, 0);
+            int count = 0;
+            for (auto vv_it = openMesh.vv_begin(vh); vv_it != openMesh.vv_end(vh); ++vv_it) {
+                sum += openMesh.point(*vv_it);
+                count++;
+            }
+            
+            if (count > 0) {
+                sum /= count; // 邻接点平均位置
+                // 应用步长控制：新位置 = 当前位置 + λ*(平均位置 - 当前位置)
+                newPositions[idx] = openMesh.point(vh) + lambda * (sum - openMesh.point(vh));
+            } else {
+                newPositions[idx] = openMesh.point(vh);
+            }
+        }
+        
+        // 更新顶点位置
+        for (auto vh : openMesh.vertices()) {
+            unsigned int idx = vh.idx();
+            openMesh.set_point(vh, newPositions[idx]);
         }
     }
     
