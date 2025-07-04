@@ -12,6 +12,7 @@
 #include <vector>
 #include <set>
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
+#include <OpenMesh/Core/IO/MeshIO.hh> // 添加OpenMesh IO头文件
 
 // 定义OpenMesh网格类型
 struct MyTraits : public OpenMesh::DefaultTraits {
@@ -19,6 +20,10 @@ struct MyTraits : public OpenMesh::DefaultTraits {
                      OpenMesh::Attributes::Status);
     FaceAttributes(OpenMesh::Attributes::Normal | 
                    OpenMesh::Attributes::Status);
+    // 添加曲率属性
+    VertexTraits {
+        float curvature;
+    };
 };
 typedef OpenMesh::TriMesh_ArrayKernelT<MyTraits> Mesh;
 
@@ -55,15 +60,13 @@ protected:
 
 public:
     void initializeShaders();
-    void calculateNormals();
     void calculateCurvatures();
-    void calculateCurvaturesOpenMesh();
     void setShowWireframeOverlay(bool show);
     void setWireframeColor(const QVector4D& color);
-    Mesh::Point computeMeanCurvatureVector(Mesh& mesh, const Mesh::VertexHandle& vh, float A_mixed);
+    Mesh::Point computeMeanCurvatureVector( const Mesh::VertexHandle& vh);
     float triangleArea(const Mesh::Point& p0, const Mesh::Point& p1, const Mesh::Point& p2);
-    float calculateMixedArea(Mesh& mesh, const Mesh::VertexHandle& vh, const std::vector<bool>& isBoundary);
-    void updateMeshFromOpenMesh();
+    float calculateMixedArea(const Mesh::VertexHandle& vh);
+    void updateBuffersFromOpenMesh(); // 新增函数
     bool showWireframeOverlay;
     // OpenGL资源
     QVector4D wireframeColor;
@@ -75,21 +78,6 @@ public:
     QOpenGLBuffer vbo;
     QOpenGLBuffer ebo;
     QOpenGLBuffer faceEbo;
-
-    // 模型数据
-    std::vector<float> vertices;
-    std::vector<float> normals;
-    std::vector<unsigned int> faces;
-    std::vector<unsigned int> edges;
-    std::set<uint64_t> uniqueEdges;
-
-    // 曲率数据
-    std::vector<float> gaussianCurvatures;
-    std::vector<float> meanCurvatures;
-    std::vector<float> maxCurvatures;
-    
-    // 顶点曲率值
-    std::vector<float> vertexCurvatures;
 
     // 视图参数
     float rotationX, rotationY;
@@ -103,10 +91,11 @@ public:
     QPoint lastMousePos;
 
 private:
-    Mesh openMesh; // 使用OpenMesh替代原有HMesh
+    Mesh openMesh; // 使用OpenMesh管理网格数据
     
-    // 极小曲面迭代相关
-    std::vector<float> originalVertices; // 保存原始顶点位置
+    // 从OpenMesh提取的数据（用于OpenGL渲染）
+    std::vector<unsigned int> faces;
+    std::vector<unsigned int> edges;
 };
 
 #endif // GLWIDGET_H

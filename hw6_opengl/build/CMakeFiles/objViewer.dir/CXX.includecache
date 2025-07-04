@@ -35,6 +35,10 @@ OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh
 -
 OpenMesh/Tools/Smoother/JacobiLaplaceSmootherT.hh
 -
+OpenMesh/Core/IO/MeshIO.hh
+-
+OpenMesh/Core/IO/Options.hh
+-
 
 /opt/games102/hw6_opengl/glwidget.h
 QOpenGLWidget
@@ -58,6 +62,8 @@ vector
 set
 -
 OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh
+-
+OpenMesh/Core/IO/MeshIO.hh
 -
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/QDebug
