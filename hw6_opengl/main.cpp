@@ -119,26 +119,21 @@ int main(int argc, char *argv[])
     QGroupBox *renderModeGroup = new QGroupBox("Rendering Mode");
     QVBoxLayout *renderModeLayout = new QVBoxLayout(renderModeGroup);
     
-    QRadioButton *wireframeRadio = new QRadioButton("Wireframe");
+    // 删除Wireframe单选按钮
     QRadioButton *solidRadio = new QRadioButton("Solid (Blinn-Phong)");
     QRadioButton *gaussianRadio = new QRadioButton("Gaussian Curvature");
     QRadioButton *meanRadio = new QRadioButton("Mean Curvature");
     QRadioButton *maxRadio = new QRadioButton("Max Curvature");
     
-    wireframeRadio->setChecked(true);
+    solidRadio->setChecked(true);  // 默认选择实体模式
     
     // 添加到布局
-    renderModeLayout->addWidget(wireframeRadio);
     renderModeLayout->addWidget(solidRadio);
     renderModeLayout->addWidget(gaussianRadio);
     renderModeLayout->addWidget(meanRadio);
     renderModeLayout->addWidget(maxRadio);
     
     // 连接信号
-    QObject::connect(wireframeRadio, &QRadioButton::clicked, [glWidget]() {
-        glWidget->setRenderMode(GLWidget::Wireframe);
-    });
-    
     QObject::connect(solidRadio, &QRadioButton::clicked, [glWidget]() {
         glWidget->setRenderMode(GLWidget::BlinnPhong);
     });
@@ -165,6 +160,14 @@ int main(int argc, char *argv[])
         glWidget->setShowWireframeOverlay(state == Qt::Checked);
     });
     objControlLayout->addWidget(wireframeOverlayCheckbox);
+    
+    // 新增：添加隐藏面选项
+    QCheckBox *hideFacesCheckbox = new QCheckBox("Hide Faces");
+    hideFacesCheckbox->setStyleSheet("color: white;");
+    QObject::connect(hideFacesCheckbox, &QCheckBox::stateChanged, [glWidget](int state) {
+        glWidget->setHideFaces(state == Qt::Checked);
+    });
+    objControlLayout->addWidget(hideFacesCheckbox);
     
     // 添加线框颜色选择按钮
     QPushButton *lineColorButton = new QPushButton("Change Wireframe Color");
@@ -261,8 +264,9 @@ int main(int argc, char *argv[])
         "• Arrow keys: Fine-tune rotation<br>"
         "• '+'/'-' keys: Zoom in/out<br>"
         "• 'R' key: Reset view<br>"
-        "• Switch between wireframe and solid rendering<br>"
-        "• Enable wireframe overlay to see model structure"
+        "• Switch between solid rendering and curvature visualizations<br>"
+        "• Enable wireframe overlay to see model structure<br>"
+        "• Use 'Hide Faces' to show only wireframe"
     );
     infoLabel->setWordWrap(true);
     infoLabel->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px; font-size: 14px;");

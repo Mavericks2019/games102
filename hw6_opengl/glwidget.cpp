@@ -23,7 +23,8 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
     vbo(QOpenGLBuffer::VertexBuffer),
     ebo(QOpenGLBuffer::IndexBuffer),
     faceEbo(QOpenGLBuffer::IndexBuffer),
-    showWireframeOverlay(false)
+    showWireframeOverlay(false),
+    hideFaces(false)  // 初始化新增成员
 {
     // 设置多重采样格式
     QSurfaceFormat format;
@@ -36,8 +37,14 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
     modelLoaded = false;
     isDragging = false;
     bgColor = QColor(0, 0, 0); // 初始化背景色为黑色
-    currentRenderMode = Wireframe;
+    currentRenderMode = BlinnPhong;  // 默认改为实体模式
     wireframeColor = QVector4D(1.0f, 0.0f, 0.0f, 1.0f); // 红色线框
+}
+
+void GLWidget::setHideFaces(bool hide)
+{
+    hideFaces = hide;
+    update();
 }
 
 void GLWidget::setShowWireframeOverlay(bool show)
@@ -533,10 +540,12 @@ void GLWidget::paintGL()
     GLint oldPolygonMode[2];
     glGetIntegerv(GL_POLYGON_MODE, oldPolygonMode);
 
-    if (currentRenderMode == Wireframe) {
-        // 线框模式
+    // 如果启用了隐藏面，只绘制线框
+    if (hideFaces) {
+        // 使用线框着色器
         wireframeProgram.bind();
         vao.bind();
+        ebo.bind();
 
         // 设置线条宽度
         glLineWidth(1.5f);
@@ -544,16 +553,16 @@ void GLWidget::paintGL()
         wireframeProgram.setUniformValue("model", model);
         wireframeProgram.setUniformValue("view", view);
         wireframeProgram.setUniformValue("projection", projection);
-        wireframeProgram.setUniformValue("lineColor", wireframeColor); // 设置线框颜色
+        wireframeProgram.setUniformValue("lineColor", wireframeColor);
 
-        // 绘制模型 - 使用线框模式 (GL_LINES)
+        // 绘制线框
         glDrawElements(GL_LINES, edges.size(), GL_UNSIGNED_INT, 0);
-
+        
+        ebo.release();
         vao.release();
         wireframeProgram.release();
-    }
-    else 
-    {
+    } else {
+        // 正常绘制模式
         if (currentRenderMode == GaussianCurvature || 
                currentRenderMode == MeanCurvature || 
                currentRenderMode == MaxCurvature) {
@@ -608,7 +617,8 @@ void GLWidget::paintGL()
             vao.release();
             blinnPhongProgram.release();
         }
-            // 如果启用了线框叠加
+
+        // 如果启用了线框叠加
         if (showWireframeOverlay) {
             // 启用多边形偏移以避免深度冲突
             glEnable(GL_POLYGON_OFFSET_LINE);
@@ -626,7 +636,7 @@ void GLWidget::paintGL()
             wireframeProgram.setUniformValue("model", model);
             wireframeProgram.setUniformValue("view", view);
             wireframeProgram.setUniformValue("projection", projection);
-            wireframeProgram.setUniformValue("lineColor", wireframeColor); // 设置线框颜色为红色
+            wireframeProgram.setUniformValue("lineColor", wireframeColor);
 
             // 绘制线框
             glDrawElements(GL_LINES, edges.size(), GL_UNSIGNED_INT, 0);
@@ -638,8 +648,8 @@ void GLWidget::paintGL()
             // 禁用多边形偏移
             glDisable(GL_POLYGON_OFFSET_LINE);
         }
-
     }
+    
     // 恢复原始多边形模式
     glPolygonMode(GL_FRONT, oldPolygonMode[0]);
     glPolygonMode(GL_BACK, oldPolygonMode[1]);

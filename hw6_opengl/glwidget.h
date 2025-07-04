@@ -32,7 +32,6 @@ class GLWidget : public QOpenGLWidget, protected QOpenGLFunctions
     Q_OBJECT
 public:
     enum RenderMode { 
-        Wireframe, 
         BlinnPhong, 
         GaussianCurvature,
         MeanCurvature,
@@ -47,6 +46,7 @@ public:
     void setRenderMode(RenderMode mode);
     void loadOBJ(const QString &path);
     void performMinimalSurfaceIteration(int iterations, float lambda);
+    void setHideFaces(bool hide);  // 新增函数
 
 protected:
     void initializeGL() override;
@@ -68,6 +68,7 @@ public:
     float calculateMixedArea(const Mesh::VertexHandle& vh);
     void updateBuffersFromOpenMesh(); // 新增函数
     bool showWireframeOverlay;
+    bool hideFaces;  // 新增成员变量
     // OpenGL资源
     QVector4D wireframeColor;
     QOpenGLShaderProgram wireframeProgram;
