@@ -53,7 +53,7 @@ public:
     void performUniformLaplacianIteration(int iterations, float lambda);
     void performCotangentWeightsIteration(int iterations, float lambda);
     void setHideFaces(bool hide);  // 新增函数
-    IterationMethod iterationMethod = CotangentWeights; // 默认使用余切权重
+    IterationMethod iterationMethod = UniformLaplacian; // 默认使用余切权重
     void setIterationMethod(IterationMethod method) { iterationMethod = method; }
 
 protected:

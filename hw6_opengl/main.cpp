@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
     QRadioButton *cotangentRadio = new QRadioButton("Cotangent Weights");
     
     // 默认选择余切权重
-    cotangentRadio->setChecked(true);
+    uniformRadio->setChecked(true);
     
     methodLayout->addWidget(uniformRadio);
     methodLayout->addWidget(cotangentRadio);
