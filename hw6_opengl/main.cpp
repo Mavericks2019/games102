@@ -213,6 +213,31 @@ int main(int argc, char *argv[])
     });
     objControlLayout->addWidget(resetButton);
     
+    // 添加迭代方法选择组
+    QGroupBox *methodGroup = new QGroupBox("Iteration Method");
+    methodGroup->setStyleSheet("QGroupBox { color: white; font-size: 14px; }");
+    QVBoxLayout *methodLayout = new QVBoxLayout(methodGroup);
+    
+    QRadioButton *uniformRadio = new QRadioButton("Uniform Laplacian");
+    QRadioButton *cotangentRadio = new QRadioButton("Cotangent Weights");
+    
+    // 默认选择余切权重
+    cotangentRadio->setChecked(true);
+    
+    methodLayout->addWidget(uniformRadio);
+    methodLayout->addWidget(cotangentRadio);
+    
+    // 连接信号
+    QObject::connect(uniformRadio, &QRadioButton::clicked, [glWidget]() {
+        glWidget->setIterationMethod(GLWidget::UniformLaplacian);
+    });
+    QObject::connect(cotangentRadio, &QRadioButton::clicked, [glWidget]() {
+        glWidget->setIterationMethod(GLWidget::CotangentWeights);
+    });
+    
+    // 添加到控制面板
+    objControlLayout->addWidget(methodGroup);
+    
     // 添加极小曲面迭代控制组
     QGroupBox *minimalSurfaceGroup = new QGroupBox("Minimal Surface Iteration");
     minimalSurfaceGroup->setStyleSheet("QGroupBox { color: white; font-size: 14px; }");
@@ -226,9 +251,9 @@ int main(int argc, char *argv[])
     
     // 步长参数
     QDoubleSpinBox *lambdaSpinBox = new QDoubleSpinBox;
-    lambdaSpinBox->setRange(0.0001, 0.1);
-    lambdaSpinBox->setValue(0.01);
-    lambdaSpinBox->setSingleStep(0.001);
+    lambdaSpinBox->setRange(0.0001, 0.5);
+    lambdaSpinBox->setValue(0.1);
+    lambdaSpinBox->setSingleStep(0.01);
     lambdaSpinBox->setDecimals(4);
     minimalLayout->addRow("Step Size (λ):", lambdaSpinBox);
     
@@ -266,42 +291,12 @@ int main(int argc, char *argv[])
         "• 'R' key: Reset view<br>"
         "• Switch between solid rendering and curvature visualizations<br>"
         "• Enable wireframe overlay to see model structure<br>"
-        "• Use 'Hide Faces' to show only wireframe"
+        "• Use 'Hide Faces' to show only wireframe<br>"
+        "• Select iteration method: Uniform (faster) or Cotangent (more accurate)"
     );
     infoLabel->setWordWrap(true);
     infoLabel->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px; font-size: 14px;");
     objControlLayout->addWidget(infoLabel);
-    
-    // 添加光照控制组
-    QGroupBox *lightGroup = new QGroupBox("Lighting Controls");
-    lightGroup->setStyleSheet("QGroupBox { color: white; font-size: 14px; }");
-    QFormLayout *lightLayout = new QFormLayout(lightGroup);
-    
-    // 环境光强度滑块
-    QSlider *ambientSlider = new QSlider(Qt::Horizontal);
-    ambientSlider->setRange(0, 100);
-    ambientSlider->setValue(30);
-    lightLayout->addRow("Ambient:", ambientSlider);
-    
-    // 漫反射强度滑块
-    QSlider *diffuseSlider = new QSlider(Qt::Horizontal);
-    diffuseSlider->setRange(0, 100);
-    diffuseSlider->setValue(70);
-    lightLayout->addRow("Diffuse:", diffuseSlider);
-    
-    // 镜面反射强度滑块
-    QSlider *specularSlider = new QSlider(Qt::Horizontal);
-    specularSlider->setRange(0, 100);
-    specularSlider->setValue(40);
-    lightLayout->addRow("Specular:", specularSlider);
-    
-    // 高光指数滑块
-    QSlider *shininessSlider = new QSlider(Qt::Horizontal);
-    shininessSlider->setRange(1, 256);
-    shininessSlider->setValue(32);
-    lightLayout->addRow("Shininess:", shininessSlider);
-    
-    objControlLayout->addWidget(lightGroup);
     
     // 添加背景颜色按钮
     QPushButton *bgColorButton = new QPushButton("Change Background Color");

@@ -37,6 +37,10 @@ public:
         MeanCurvature,
         MaxCurvature 
     };
+    enum IterationMethod {
+        UniformLaplacian,
+        CotangentWeights
+    };
     explicit GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
 
@@ -46,7 +50,11 @@ public:
     void setRenderMode(RenderMode mode);
     void loadOBJ(const QString &path);
     void performMinimalSurfaceIteration(int iterations, float lambda);
+    void performUniformLaplacianIteration(int iterations, float lambda);
+    void performCotangentWeightsIteration(int iterations, float lambda);
     void setHideFaces(bool hide);  // 新增函数
+    IterationMethod iterationMethod = CotangentWeights; // 默认使用余切权重
+    void setIterationMethod(IterationMethod method) { iterationMethod = method; }
 
 protected:
     void initializeGL() override;
@@ -65,6 +73,7 @@ public:
     void setWireframeColor(const QVector4D& color);
     Mesh::Point computeMeanCurvatureVector( const Mesh::VertexHandle& vh);
     float triangleArea(const Mesh::Point& p0, const Mesh::Point& p1, const Mesh::Point& p2);
+    float cotangent(const Mesh::Point& a, const Mesh::Point& b, const Mesh::Point& c);
     float calculateMixedArea(const Mesh::VertexHandle& vh);
     void updateBuffersFromOpenMesh(); // 新增函数
     bool showWireframeOverlay;
