@@ -6,54 +6,6 @@
 
 #IncludeRegexTransform: 
 
-/opt/games102/hw6_opengl/build/objViewer_autogen/EWIEGA46WW/moc_glwidget.cpp
-../../../glwidget.h
-/opt/games102/hw6_opengl/glwidget.h
-QtCore/qbytearray.h
--
-QtCore/qmetatype.h
--
-
-/opt/games102/hw6_opengl/build/objViewer_autogen/mocs_compilation.cpp
-EWIEGA46WW/moc_glwidget.cpp
-/opt/games102/hw6_opengl/build/objViewer_autogen/EWIEGA46WW/moc_glwidget.cpp
-
-/opt/games102/hw6_opengl/glwidget.cpp
-glwidget.h
-/opt/games102/hw6_opengl/glwidget.h
-QFile
--
-QDebug
--
-QMouseEvent
--
-QWheelEvent
--
-QKeyEvent
--
-QSurfaceFormat
--
-QVector3D
--
-QtMath
--
-QResource
--
-algorithm
--
-iostream
--
-OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh
--
-OpenMesh/Tools/Smoother/JacobiLaplaceSmootherT.hh
--
-OpenMesh/Core/IO/MeshIO.hh
--
-OpenMesh/Core/IO/Options.hh
--
-unordered_set
--
-
 /opt/games102/hw6_opengl/glwidget.h
 QOpenGLWidget
 -
@@ -124,14 +76,6 @@ QSpinBox
 QDoubleSpinBox
 -
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/QDebug
-qdebug.h
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qdebug.h
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/QFile
-qfile.h
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qfile.h
-
 /usr/include/x86_64-linux-gnu/qt5/QtCore/QFileInfo
 qfileinfo.h
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qfileinfo.h
@@ -140,17 +84,9 @@ qfileinfo.h
 qobject.h
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qobject.h
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/QResource
-qresource.h
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qresource.h
-
 /usr/include/x86_64-linux-gnu/qt5/QtCore/QScopedPointer
 qscopedpointer.h
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qscopedpointer.h
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/QtMath
-qmath.h
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qmath.h
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qalgorithms.h
 QtCore/qglobal.h
@@ -520,14 +456,6 @@ initializer_list
 QtCore/qnamespace.h
 -
 
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qmath.h
-QtCore/qglobal.h
--
-QtCore/qalgorithms.h
--
-cmath
--
-
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qmetatype.h
 QtCore/qglobal.h
 -
@@ -640,18 +568,6 @@ QtCore/qstringlist.h
 QtCore/qshareddata.h
 -
 QtCore/qvariant.h
--
-
-/usr/include/x86_64-linux-gnu/qt5/QtCore/qresource.h
-QtCore/qstring.h
--
-QtCore/qlocale.h
--
-QtCore/qstringlist.h
--
-QtCore/qlist.h
--
-QtCore/qscopedpointer.h
 -
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/qscopedpointer.h
@@ -916,17 +832,9 @@ QtCore/qglobal.h
 qcolor.h
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qcolor.h
 
-/usr/include/x86_64-linux-gnu/qt5/QtGui/QKeyEvent
-qevent.h
-/usr/include/x86_64-linux-gnu/qt5/QtGui/qevent.h
-
 /usr/include/x86_64-linux-gnu/qt5/QtGui/QMatrix4x4
 qmatrix4x4.h
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qmatrix4x4.h
-
-/usr/include/x86_64-linux-gnu/qt5/QtGui/QMouseEvent
-qevent.h
-/usr/include/x86_64-linux-gnu/qt5/QtGui/qevent.h
 
 /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
 qopenglbuffer.h
@@ -955,10 +863,6 @@ qsurfaceformat.h
 /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
 qvector3d.h
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qvector3d.h
-
-/usr/include/x86_64-linux-gnu/qt5/QtGui/QWheelEvent
-qevent.h
-/usr/include/x86_64-linux-gnu/qt5/QtGui/qevent.h
 
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qbrush.h
 QtGui/qtguiglobal.h
