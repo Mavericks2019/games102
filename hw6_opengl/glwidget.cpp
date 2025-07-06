@@ -1138,13 +1138,10 @@ void GLWidget::performCotangentWithAreaIteration(int iterations, float lambda) {
             }
             
             // 计算新位置（带面积归一化）
-            if (validWeights && totalWeight > EPSILON && lambda / A_mixed > 200 && A_mixed > EPSILON * 10) {
+            if (validWeights && totalWeight > EPSILON && lambda / A_mixed > 200 && A_mixed > 10 * EPSILON) {
                 Mesh::Point centroid = weightedSum / totalWeight;
                 // Laplace-Beltrami算子：Δf = (1/4A) * Σ(cotα + cotβ)(f_j - f_i)
                 Mesh::Point displacement = (centroid - openMesh.point(vh)) / (4 * A_mixed);
-                // if(A_mixed < EPSILON * 10) {
-                //     std::cout << A_mixed << std::endl;
-                // }
                 newPositions[idx] = openMesh.point(vh) + lambda * displacement;
             } else {
                 // 如果无法计算有效权重，使用均匀拉普拉斯作为后备
