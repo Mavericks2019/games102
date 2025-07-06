@@ -220,12 +220,14 @@ int main(int argc, char *argv[])
     
     QRadioButton *uniformRadio = new QRadioButton("Uniform Laplacian");
     QRadioButton *cotangentRadio = new QRadioButton("Cotangent Weights");
+    QRadioButton *cotangentAreaRadio = new QRadioButton("Cotangent with Area (Laplace-Beltrami)"); 
     
     // 默认选择余切权重
     uniformRadio->setChecked(true);
     
     methodLayout->addWidget(uniformRadio);
     methodLayout->addWidget(cotangentRadio);
+    methodLayout->addWidget(cotangentAreaRadio); // 新增
     
     // 连接信号
     QObject::connect(uniformRadio, &QRadioButton::clicked, [glWidget]() {
@@ -233,6 +235,9 @@ int main(int argc, char *argv[])
     });
     QObject::connect(cotangentRadio, &QRadioButton::clicked, [glWidget]() {
         glWidget->setIterationMethod(GLWidget::CotangentWeights);
+    });
+    QObject::connect(cotangentAreaRadio, &QRadioButton::clicked, [glWidget]() { // 新增
+        glWidget->setIterationMethod(GLWidget::CotangentWithArea);
     });
     
     // 添加到控制面板
@@ -280,23 +285,6 @@ int main(int argc, char *argv[])
     
     objControlLayout->addWidget(minimalSurfaceGroup);
     
-    // 添加使用说明
-    QLabel *infoLabel = new QLabel(
-        "<b>Instructions:</b><br>"
-        "• Load an OBJ model using the button above<br>"
-        "• Mouse drag: Rotate the model<br>"
-        "• Mouse wheel: Zoom in/out<br>"
-        "• Arrow keys: Fine-tune rotation<br>"
-        "• '+'/'-' keys: Zoom in/out<br>"
-        "• 'R' key: Reset view<br>"
-        "• Switch between solid rendering and curvature visualizations<br>"
-        "• Enable wireframe overlay to see model structure<br>"
-        "• Use 'Hide Faces' to show only wireframe<br>"
-        "• Select iteration method: Uniform (faster) or Cotangent (more accurate)"
-    );
-    infoLabel->setWordWrap(true);
-    infoLabel->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px; font-size: 14px;");
-    objControlLayout->addWidget(infoLabel);
     
     // 添加背景颜色按钮
     QPushButton *bgColorButton = new QPushButton("Change Background Color");

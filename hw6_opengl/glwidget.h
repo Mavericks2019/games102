@@ -39,7 +39,8 @@ public:
     };
     enum IterationMethod {
         UniformLaplacian,
-        CotangentWeights
+        CotangentWeights,
+        CotangentWithArea // 新增的带面积迭代方法
     };
     explicit GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
@@ -52,6 +53,7 @@ public:
     void performMinimalSurfaceIteration(int iterations, float lambda);
     void performUniformLaplacianIteration(int iterations, float lambda);
     void performCotangentWeightsIteration(int iterations, float lambda);
+    void performCotangentWithAreaIteration(int iterations, float lambda);
     void setHideFaces(bool hide);  // 新增函数
     IterationMethod iterationMethod = UniformLaplacian; // 默认使用余切权重
     void setIterationMethod(IterationMethod method) { iterationMethod = method; }
