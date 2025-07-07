@@ -70,13 +70,13 @@
 	"SETTINGS_FILE" : "/opt/games102/hw6_opengl/build/CMakeFiles/objViewer_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
-		[ "/opt/games102/hw6_opengl/curvature.cpp", "MU" ],
 		[ "/opt/games102/hw6_opengl/glwidget_core.cpp", "MU" ],
-		[ "/opt/games102/hw6_opengl/loop_subdivision.cpp", "MU" ],
-		[ "/opt/games102/hw6_opengl/main.cpp", "MU" ],
-		[ "/opt/games102/hw6_opengl/mesh_loader.cpp", "MU" ],
-		[ "/opt/games102/hw6_opengl/mesh_simplification.cpp", "MU" ],
-		[ "/opt/games102/hw6_opengl/minimal_surface.cpp", "MU" ]
+		[ "/opt/games102/hw6_opengl/glwidget_curvature.cpp", "MU" ],
+		[ "/opt/games102/hw6_opengl/glwidget_loop_subdivision.cpp", "MU" ],
+		[ "/opt/games102/hw6_opengl/glwidget_mesh_loader.cpp", "MU" ],
+		[ "/opt/games102/hw6_opengl/glwidget_mesh_simplification.cpp", "MU" ],
+		[ "/opt/games102/hw6_opengl/glwidget_minimal_surface.cpp", "MU" ],
+		[ "/opt/games102/hw6_opengl/main.cpp", "MU" ]
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],
