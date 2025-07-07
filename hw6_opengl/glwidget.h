@@ -15,6 +15,8 @@
 #include <OpenMesh/Core/IO/MeshIO.hh> // 添加OpenMesh IO头文件
 #include <queue>
 
+#define EPSILON 1E-4F 
+
 // 定义OpenMesh网格类型
 struct MyTraits : public OpenMesh::DefaultTraits {
     VertexAttributes(OpenMesh::Attributes::Normal | 

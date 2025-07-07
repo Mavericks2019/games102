@@ -182,32 +182,86 @@ objViewer_autogen/fast:
 	$(MAKE) -f CMakeFiles/objViewer_autogen.dir/build.make CMakeFiles/objViewer_autogen.dir/build
 .PHONY : objViewer_autogen/fast
 
-glwidget.o: glwidget.cpp.o
+curvature.o: curvature.cpp.o
 
-.PHONY : glwidget.o
+.PHONY : curvature.o
 
 # target to build an object file
-glwidget.cpp.o:
-	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/glwidget.cpp.o
-.PHONY : glwidget.cpp.o
+curvature.cpp.o:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/curvature.cpp.o
+.PHONY : curvature.cpp.o
 
-glwidget.i: glwidget.cpp.i
+curvature.i: curvature.cpp.i
 
-.PHONY : glwidget.i
+.PHONY : curvature.i
 
 # target to preprocess a source file
-glwidget.cpp.i:
-	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/glwidget.cpp.i
-.PHONY : glwidget.cpp.i
+curvature.cpp.i:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/curvature.cpp.i
+.PHONY : curvature.cpp.i
 
-glwidget.s: glwidget.cpp.s
+curvature.s: curvature.cpp.s
 
-.PHONY : glwidget.s
+.PHONY : curvature.s
 
 # target to generate assembly for a file
-glwidget.cpp.s:
-	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/glwidget.cpp.s
-.PHONY : glwidget.cpp.s
+curvature.cpp.s:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/curvature.cpp.s
+.PHONY : curvature.cpp.s
+
+glwidget_core.o: glwidget_core.cpp.o
+
+.PHONY : glwidget_core.o
+
+# target to build an object file
+glwidget_core.cpp.o:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/glwidget_core.cpp.o
+.PHONY : glwidget_core.cpp.o
+
+glwidget_core.i: glwidget_core.cpp.i
+
+.PHONY : glwidget_core.i
+
+# target to preprocess a source file
+glwidget_core.cpp.i:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/glwidget_core.cpp.i
+.PHONY : glwidget_core.cpp.i
+
+glwidget_core.s: glwidget_core.cpp.s
+
+.PHONY : glwidget_core.s
+
+# target to generate assembly for a file
+glwidget_core.cpp.s:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/glwidget_core.cpp.s
+.PHONY : glwidget_core.cpp.s
+
+loop_subdivision.o: loop_subdivision.cpp.o
+
+.PHONY : loop_subdivision.o
+
+# target to build an object file
+loop_subdivision.cpp.o:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/loop_subdivision.cpp.o
+.PHONY : loop_subdivision.cpp.o
+
+loop_subdivision.i: loop_subdivision.cpp.i
+
+.PHONY : loop_subdivision.i
+
+# target to preprocess a source file
+loop_subdivision.cpp.i:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/loop_subdivision.cpp.i
+.PHONY : loop_subdivision.cpp.i
+
+loop_subdivision.s: loop_subdivision.cpp.s
+
+.PHONY : loop_subdivision.s
+
+# target to generate assembly for a file
+loop_subdivision.cpp.s:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/loop_subdivision.cpp.s
+.PHONY : loop_subdivision.cpp.s
 
 main.o: main.cpp.o
 
@@ -235,6 +289,87 @@ main.s: main.cpp.s
 main.cpp.s:
 	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/main.cpp.s
 .PHONY : main.cpp.s
+
+mesh_loader.o: mesh_loader.cpp.o
+
+.PHONY : mesh_loader.o
+
+# target to build an object file
+mesh_loader.cpp.o:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/mesh_loader.cpp.o
+.PHONY : mesh_loader.cpp.o
+
+mesh_loader.i: mesh_loader.cpp.i
+
+.PHONY : mesh_loader.i
+
+# target to preprocess a source file
+mesh_loader.cpp.i:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/mesh_loader.cpp.i
+.PHONY : mesh_loader.cpp.i
+
+mesh_loader.s: mesh_loader.cpp.s
+
+.PHONY : mesh_loader.s
+
+# target to generate assembly for a file
+mesh_loader.cpp.s:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/mesh_loader.cpp.s
+.PHONY : mesh_loader.cpp.s
+
+mesh_simplification.o: mesh_simplification.cpp.o
+
+.PHONY : mesh_simplification.o
+
+# target to build an object file
+mesh_simplification.cpp.o:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/mesh_simplification.cpp.o
+.PHONY : mesh_simplification.cpp.o
+
+mesh_simplification.i: mesh_simplification.cpp.i
+
+.PHONY : mesh_simplification.i
+
+# target to preprocess a source file
+mesh_simplification.cpp.i:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/mesh_simplification.cpp.i
+.PHONY : mesh_simplification.cpp.i
+
+mesh_simplification.s: mesh_simplification.cpp.s
+
+.PHONY : mesh_simplification.s
+
+# target to generate assembly for a file
+mesh_simplification.cpp.s:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/mesh_simplification.cpp.s
+.PHONY : mesh_simplification.cpp.s
+
+minimal_surface.o: minimal_surface.cpp.o
+
+.PHONY : minimal_surface.o
+
+# target to build an object file
+minimal_surface.cpp.o:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/minimal_surface.cpp.o
+.PHONY : minimal_surface.cpp.o
+
+minimal_surface.i: minimal_surface.cpp.i
+
+.PHONY : minimal_surface.i
+
+# target to preprocess a source file
+minimal_surface.cpp.i:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/minimal_surface.cpp.i
+.PHONY : minimal_surface.cpp.i
+
+minimal_surface.s: minimal_surface.cpp.s
+
+.PHONY : minimal_surface.s
+
+# target to generate assembly for a file
+minimal_surface.cpp.s:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/minimal_surface.cpp.s
+.PHONY : minimal_surface.cpp.s
 
 objViewer_autogen/mocs_compilation.o: objViewer_autogen/mocs_compilation.cpp.o
 
@@ -304,12 +439,27 @@ help:
 	@echo "... edit_cache"
 	@echo "... objViewer"
 	@echo "... objViewer_autogen"
-	@echo "... glwidget.o"
-	@echo "... glwidget.i"
-	@echo "... glwidget.s"
+	@echo "... curvature.o"
+	@echo "... curvature.i"
+	@echo "... curvature.s"
+	@echo "... glwidget_core.o"
+	@echo "... glwidget_core.i"
+	@echo "... glwidget_core.s"
+	@echo "... loop_subdivision.o"
+	@echo "... loop_subdivision.i"
+	@echo "... loop_subdivision.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... mesh_loader.o"
+	@echo "... mesh_loader.i"
+	@echo "... mesh_loader.s"
+	@echo "... mesh_simplification.o"
+	@echo "... mesh_simplification.i"
+	@echo "... mesh_simplification.s"
+	@echo "... minimal_surface.o"
+	@echo "... minimal_surface.i"
+	@echo "... minimal_surface.s"
 	@echo "... objViewer_autogen/mocs_compilation.o"
 	@echo "... objViewer_autogen/mocs_compilation.i"
 	@echo "... objViewer_autogen/mocs_compilation.s"

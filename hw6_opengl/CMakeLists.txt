@@ -24,7 +24,12 @@ find_package(OpenMesh REQUIRED)
 # 添加可执行文件
 add_executable(${PROJECT_NAME}
     main.cpp
-    glwidget.cpp
+    glwidget_core.cpp
+    mesh_loader.cpp
+    curvature.cpp
+    minimal_surface.cpp
+    loop_subdivision.cpp
+    mesh_simplification.cpp
     glwidget.h
     ${RESOURCE_FILES}
 
