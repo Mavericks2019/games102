@@ -14,7 +14,9 @@ set(CMAKE_AUTOUIC ON)
 find_package(Qt5 COMPONENTS Widgets OpenGL REQUIRED)
 
 # 添加着色器资源文件
-set(SHADER_RESOURCES shaders.qrc)
+set(SHADER_RESOURCES
+    shaders.qrc
+ )
 qt5_add_resources(RESOURCE_FILES ${SHADER_RESOURCES})
 
 find_package(OpenMesh REQUIRED)

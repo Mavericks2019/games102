@@ -13,6 +13,7 @@
 #include <set>
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
 #include <OpenMesh/Core/IO/MeshIO.hh> // 添加OpenMesh IO头文件
+#include <queue>
 
 // 定义OpenMesh网格类型
 struct MyTraits : public OpenMesh::DefaultTraits {
@@ -35,7 +36,9 @@ public:
         BlinnPhong, 
         GaussianCurvature,
         MeanCurvature,
-        MaxCurvature 
+        MaxCurvature,
+        LoopSubdivision,  // 新增Loop细分模式
+        MeshSimplification // 新增网格简化模式
     };
     enum IterationMethod {
         UniformLaplacian,
@@ -46,6 +49,15 @@ public:
     ~GLWidget();
 
     // 公共接口
+    void performLoopSubdivision();
+    void performMeshSimplification(float ratio);
+    void setSubdivisionLevel(int level) {
+        subdivisionLevel = level;
+    };
+    void setSimplificationRatio(float ratio) {
+        simplificationRatio = ratio;
+    };
+
     void resetView();
     void setBackgroundColor(const QColor& color);
     void setRenderMode(RenderMode mode);
@@ -102,12 +114,29 @@ public:
     bool isDragging;
     QPoint lastMousePos;
 
-private:
+public:
     Mesh openMesh; // 使用OpenMesh管理网格数据
     
     // 从OpenMesh提取的数据（用于OpenGL渲染）
     std::vector<unsigned int> faces;
     std::vector<unsigned int> edges;
+
+        // 新增成员变量
+    int subdivisionLevel = 1;    // Loop细分级别
+    float simplificationRatio = 0.5f; // 网格简化比例
+    
+    // 新增OpenGL资源
+    QOpenGLShaderProgram loopSubdivisionProgram;
+    
+    // 新增网格数据结构
+    struct LoopMesh {
+        std::vector<float> vertices;
+        std::vector<float> normals;
+        std::vector<unsigned int> indices;
+    };
+    
+    LoopMesh loopSubdividedMesh;  // Loop细分后的网格
+    LoopMesh simplifiedMesh;      // 简化后的网格
 };
 
 #endif // GLWIDGET_H

@@ -85,6 +85,59 @@ int main(int argc, char *argv[])
     // 创建堆叠布局用于切换控制面板
     QStackedLayout *stackedControlLayout = new QStackedLayout;
     controlLayout->addLayout(stackedControlLayout);
+    // 在控制面板添加新功能
+    QGroupBox *subdivGroup = new QGroupBox("Loop Subdivision");
+    QVBoxLayout *subdivLayout = new QVBoxLayout(subdivGroup);
+    
+    // 细分级别控制
+    QSpinBox *subdivLevelSpin = new QSpinBox;
+    subdivLevelSpin->setRange(1, 5);
+    subdivLevelSpin->setValue(1);
+    QObject::connect(subdivLevelSpin, QOverload<int>::of(&QSpinBox::valueChanged),
+                     glWidget, &GLWidget::setSubdivisionLevel);
+    
+    // 应用细分按钮
+    QPushButton *applySubdivBtn = new QPushButton("Apply Subdivision");
+    applySubdivBtn->setStyleSheet("...");
+    QObject::connect(applySubdivBtn, &QPushButton::clicked, [glWidget]() {
+        glWidget->performLoopSubdivision();
+    });
+    
+    subdivLayout->addWidget(new QLabel("Subdivision Level:"));
+    subdivLayout->addWidget(subdivLevelSpin);
+    subdivLayout->addWidget(applySubdivBtn);
+    
+    // 网格简化组
+    QGroupBox *simplifyGroup = new QGroupBox("Mesh Simplification");
+    QVBoxLayout *simplifyLayout = new QVBoxLayout(simplifyGroup);
+    
+    // 简化比例控制
+    QSlider *simplifySlider = new QSlider(Qt::Horizontal);
+    simplifySlider->setRange(10, 90);
+    simplifySlider->setValue(50);
+    QLabel *simplifyLabel = new QLabel("Simplification: 50%");
+    
+    QObject::connect(simplifySlider, &QSlider::valueChanged, 
+                     [simplifyLabel, glWidget](int value) {
+        float ratio = value / 100.0f;
+        simplifyLabel->setText(QString("Simplification: %1%").arg(value));
+        glWidget->setSimplificationRatio(ratio);
+    });
+    
+    // 应用简化按钮
+    QPushButton *applySimplifyBtn = new QPushButton("Apply Simplification");
+    applySimplifyBtn->setStyleSheet("...");
+    QObject::connect(applySimplifyBtn, &QPushButton::clicked, [glWidget]() {
+        glWidget->performMeshSimplification(glWidget->simplificationRatio);
+    });
+    
+    simplifyLayout->addWidget(simplifyLabel);
+    simplifyLayout->addWidget(simplifySlider);
+    simplifyLayout->addWidget(applySimplifyBtn);
+    
+    // 添加到控制面板
+    controlLayout->addWidget(subdivGroup);
+    controlLayout->addWidget(simplifyGroup);
     
     // 添加OBJ控制面板
     QWidget *objControlPanel = new QWidget;

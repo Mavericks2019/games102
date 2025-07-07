@@ -15,6 +15,7 @@
 #include <OpenMesh/Core/IO/MeshIO.hh> // 添加OpenMesh IO头文件
 #include <OpenMesh/Core/IO/Options.hh>
 #include <unordered_set>
+#include <Eigen/Dense>
 
 #define EPSILON 1E-4F 
 
@@ -303,6 +304,19 @@ void GLWidget::initializeShaders()
         qWarning() << "Blinn-Phong shader link error:" << blinnPhongProgram.log();
     }
 
+    // 初始化Loop细分着色器
+    if (!loopSubdivisionProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/loop_subdivision.vert")) {
+        qWarning() << "Loop subdivision vertex shader error:" << loopSubdivisionProgram.log();
+    }
+    
+    if (!loopSubdivisionProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/loop_subdivision.frag")) {
+        qWarning() << "Loop subdivision fragment shader error:" << loopSubdivisionProgram.log();
+    }
+    
+    if (!loopSubdivisionProgram.link()) {
+        qWarning() << "Loop subdivision shader link error:" << loopSubdivisionProgram.log();
+    }
+
     // 如果模型已加载，更新缓冲区
     if (modelLoaded) {
         updateBuffersFromOpenMesh();
@@ -564,7 +578,45 @@ void GLWidget::paintGL()
         wireframeProgram.release();
     } else {
         // 正常绘制模式
-        if (currentRenderMode == GaussianCurvature || 
+        if (currentRenderMode == LoopSubdivision) {
+            loopSubdivisionProgram.bind();
+            vao.bind();
+            
+            // 设置变换矩阵
+            loopSubdivisionProgram.setUniformValue("model", model);
+            loopSubdivisionProgram.setUniformValue("view", view);
+            loopSubdivisionProgram.setUniformValue("projection", projection);
+            loopSubdivisionProgram.setUniformValue("normalMatrix", normalMatrix);
+            
+            // 绘制细分后的网格
+            glDrawElements(GL_TRIANGLES, loopSubdividedMesh.indices.size(), 
+                        GL_UNSIGNED_INT, loopSubdividedMesh.indices.data());
+            
+            vao.release();
+            loopSubdivisionProgram.release();
+        }else if (currentRenderMode == MeshSimplification) {
+            blinnPhongProgram.bind(); // 使用Blinn-Phong着色器
+            vao.bind();
+            
+            // 设置变换矩阵
+            blinnPhongProgram.setUniformValue("model", model);
+            blinnPhongProgram.setUniformValue("view", view);
+            blinnPhongProgram.setUniformValue("projection", projection);
+            blinnPhongProgram.setUniformValue("normalMatrix", normalMatrix);
+            
+            // 设置光照参数
+            blinnPhongProgram.setUniformValue("lightPos", QVector3D(2.0f, 2.0f, 2.0f));
+            blinnPhongProgram.setUniformValue("viewPos", QVector3D(0.0f, 0.0f, 5.0f));
+            blinnPhongProgram.setUniformValue("lightColor", QVector3D(1.0f, 1.0f, 1.0f));
+            blinnPhongProgram.setUniformValue("objectColor", QVector3D(0.7f, 0.7f, 0.8f));
+            
+            // 绘制简化后的网格
+            glDrawElements(GL_TRIANGLES, simplifiedMesh.indices.size(), 
+                        GL_UNSIGNED_INT, simplifiedMesh.indices.data());
+            
+            vao.release();
+            blinnPhongProgram.release();
+        }else if (currentRenderMode == GaussianCurvature || 
                currentRenderMode == MeanCurvature || 
                currentRenderMode == MaxCurvature) {
             // 曲率可视化模式
@@ -1191,5 +1243,202 @@ void GLWidget::performMinimalSurfaceIteration(int iterations, float lambda) {
     updateBuffersFromOpenMesh();
     doneCurrent();
     
+    update();
+}
+
+// ==================== Loop细分实现 ====================
+
+void GLWidget::performLoopSubdivision() {
+    if (!modelLoaded) return;
+    
+    // 清空现有细分网格
+    loopSubdividedMesh.vertices.clear();
+    loopSubdividedMesh.normals.clear();
+    loopSubdividedMesh.indices.clear();
+    
+    // 创建原始网格的顶点映射
+    std::map<Mesh::VertexHandle, int> vertexMap;
+    int index = 0;
+    for (auto vh : openMesh.vertices()) {
+        const auto& p = openMesh.point(vh);
+        loopSubdividedMesh.vertices.push_back(p[0]);
+        loopSubdividedMesh.vertices.push_back(p[1]);
+        loopSubdividedMesh.vertices.push_back(p[2]);
+        
+        const auto& n = openMesh.normal(vh);
+        loopSubdividedMesh.normals.push_back(n[0]);
+        loopSubdividedMesh.normals.push_back(n[1]);
+        loopSubdividedMesh.normals.push_back(n[2]);
+        
+        vertexMap[vh] = index++;
+    }
+    
+    // 创建边到新顶点的映射
+    std::map<std::pair<Mesh::VertexHandle, Mesh::VertexHandle>, int> edgeVertexMap;
+    
+    // 第一遍：为每条边创建新顶点
+    for (auto eit = openMesh.edges_begin(); eit != openMesh.edges_end(); ++eit) {
+        auto heh = openMesh.halfedge_handle(*eit, 0);
+        auto v0 = openMesh.from_vertex_handle(heh);
+        auto v1 = openMesh.to_vertex_handle(heh);
+        
+        // 获取相邻的两个顶点
+        auto v2 = openMesh.to_vertex_handle(openMesh.next_halfedge_handle(heh));
+        auto heh_opp = openMesh.opposite_halfedge_handle(heh);
+        auto v3 = openMesh.to_vertex_handle(openMesh.next_halfedge_handle(heh_opp));
+        
+        // Loop细分规则：新顶点 = 3/8*(A+B) + 1/8*(C+D)
+        Mesh::Point newPos = 
+            0.375f * (openMesh.point(v0) + openMesh.point(v1)) +
+            0.125f * (openMesh.point(v2) + openMesh.point(v3));
+        
+        loopSubdividedMesh.vertices.push_back(newPos[0]);
+        loopSubdividedMesh.vertices.push_back(newPos[1]);
+        loopSubdividedMesh.vertices.push_back(newPos[2]);
+        
+        // 计算新顶点的法线（平均法线）
+        Mesh::Normal newNormal = 
+            0.375f * (openMesh.normal(v0) + openMesh.normal(v1)) +
+            0.125f * (openMesh.normal(v2) + openMesh.normal(v3));
+        newNormal.normalize();
+        
+        loopSubdividedMesh.normals.push_back(newNormal[0]);
+        loopSubdividedMesh.normals.push_back(newNormal[1]);
+        loopSubdividedMesh.normals.push_back(newNormal[2]);
+        
+        // 存储新顶点索引
+        int newIndex = loopSubdividedMesh.vertices.size() / 3 - 1;
+        edgeVertexMap[std::make_pair(v0, v1)] = newIndex;
+        edgeVertexMap[std::make_pair(v1, v0)] = newIndex;
+    }
+    
+    // 第二遍：创建新面
+    for (auto fit = openMesh.faces_begin(); fit != openMesh.faces_end(); ++fit) {
+        // 获取面的三个顶点
+        auto fv_it = openMesh.fv_ccwbegin(*fit);
+        auto v0 = *fv_it; ++fv_it;
+        auto v1 = *fv_it; ++fv_it;
+        auto v2 = *fv_it;
+        
+        // 获取三条边上的新顶点
+        int e0 = edgeVertexMap[std::make_pair(v0, v1)];
+        int e1 = edgeVertexMap[std::make_pair(v1, v2)];
+        int e2 = edgeVertexMap[std::make_pair(v2, v0)];
+        
+        // 原始顶点索引
+        int v0_idx = vertexMap[v0];
+        int v1_idx = vertexMap[v1];
+        int v2_idx = vertexMap[v2];
+        
+        // 创建四个新三角形
+        loopSubdividedMesh.indices.insert(loopSubdividedMesh.indices.end(), {v0_idx, e0, e2});
+        loopSubdividedMesh.indices.insert(loopSubdividedMesh.indices.end(), {e0, v1_idx, e1});
+        loopSubdividedMesh.indices.insert(loopSubdividedMesh.indices.end(), {e2, e1, v2_idx});
+        loopSubdividedMesh.indices.insert(loopSubdividedMesh.indices.end(), {e0, e1, e2});
+    }
+    
+    // 更新渲染模式
+    currentRenderMode = LoopSubdivision;
+    update();
+}
+
+// ==================== 网格简化实现 ====================
+
+void GLWidget::performMeshSimplification(float ratio) {
+    if (!modelLoaded) return;
+    
+    // 清空简化网格
+    simplifiedMesh.vertices.clear();
+    simplifiedMesh.normals.clear();
+    simplifiedMesh.indices.clear();
+    
+    // 计算要移除的边数量
+    int targetEdges = openMesh.n_edges() * ratio;
+    
+    // 使用二次误差度量进行简化
+    struct EdgeCost {
+        Mesh::EdgeHandle eh;
+        double cost;
+        Mesh::Point newPos;
+        
+        bool operator<(const EdgeCost& other) const {
+            return cost > other.cost; // 最小堆
+        }
+    };
+    
+    std::priority_queue<EdgeCost> edgeQueue;
+    
+    // 初始化边成本
+    for (auto eit = openMesh.edges_begin(); eit != openMesh.edges_end(); ++eit) {
+        // 跳过边界边
+        if (openMesh.is_boundary(*eit)) continue;
+        
+        auto heh = openMesh.halfedge_handle(*eit, 0);
+        auto v0 = openMesh.from_vertex_handle(heh);
+        auto v1 = openMesh.to_vertex_handle(heh);
+        
+        // 计算新顶点位置（中点）
+        Mesh::Point newPos = 0.5 * (openMesh.point(v0) + openMesh.point(v1));
+        
+        // 计算二次误差
+        double cost = (openMesh.point(v0) - newPos).sqrnorm() + 
+                     (openMesh.point(v1) - newPos).sqrnorm();
+        
+        edgeQueue.push({*eit, cost, newPos});
+    }
+    
+    // 执行简化
+    int edgesRemoved = 0;
+    while (!edgeQueue.empty() && edgesRemoved < targetEdges) {
+        EdgeCost ec = edgeQueue.top();
+        edgeQueue.pop();
+        
+        // 检查边是否仍然存在
+        if (!openMesh.status(ec.eh).deleted()) {
+            // 获取边对应的半边
+            auto heh = openMesh.halfedge_handle(ec.eh, 0);
+            auto v0 = openMesh.from_vertex_handle(heh);
+            auto v1 = openMesh.to_vertex_handle(heh);
+            
+            // 检查是否可以安全折叠
+            if (!openMesh.is_collapse_ok(heh)) continue;
+            
+            // 设置目标顶点位置为中点
+            openMesh.set_point(v1, ec.newPos);
+            
+            // 执行边折叠操作 (移除v0，保留v1)
+            openMesh.collapse(heh);
+            
+            edgesRemoved++;
+        }
+    }
+    
+    // 垃圾收集
+    openMesh.garbage_collection();
+    
+    // 更新法线
+    openMesh.update_normals();
+    
+    // 准备简化后的网格数据
+    for (auto vh : openMesh.vertices()) {
+        const auto& p = openMesh.point(vh);
+        simplifiedMesh.vertices.push_back(p[0]);
+        simplifiedMesh.vertices.push_back(p[1]);
+        simplifiedMesh.vertices.push_back(p[2]);
+        
+        const auto& n = openMesh.normal(vh);
+        simplifiedMesh.normals.push_back(n[0]);
+        simplifiedMesh.normals.push_back(n[1]);
+        simplifiedMesh.normals.push_back(n[2]);
+    }
+    
+    for (auto fh : openMesh.faces()) {
+        for (auto fv_it = openMesh.fv_ccwbegin(fh); fv_it != openMesh.fv_ccwend(fh); ++fv_it) {
+            simplifiedMesh.indices.push_back(fv_it->idx());
+        }
+    }
+    
+    // 更新渲染模式
+    currentRenderMode = MeshSimplification;
     update();
 }
