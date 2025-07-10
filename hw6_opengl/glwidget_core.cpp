@@ -128,6 +128,9 @@ void GLWidget::initializeShaders()
     if (curvatureProgram.isLinked()) {
         curvatureProgram.removeAllShaders();
     }
+    if (loopSubdivisionProgram.isLinked()) {
+        loopSubdivisionProgram.removeAllShaders();
+    }
     
     if (!curvatureProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/curvature.vert")) {
         qWarning() << "Curvature vertex shader error:" << curvatureProgram.log();

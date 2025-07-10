@@ -41,6 +41,7 @@ target_link_libraries(${PROJECT_NAME}
     Qt5::OpenGL
     GL
     OpenMeshCore
+    OpenMeshTools
 )
 
 # 设置安装路径

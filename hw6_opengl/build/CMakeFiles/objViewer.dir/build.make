@@ -213,10 +213,11 @@ objViewer: CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o
 objViewer: CMakeFiles/objViewer.dir/qrc_shaders.cpp.o
 objViewer: CMakeFiles/objViewer.dir/build.make
 objViewer: /usr/lib/x86_64-linux-gnu/libQt5OpenGL.so.5.12.8
-objViewer: /usr/local/lib/libOpenMeshCore.so.11.0
+objViewer: /usr/local/lib/libOpenMeshTools.so.11.0
 objViewer: /usr/lib/x86_64-linux-gnu/libQt5Widgets.so.5.12.8
 objViewer: /usr/lib/x86_64-linux-gnu/libQt5Gui.so.5.12.8
 objViewer: /usr/lib/x86_64-linux-gnu/libQt5Core.so.5.12.8
+objViewer: /usr/local/lib/libOpenMeshCore.so.11.0
 objViewer: CMakeFiles/objViewer.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/opt/games102/hw6_opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Linking CXX executable objViewer"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/objViewer.dir/link.txt --verbose=$(VERBOSE)
