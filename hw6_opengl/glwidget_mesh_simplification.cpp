@@ -4,13 +4,17 @@
 #include <OpenMesh/Tools/Decimater/DecimaterT.hh>
 #include <OpenMesh/Tools/Decimater/ModQuadricT.hh>
 
+#include "glwidget.h"
+#include <queue>
+#include <map>
+#include <OpenMesh/Tools/Decimater/DecimaterT.hh>
+#include <OpenMesh/Tools/Decimater/ModQuadricT.hh>
+
 void GLWidget::performMeshSimplification(float ratio) {
     if (!modelLoaded || openMesh.n_vertices() == 0) return;
     
-    // 清空简化网格
-    simplifiedMesh.vertices.clear();
-    simplifiedMesh.normals.clear();
-    simplifiedMesh.indices.clear();
+    // 备份原始网格（用于可能的撤销操作）
+    Mesh originalMesh = openMesh;
     
     try {
         // 创建简化器实例
@@ -52,29 +56,36 @@ void GLWidget::performMeshSimplification(float ratio) {
                  << "Actual vertices:" << openMesh.n_vertices();
     } catch (const std::exception& e) {
         qCritical() << "Mesh simplification failed:" << e.what();
+        openMesh = originalMesh; // 恢复原始网格
         return;
     }
     
-    // 准备简化后的网格数据
-    for (auto vh : openMesh.vertices()) {
-        const auto& p = openMesh.point(vh);
-        simplifiedMesh.vertices.push_back(p[0]);
-        simplifiedMesh.vertices.push_back(p[1]);
-        simplifiedMesh.vertices.push_back(p[2]);
-        
-        const auto& n = openMesh.normal(vh);
-        simplifiedMesh.normals.push_back(n[0]);
-        simplifiedMesh.normals.push_back(n[1]);
-        simplifiedMesh.normals.push_back(n[2]);
+    // 更新边索引（用于线框渲染）
+    edges.clear();
+    for (auto eh : openMesh.edges()) {
+        auto heh = openMesh.halfedge_handle(eh, 0);
+        auto v0 = openMesh.from_vertex_handle(heh);
+        auto v1 = openMesh.to_vertex_handle(heh);
+        edges.push_back(v0.idx());
+        edges.push_back(v1.idx());
     }
     
+    // 更新面索引（用于三角面渲染）
+    faces.clear();
     for (auto fh : openMesh.faces()) {
         for (auto fv_it = openMesh.fv_ccwbegin(fh); fv_it != openMesh.fv_ccwend(fh); ++fv_it) {
-            simplifiedMesh.indices.push_back(fv_it->idx());
+            faces.push_back(fv_it->idx());
         }
     }
     
-    // 更新渲染模式
-    currentRenderMode = MeshSimplification;
+    // 重新计算曲率（适配曲率可视化）
+    calculateCurvatures();
+    
+    // 更新OpenGL缓冲区（适配所有渲染模式）
+    makeCurrent();
+    updateBuffersFromOpenMesh();
+    doneCurrent();
+    
+    // 不改变当前渲染模式，保持一致性
     update();
 }

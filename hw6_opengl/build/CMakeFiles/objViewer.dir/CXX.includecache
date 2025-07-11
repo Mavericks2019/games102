@@ -34,16 +34,18 @@ OpenMesh/Core/IO/MeshIO.hh
 queue
 -
 
-/opt/games102/hw6_opengl/glwidget_mesh_simplification.cpp
+/opt/games102/hw6_opengl/glwidget_loop_subdivision.cpp
 glwidget.h
 /opt/games102/hw6_opengl/glwidget.h
 queue
 -
 map
 -
-OpenMesh/Tools/Decimater/DecimaterT.hh
+vector
 -
-OpenMesh/Tools/Decimater/ModQuadricT.hh
+unordered_map
+-
+OpenMesh/Core/Geometry/VectorT.hh
 -
 
 /usr/include/x86_64-linux-gnu/qt5/QtCore/QObject
