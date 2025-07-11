@@ -85,6 +85,96 @@ int main(int argc, char *argv[])
     // 创建堆叠布局用于切换控制面板
     QStackedLayout *stackedControlLayout = new QStackedLayout;
     controlLayout->addLayout(stackedControlLayout);
+    
+    // ==== 新增：颜色设置组 ====
+    QGroupBox *colorGroup = new QGroupBox("Color Settings");
+    QVBoxLayout *colorLayout = new QVBoxLayout(colorGroup);
+    colorLayout->setSpacing(10);
+    
+    // 背景颜色按钮
+    QPushButton *bgColorButton = new QPushButton("Change Background Color");
+    bgColorButton->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #505050;"
+        "   color: white;"
+        "   border: none;"
+        "   padding: 10px 20px;"
+        "   font-size: 16px;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:hover { background-color: #606060; }"
+    );
+    QObject::connect(bgColorButton, &QPushButton::clicked, [glWidget, &mainWindow]() {
+        QColor color = QColorDialog::getColor(Qt::black, &mainWindow, "Select Background Color");
+        if (color.isValid()) {
+            glWidget->setBackgroundColor(color);
+        }
+    });
+    colorLayout->addWidget(bgColorButton);
+    
+    // 线框颜色按钮
+    QPushButton *lineColorButton = new QPushButton("Change Wireframe Color");
+    lineColorButton->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #505050;"
+        "   color: white;"
+        "   border: none;"
+        "   padding: 10px 20px;"
+        "   font-size: 16px;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:hover { background-color: #606060; }"
+    );
+    QObject::connect(lineColorButton, &QPushButton::clicked, [glWidget, &mainWindow]() {
+        QColor color = QColorDialog::getColor(Qt::red, &mainWindow, "Select Wireframe Color");
+        if (color.isValid()) {
+            glWidget->setWireframeColor(QVector4D(
+                color.redF(), 
+                color.greenF(), 
+                color.blueF(), 
+                1.0f
+            ));
+        }
+    });
+    colorLayout->addWidget(lineColorButton);
+    
+    // 新增：表面颜色按钮
+    QPushButton *surfaceColorButton = new QPushButton("Change Surface Color");
+    surfaceColorButton->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #505050;"
+        "   color: white;"
+        "   border: none;"
+        "   padding: 10px 20px;"
+        "   font-size: 16px;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:hover { background-color: #606060; }"
+    );
+    QObject::connect(surfaceColorButton, &QPushButton::clicked, [glWidget, &mainWindow]() {
+        QColor color = QColorDialog::getColor(QColor(179, 179, 204), &mainWindow, "Select Surface Color");
+        if (color.isValid()) {
+            glWidget->setSurfaceColor(QVector3D(
+                color.redF(), 
+                color.greenF(), 
+                color.blueF()
+            ));
+        }
+    });
+    colorLayout->addWidget(surfaceColorButton);
+    
+    // 新增：关闭高光复选框
+    QCheckBox *disableSpecularCheckbox = new QCheckBox("Disable Specular Highlight");
+    disableSpecularCheckbox->setStyleSheet("color: white;");
+    QObject::connect(disableSpecularCheckbox, &QCheckBox::stateChanged, [glWidget](int state) {
+        glWidget->setSpecularEnabled(state != Qt::Checked);
+    });
+    colorLayout->addWidget(disableSpecularCheckbox);
+    
+    colorLayout->addStretch();
+    controlLayout->addWidget(colorGroup);
+    // ==== 结束颜色设置组 ====
+    
     // 在控制面板添加新功能
     QGroupBox *subdivGroup = new QGroupBox("Loop Subdivision");
     QVBoxLayout *subdivLayout = new QVBoxLayout(subdivGroup);
@@ -98,7 +188,17 @@ int main(int argc, char *argv[])
     
     // 应用细分按钮
     QPushButton *applySubdivBtn = new QPushButton("Apply Subdivision");
-    applySubdivBtn->setStyleSheet("...");
+    applySubdivBtn->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #505050;"
+        "   color: white;"
+        "   border: none;"
+        "   padding: 10px 20px;"
+        "   font-size: 16px;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:hover { background-color: #606060; }"
+    );
     QObject::connect(applySubdivBtn, &QPushButton::clicked, [glWidget]() {
         glWidget->performLoopSubdivision();
     });
@@ -126,7 +226,17 @@ int main(int argc, char *argv[])
     
     // 应用简化按钮
     QPushButton *applySimplifyBtn = new QPushButton("Apply Simplification");
-    applySimplifyBtn->setStyleSheet("...");
+    applySimplifyBtn->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #505050;"
+        "   color: white;"
+        "   border: none;"
+        "   padding: 10px 20px;"
+        "   font-size: 16px;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:hover { background-color: #606060; }"
+    );
     QObject::connect(applySimplifyBtn, &QPushButton::clicked, [glWidget]() {
         glWidget->performMeshSimplification(glWidget->simplificationRatio);
     });
@@ -222,32 +332,6 @@ int main(int argc, char *argv[])
     });
     objControlLayout->addWidget(hideFacesCheckbox);
     
-    // 添加线框颜色选择按钮
-    QPushButton *lineColorButton = new QPushButton("Change Wireframe Color");
-    lineColorButton->setStyleSheet(
-        "QPushButton {"
-        "   background-color: #505050;"
-        "   color: white;"
-        "   border: none;"
-        "   padding: 10px 20px;"
-        "   font-size: 16px;"
-        "   border-radius: 5px;"
-        "}"
-        "QPushButton:hover { background-color: #606060; }"
-    );
-    QObject::connect(lineColorButton, &QPushButton::clicked, [glWidget, &mainWindow]() {
-        QColor color = QColorDialog::getColor(Qt::red, &mainWindow, "Select Wireframe Color");
-        if (color.isValid()) {
-            glWidget->setWireframeColor(QVector4D(
-                color.redF(), 
-                color.greenF(), 
-                color.blueF(), 
-                1.0f
-            ));
-        }
-    });
-    objControlLayout->addWidget(lineColorButton);
-    
     // 添加重置视图按钮
     QPushButton *resetButton = new QPushButton("Reset View");
     resetButton->setStyleSheet(
@@ -337,28 +421,6 @@ int main(int argc, char *argv[])
     minimalLayout->addRow(applyIterationButton);
     
     objControlLayout->addWidget(minimalSurfaceGroup);
-    
-    
-    // 添加背景颜色按钮
-    QPushButton *bgColorButton = new QPushButton("Change Background Color");
-    bgColorButton->setStyleSheet(
-        "QPushButton {"
-        "   background-color: #505050;"
-        "   color: white;"
-        "   border: none;"
-        "   padding: 10px 20px;"
-        "   font-size: 16px;"
-        "   border-radius: 5px;"
-        "}"
-        "QPushButton:hover { background-color: #606060; }"
-    );
-    QObject::connect(bgColorButton, &QPushButton::clicked, [glWidget, &mainWindow]() {
-        QColor color = QColorDialog::getColor(Qt::black, &mainWindow, "Select Background Color");
-        if (color.isValid()) {
-            glWidget->setBackgroundColor(color);
-        }
-    });
-    objControlLayout->addWidget(bgColorButton);
     
     objControlLayout->addStretch();
     

@@ -49,7 +49,8 @@ public:
     };
     explicit GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
-
+    void setSurfaceColor(const QVector3D& color);
+    void setSpecularEnabled(bool enabled);
     // 公共接口
     void performLoopSubdivision();
     void performMeshSimplification(float ratio);
@@ -83,6 +84,9 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
 
 public:
+    QVector3D surfaceColor = QVector3D(0.7f, 0.7f, 0.8f); // 默认表面颜色
+    bool specularEnabled = true; // 是否启用高光
+    
     void initializeShaders();
     void calculateCurvatures();
     void setShowWireframeOverlay(bool show);

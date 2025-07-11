@@ -417,7 +417,8 @@ void GLWidget::paintGL()
             blinnPhongProgram.setUniformValue("lightPos", QVector3D(2.0f, 2.0f, 2.0f));
             blinnPhongProgram.setUniformValue("viewPos", QVector3D(0.0f, 0.0f, 5.0f));
             blinnPhongProgram.setUniformValue("lightColor", QVector3D(1.0f, 1.0f, 1.0f));
-            blinnPhongProgram.setUniformValue("objectColor", QVector3D(0.7f, 0.7f, 0.8f));
+            blinnPhongProgram.setUniformValue("objectColor", surfaceColor); // 使用新表面颜色
+            blinnPhongProgram.setUniformValue("specularEnabled", specularEnabled); // 高光开关
 
             // 绘制模型
             glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, 0);
@@ -541,4 +542,17 @@ void GLWidget::wheelEvent(QWheelEvent *event)
         
         update();
     }
+}
+
+// 添加新函数的实现
+void GLWidget::setSurfaceColor(const QVector3D& color)
+{
+    surfaceColor = color;
+    update();
+}
+
+void GLWidget::setSpecularEnabled(bool enabled)
+{
+    specularEnabled = enabled;
+    update();
 }
