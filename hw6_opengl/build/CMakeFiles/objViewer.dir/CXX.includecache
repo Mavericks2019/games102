@@ -18,8 +18,6 @@ QtCore/qmetatype.h
 EWIEGA46WW/moc_glwidget.cpp
 /opt/games102/hw6_opengl/build/objViewer_autogen/EWIEGA46WW/moc_glwidget.cpp
 
-/opt/games102/hw6_opengl/build/qrc_shaders.cpp
-
 /opt/games102/hw6_opengl/glwidget.h
 QOpenGLWidget
 -
@@ -106,6 +104,8 @@ vector
 unordered_map
 -
 OpenMesh/Core/Geometry/VectorT.hh
+-
+OpenMesh/Tools/Subdivider/Uniform/LoopT.hh
 -
 
 /opt/games102/hw6_opengl/glwidget_mesh_loader.cpp
