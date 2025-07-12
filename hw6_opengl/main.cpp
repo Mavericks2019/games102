@@ -20,56 +20,8 @@
 #include <QSpinBox>
 #include <QDoubleSpinBox>
 
-int main(int argc, char *argv[])
-{
-    QApplication app(argc, argv);
-    
-    // 设置Fusion样式
-    QApplication::setStyle(QStyleFactory::create("Fusion"));
-    
-    // 设置深色主题
-    QPalette palette;
-    palette.setColor(QPalette::Window, QColor(53, 53, 53));
-    palette.setColor(QPalette::WindowText, Qt::white);
-    palette.setColor(QPalette::Base, QColor(25, 25, 25));
-    palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
-    palette.setColor(QPalette::ToolTipBase, Qt::white);
-    palette.setColor(QPalette::ToolTipText, Qt::white);
-    palette.setColor(QPalette::Text, Qt::white);
-    palette.setColor(QPalette::Button, QColor(53, 53, 53));
-    palette.setColor(QPalette::ButtonText, Qt::white);
-    palette.setColor(QPalette::BrightText, Qt::red);
-    palette.setColor(QPalette::Link, QColor(42, 130, 218));
-    palette.setColor(QPalette::Highlight, QColor(42, 130, 218));
-    palette.setColor(QPalette::HighlightedText, Qt::black);
-    app.setPalette(palette);
-    
-    // 设置字体
-    QFont defaultFont("Arial", 12);
-    app.setFont(defaultFont);
-
-    // 创建主窗口
-    QWidget mainWindow;
-    mainWindow.resize(1920, 1080);
-    
-    // 创建主布局
-    QHBoxLayout *mainLayout = new QHBoxLayout(&mainWindow);
-    
-    // 创建OpenGL窗口
-    GLWidget *glWidget = new GLWidget;
-    
-    // 创建TabWidget
-    QTabWidget *tabWidget = new QTabWidget;
-    tabWidget->addTab(glWidget, "OBJ Model");
-    mainLayout->addWidget(tabWidget, 5);
-    
-    // 创建右侧控制面板
-    QWidget *controlPanel = new QWidget;
-    QVBoxLayout *controlLayout = new QVBoxLayout(controlPanel);
-    controlLayout->setAlignment(Qt::AlignTop);
-    controlPanel->setFixedWidth(400);
-
-    // ==== 新增：网格操作组 ====
+// 创建网格操作组
+QGroupBox* createMeshOpGroup(GLWidget* glWidget) {
     QGroupBox *meshOpGroup = new QGroupBox("Mesh Operations");
     QVBoxLayout *meshOpLayout = new QVBoxLayout(meshOpGroup);
     
@@ -128,10 +80,11 @@ int main(int argc, char *argv[])
     });
     meshOpLayout->addWidget(resetMeshOpButton);
     
-    // 添加到控制面板顶部
-    controlLayout->addWidget(meshOpGroup);
+    return meshOpGroup;
+}
 
-    // 点信息组
+// 创建模型信息组
+QGroupBox* createModelInfoGroup() {
     QGroupBox *pointGroup = new QGroupBox("Model Information");
     QVBoxLayout *pointLayout = new QVBoxLayout(pointGroup);
     
@@ -142,13 +95,11 @@ int main(int argc, char *argv[])
     pointInfoLabel->setWordWrap(true);
     
     pointLayout->addWidget(pointInfoLabel);
-    controlLayout->addWidget(pointGroup);
-    
-    // 创建堆叠布局用于切换控制面板
-    QStackedLayout *stackedControlLayout = new QStackedLayout;
-    controlLayout->addLayout(stackedControlLayout);
-    
-    // ==== 新增：颜色设置组 ====
+    return pointGroup;
+}
+
+// 创建颜色设置组
+QGroupBox* createColorGroup(GLWidget* glWidget, QWidget* mainWindow) {
     QGroupBox *colorGroup = new QGroupBox("Color Settings");
     QVBoxLayout *colorLayout = new QVBoxLayout(colorGroup);
     colorLayout->setSpacing(10);
@@ -166,8 +117,8 @@ int main(int argc, char *argv[])
         "}"
         "QPushButton:hover { background-color: #606060; }"
     );
-    QObject::connect(bgColorButton, &QPushButton::clicked, [glWidget, &mainWindow]() {
-        QColor color = QColorDialog::getColor(Qt::black, &mainWindow, "Select Background Color");
+    QObject::connect(bgColorButton, &QPushButton::clicked, [glWidget, mainWindow]() {
+        QColor color = QColorDialog::getColor(Qt::black, mainWindow, "Select Background Color");
         if (color.isValid()) {
             glWidget->setBackgroundColor(color);
         }
@@ -187,8 +138,8 @@ int main(int argc, char *argv[])
         "}"
         "QPushButton:hover { background-color: #606060; }"
     );
-    QObject::connect(lineColorButton, &QPushButton::clicked, [glWidget, &mainWindow]() {
-        QColor color = QColorDialog::getColor(Qt::red, &mainWindow, "Select Wireframe Color");
+    QObject::connect(lineColorButton, &QPushButton::clicked, [glWidget, mainWindow]() {
+        QColor color = QColorDialog::getColor(Qt::red, mainWindow, "Select Wireframe Color");
         if (color.isValid()) {
             glWidget->setWireframeColor(QVector4D(
                 color.redF(), 
@@ -200,7 +151,7 @@ int main(int argc, char *argv[])
     });
     colorLayout->addWidget(lineColorButton);
     
-    // 新增：表面颜色按钮
+    // 表面颜色按钮
     QPushButton *surfaceColorButton = new QPushButton("Change Surface Color");
     surfaceColorButton->setStyleSheet(
         "QPushButton {"
@@ -213,8 +164,8 @@ int main(int argc, char *argv[])
         "}"
         "QPushButton:hover { background-color: #606060; }"
     );
-    QObject::connect(surfaceColorButton, &QPushButton::clicked, [glWidget, &mainWindow]() {
-        QColor color = QColorDialog::getColor(QColor(179, 179, 204), &mainWindow, "Select Surface Color");
+    QObject::connect(surfaceColorButton, &QPushButton::clicked, [glWidget, mainWindow]() {
+        QColor color = QColorDialog::getColor(QColor(179, 179, 204), mainWindow, "Select Surface Color");
         if (color.isValid()) {
             glWidget->setSurfaceColor(QVector3D(
                 color.redF(), 
@@ -225,7 +176,7 @@ int main(int argc, char *argv[])
     });
     colorLayout->addWidget(surfaceColorButton);
     
-    // 新增：关闭高光复选框
+    // 关闭高光复选框
     QCheckBox *disableSpecularCheckbox = new QCheckBox("Disable Specular Highlight");
     disableSpecularCheckbox->setStyleSheet("color: white;");
     QObject::connect(disableSpecularCheckbox, &QCheckBox::stateChanged, [glWidget](int state) {
@@ -234,11 +185,11 @@ int main(int argc, char *argv[])
     colorLayout->addWidget(disableSpecularCheckbox);
     
     colorLayout->addStretch();
-    controlLayout->addWidget(colorGroup);
-    // ==== 结束颜色设置组 ====
-    
+    return colorGroup;
+}
 
-    // 添加OBJ控制面板
+// 创建OBJ控制面板
+QWidget* createOBJControlPanel(GLWidget* glWidget, QLabel* pointInfoLabel, QWidget* mainWindow) {
     QWidget *objControlPanel = new QWidget;
     QVBoxLayout *objControlLayout = new QVBoxLayout(objControlPanel);
     
@@ -255,14 +206,14 @@ int main(int argc, char *argv[])
         "}"
         "QPushButton:hover { background-color: #606060; }"
     );
-    QObject::connect(loadButton, &QPushButton::clicked, [glWidget, pointInfoLabel, &mainWindow]() {
+    QObject::connect(loadButton, &QPushButton::clicked, [glWidget, pointInfoLabel, mainWindow]() {
         QString filePath = QFileDialog::getOpenFileName(
-            &mainWindow, "Open OBJ File", "", "OBJ Files (*.obj)");
+            mainWindow, "Open OBJ File", "", "OBJ Files (*.obj)");
         
         if (!filePath.isEmpty()) {
             glWidget->loadOBJ(filePath);
             pointInfoLabel->setText("Model loaded: " + QFileInfo(filePath).fileName());
-            mainWindow.setWindowTitle("OBJ Viewer - " + QFileInfo(filePath).fileName());
+            mainWindow->setWindowTitle("OBJ Viewer - " + QFileInfo(filePath).fileName());
         }
     });
     objControlLayout->addWidget(loadButton);
@@ -271,7 +222,6 @@ int main(int argc, char *argv[])
     QGroupBox *renderModeGroup = new QGroupBox("Rendering Mode");
     QVBoxLayout *renderModeLayout = new QVBoxLayout(renderModeGroup);
     
-    // 删除Wireframe单选按钮
     QRadioButton *solidRadio = new QRadioButton("Solid (Blinn-Phong)");
     QRadioButton *gaussianRadio = new QRadioButton("Gaussian Curvature");
     QRadioButton *meanRadio = new QRadioButton("Mean Curvature");
@@ -313,7 +263,7 @@ int main(int argc, char *argv[])
     });
     objControlLayout->addWidget(wireframeOverlayCheckbox);
     
-    // 新增：添加隐藏面选项
+    // 添加隐藏面选项
     QCheckBox *hideFacesCheckbox = new QCheckBox("Hide Faces");
     hideFacesCheckbox->setStyleSheet("color: white;");
     QObject::connect(hideFacesCheckbox, &QCheckBox::stateChanged, [glWidget](int state) {
@@ -353,7 +303,7 @@ int main(int argc, char *argv[])
     
     methodLayout->addWidget(uniformRadio);
     methodLayout->addWidget(cotangentRadio);
-    methodLayout->addWidget(cotangentAreaRadio); // 新增
+    methodLayout->addWidget(cotangentAreaRadio);
     
     // 连接信号
     QObject::connect(uniformRadio, &QRadioButton::clicked, [glWidget]() {
@@ -362,7 +312,7 @@ int main(int argc, char *argv[])
     QObject::connect(cotangentRadio, &QRadioButton::clicked, [glWidget]() {
         glWidget->setIterationMethod(GLWidget::CotangentWeights);
     });
-    QObject::connect(cotangentAreaRadio, &QRadioButton::clicked, [glWidget]() { // 新增
+    QObject::connect(cotangentAreaRadio, &QRadioButton::clicked, [glWidget]() {
         glWidget->setIterationMethod(GLWidget::CotangentWithArea);
     });
     
@@ -413,8 +363,75 @@ int main(int argc, char *argv[])
     
     objControlLayout->addStretch();
     
-    // 将OBJ控制面板添加到堆叠布局
-    stackedControlLayout->addWidget(objControlPanel);
+    return objControlPanel;
+}
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+    
+    // 设置Fusion样式
+    QApplication::setStyle(QStyleFactory::create("Fusion"));
+    
+    // 设置深色主题
+    QPalette palette;
+    palette.setColor(QPalette::Window, QColor(53, 53, 53));
+    palette.setColor(QPalette::WindowText, Qt::white);
+    palette.setColor(QPalette::Base, QColor(25, 25, 25));
+    palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
+    palette.setColor(QPalette::ToolTipBase, Qt::white);
+    palette.setColor(QPalette::ToolTipText, Qt::white);
+    palette.setColor(QPalette::Text, Qt::white);
+    palette.setColor(QPalette::Button, QColor(53, 53, 53));
+    palette.setColor(QPalette::ButtonText, Qt::white);
+    palette.setColor(QPalette::BrightText, Qt::red);
+    palette.setColor(QPalette::Link, QColor(42, 130, 218));
+    palette.setColor(QPalette::Highlight, QColor(42, 130, 218));
+    palette.setColor(QPalette::HighlightedText, Qt::black);
+    app.setPalette(palette);
+    
+    // 设置字体
+    QFont defaultFont("Arial", 12);
+    app.setFont(defaultFont);
+
+    // 创建主窗口
+    QWidget mainWindow;
+    mainWindow.resize(1920, 1080);
+    
+    // 创建主布局
+    QHBoxLayout *mainLayout = new QHBoxLayout(&mainWindow);
+    
+    // 创建OpenGL窗口
+    GLWidget *glWidget = new GLWidget;
+    
+    // 创建TabWidget
+    QTabWidget *tabWidget = new QTabWidget;
+    tabWidget->addTab(glWidget, "OBJ Model");
+    mainLayout->addWidget(tabWidget, 5);
+    
+    // 创建右侧控制面板
+    QWidget *controlPanel = new QWidget;
+    QVBoxLayout *controlLayout = new QVBoxLayout(controlPanel);
+    controlLayout->setAlignment(Qt::AlignTop);
+    controlPanel->setFixedWidth(400);
+
+    // ==== 网格操作组 ====
+    controlLayout->addWidget(createMeshOpGroup(glWidget));
+
+    // ==== 模型信息组 ====
+    QGroupBox *pointGroup = createModelInfoGroup();
+    QLabel *pointInfoLabel = pointGroup->findChild<QLabel*>(); // 获取标签引用
+    controlLayout->addWidget(pointGroup);
+    
+    // 创建堆叠布局用于切换控制面板
+    QStackedLayout *stackedControlLayout = new QStackedLayout;
+    controlLayout->addLayout(stackedControlLayout);
+    
+    // ==== 颜色设置组 ====
+    controlLayout->addWidget(createColorGroup(glWidget, &mainWindow));
+    
+    // ==== OBJ控制面板 ====
+    stackedControlLayout->addWidget(createOBJControlPanel(glWidget, pointInfoLabel, &mainWindow));
     
     // 将控制面板添加到主布局
     mainLayout->addWidget(controlPanel);
