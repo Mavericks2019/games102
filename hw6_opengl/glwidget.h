@@ -73,6 +73,9 @@ public:
     void setHideFaces(bool hide);  // 新增函数
     IterationMethod iterationMethod = UniformLaplacian; // 默认使用余切权重
     void setIterationMethod(IterationMethod method) { iterationMethod = method; }
+        
+    void applyMeshOperation(int sliderValue);  // 新增：处理滑动条操作
+    void resetMeshOperation();  // 新增：重置网格操作
 
 protected:
     void initializeGL() override;
@@ -123,6 +126,9 @@ public:
 
 public:
     Mesh openMesh; // 使用OpenMesh管理网格数据
+    Mesh originalMesh;  // 存储原始网格
+    bool hasOriginalMesh = false; // 标记是否有原始网格
+    int meshOperationValue = 50; // 当前网格操作值 (0-100)
     
     // 从OpenMesh提取的数据（用于OpenGL渲染）
     std::vector<unsigned int> faces;

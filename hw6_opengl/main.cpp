@@ -68,7 +68,69 @@ int main(int argc, char *argv[])
     QVBoxLayout *controlLayout = new QVBoxLayout(controlPanel);
     controlLayout->setAlignment(Qt::AlignTop);
     controlPanel->setFixedWidth(400);
+
+    // ==== 新增：网格操作组 ====
+    QGroupBox *meshOpGroup = new QGroupBox("Mesh Operations");
+    QVBoxLayout *meshOpLayout = new QVBoxLayout(meshOpGroup);
     
+    // 创建滑动条
+    QSlider *meshOpSlider = new QSlider(Qt::Horizontal);
+    meshOpSlider->setRange(0, 100);
+    meshOpSlider->setValue(50);
+    meshOpSlider->setTickPosition(QSlider::TicksBelow);
+    meshOpSlider->setTickInterval(10);
+    
+    // 创建标签显示当前操作
+    QLabel *meshOpLabel = new QLabel("Current: Original Mesh");
+    meshOpLabel->setAlignment(Qt::AlignCenter);
+    meshOpLabel->setStyleSheet("font-weight: bold; color: white;");
+    
+    // 连接滑动条信号
+    QObject::connect(meshOpSlider, &QSlider::valueChanged, [glWidget, meshOpLabel](int value) {
+        if (value < 50) {
+            float ratio = 0.1f + (value / 50.0f) * 0.9f;
+            meshOpLabel->setText(QString("Simplify: %1%").arg(qRound(100 * (1.0 - ratio))));
+        } 
+        else if (value > 50) {
+            int level = static_cast<int>((value - 50) / 12.5f);
+            meshOpLabel->setText(QString("Subdivide: Level %1").arg(level));
+        } 
+        else {
+            meshOpLabel->setText("Original Mesh");
+        }
+        
+        // 应用网格操作
+        glWidget->applyMeshOperation(value);
+    });
+    
+    // 添加滑动条和标签
+    meshOpLayout->addWidget(new QLabel("Simplify        Original        Subdivide"));
+    meshOpLayout->addWidget(meshOpSlider);
+    meshOpLayout->addWidget(meshOpLabel);
+    
+    // 添加重置按钮
+    QPushButton *resetMeshOpButton = new QPushButton("Reset to Original");
+    resetMeshOpButton->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #505050;"
+        "   color: white;"
+        "   border: none;"
+        "   padding: 8px 16px;"
+        "   font-size: 14px;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:hover { background-color: #606060; }"
+    );
+    QObject::connect(resetMeshOpButton, &QPushButton::clicked, [glWidget, meshOpSlider, meshOpLabel]() {
+        meshOpSlider->setValue(50);
+        meshOpLabel->setText("Original Mesh");
+        glWidget->resetMeshOperation();
+    });
+    meshOpLayout->addWidget(resetMeshOpButton);
+    
+    // 添加到控制面板顶部
+    controlLayout->addWidget(meshOpGroup);
+
     // 点信息组
     QGroupBox *pointGroup = new QGroupBox("Model Information");
     QVBoxLayout *pointLayout = new QVBoxLayout(pointGroup);
@@ -175,80 +237,7 @@ int main(int argc, char *argv[])
     controlLayout->addWidget(colorGroup);
     // ==== 结束颜色设置组 ====
     
-    // 在控制面板添加新功能
-    QGroupBox *subdivGroup = new QGroupBox("Loop Subdivision");
-    QVBoxLayout *subdivLayout = new QVBoxLayout(subdivGroup);
-    
-    // 细分级别控制
-    QSpinBox *subdivLevelSpin = new QSpinBox;
-    subdivLevelSpin->setRange(1, 5);
-    subdivLevelSpin->setValue(1);
-    QObject::connect(subdivLevelSpin, QOverload<int>::of(&QSpinBox::valueChanged),
-                     glWidget, &GLWidget::setSubdivisionLevel);
-    
-    // 应用细分按钮
-    QPushButton *applySubdivBtn = new QPushButton("Apply Subdivision");
-    applySubdivBtn->setStyleSheet(
-        "QPushButton {"
-        "   background-color: #505050;"
-        "   color: white;"
-        "   border: none;"
-        "   padding: 10px 20px;"
-        "   font-size: 16px;"
-        "   border-radius: 5px;"
-        "}"
-        "QPushButton:hover { background-color: #606060; }"
-    );
-    QObject::connect(applySubdivBtn, &QPushButton::clicked, [glWidget]() {
-        glWidget->performLoopSubdivision();
-    });
-    
-    subdivLayout->addWidget(new QLabel("Subdivision Level:"));
-    subdivLayout->addWidget(subdivLevelSpin);
-    subdivLayout->addWidget(applySubdivBtn);
-    
-    // 网格简化组
-    QGroupBox *simplifyGroup = new QGroupBox("Mesh Simplification");
-    QVBoxLayout *simplifyLayout = new QVBoxLayout(simplifyGroup);
-    
-    // 简化比例控制
-    QSlider *simplifySlider = new QSlider(Qt::Horizontal);
-    simplifySlider->setRange(10, 90);
-    simplifySlider->setValue(50);
-    QLabel *simplifyLabel = new QLabel("Simplification: 50%");
-    
-    QObject::connect(simplifySlider, &QSlider::valueChanged, 
-                     [simplifyLabel, glWidget](int value) {
-        float ratio = value / 100.0f;
-        simplifyLabel->setText(QString("Simplification: %1%").arg(value));
-        glWidget->setSimplificationRatio(ratio);
-    });
-    
-    // 应用简化按钮
-    QPushButton *applySimplifyBtn = new QPushButton("Apply Simplification");
-    applySimplifyBtn->setStyleSheet(
-        "QPushButton {"
-        "   background-color: #505050;"
-        "   color: white;"
-        "   border: none;"
-        "   padding: 10px 20px;"
-        "   font-size: 16px;"
-        "   border-radius: 5px;"
-        "}"
-        "QPushButton:hover { background-color: #606060; }"
-    );
-    QObject::connect(applySimplifyBtn, &QPushButton::clicked, [glWidget]() {
-        glWidget->performMeshSimplification(glWidget->simplificationRatio);
-    });
-    
-    simplifyLayout->addWidget(simplifyLabel);
-    simplifyLayout->addWidget(simplifySlider);
-    simplifyLayout->addWidget(applySimplifyBtn);
-    
-    // 添加到控制面板
-    controlLayout->addWidget(subdivGroup);
-    controlLayout->addWidget(simplifyGroup);
-    
+
     // 添加OBJ控制面板
     QWidget *objControlPanel = new QWidget;
     QVBoxLayout *objControlLayout = new QVBoxLayout(objControlPanel);

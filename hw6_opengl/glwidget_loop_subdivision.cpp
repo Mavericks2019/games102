@@ -9,6 +9,7 @@
 // Loop细分权重常量
 const float LOOP_BETA = 3.0f / (8.0f * 3.0f); // 3/(8*valence)
 const float LOOP_ALPHA = 3.0f / 8.0f;
+typedef OpenMesh::Subdivider::Uniform::LoopT<Mesh> LoopSubdivider;
 
 void GLWidget::performLoopSubdivisionOrigin() {
     if (!modelLoaded || openMesh.n_vertices() == 0) return;
@@ -195,14 +196,8 @@ void GLWidget::performLoopSubdivisionOrigin() {
     update();
 }
 
-// 定义Loop细分器类型
-typedef OpenMesh::Subdivider::Uniform::LoopT<Mesh> LoopSubdivider;
-
 void GLWidget::performLoopSubdivision() {
     if (!modelLoaded || openMesh.n_vertices() == 0) return;
-    
-    // 备份原始网格（用于多级细分）
-    Mesh originalMesh = openMesh;
     
     try {
         // 创建Loop细分器
@@ -214,19 +209,17 @@ void GLWidget::performLoopSubdivision() {
         // 执行细分（支持多级细分）
         if (!loopSubdivider(subdivisionLevel)) {
             qCritical() << "Loop subdivision failed";
-            openMesh = originalMesh;
             return;
         }
         
         // 从细分器分离网格
         loopSubdivider.detach();
         
-        qDebug() << "Loop subdivision completed: Levels =" << subdivisionLevel
-                 << "New vertices:" << openMesh.n_vertices()
-                 << "New faces:" << openMesh.n_faces();
+        // qDebug() << "Loop subdivision completed: Levels =" << subdivisionLevel
+        //          << "New vertices:" << openMesh.n_vertices()
+        //          << "New faces:" << openMesh.n_faces();
     } catch (const std::exception& e) {
         qCritical() << "Loop subdivision failed:" << e.what();
-        openMesh = originalMesh; // 恢复原始网格
         return;
     }
     
@@ -253,13 +246,4 @@ void GLWidget::performLoopSubdivision() {
     
     // 重新计算曲率
     calculateCurvatures();
-    
-    // 更新OpenGL缓冲区
-    makeCurrent();
-    updateBuffersFromOpenMesh();
-    doneCurrent();
-    
-    // 切换到细分渲染模式
-    currentRenderMode = BlinnPhong;  // 使用普通渲染模式显示细分结果
-    update();
 }

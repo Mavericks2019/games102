@@ -136,4 +136,53 @@ void GLWidget::loadOBJ(const QString &path)
     zoom = 1.0f;
     
     update(); // 触发重绘
+        // 保存原始网格
+    originalMesh = openMesh;
+    hasOriginalMesh = true;
+    
+    // 重置网格操作
+    resetMeshOperation();
+}
+
+void GLWidget::resetMeshOperation()
+{
+    if (!hasOriginalMesh) return;
+    
+    // 恢复原始网格
+    openMesh = originalMesh;
+    
+    // 更新网格数据
+    updateBuffersFromOpenMesh();
+    
+    // 重置操作值
+    meshOperationValue = 50;
+    
+    update();
+}
+
+void GLWidget::applyMeshOperation(int sliderValue)
+{
+    if (!hasOriginalMesh) return;
+    
+    // 保存新值
+    meshOperationValue = sliderValue;
+    
+    // 恢复原始网格
+    openMesh = originalMesh;
+    
+    if (sliderValue < 50) {
+        // 简化操作：0-50 映射到 0.1-1.0 简化比例
+        float ratio = 0.1f + (sliderValue / 50.0f) * 0.9f;
+        performMeshSimplification(ratio);
+    } 
+    else if (sliderValue > 50) {
+        // 细分操作：50-100 映射到 0-4 细分级别
+        int level = static_cast<int>((sliderValue - 50) / 12.5f);
+        setSubdivisionLevel(level);
+        performLoopSubdivision();
+    }
+    
+    // 更新网格数据
+    updateBuffersFromOpenMesh();
+    update();
 }

@@ -39,6 +39,8 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
     bgColor = QColor(0, 0, 0); // 初始化背景色为黑色
     currentRenderMode = BlinnPhong;  // 默认改为实体模式
     wireframeColor = QVector4D(1.0f, 0.0f, 0.0f, 1.0f); // 红色线框
+    meshOperationValue = 50;  // 默认居中
+
 }
 
 void GLWidget::setHideFaces(bool hide)
