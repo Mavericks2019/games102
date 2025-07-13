@@ -39,15 +39,10 @@ QGroupBox* createMeshOpGroup(GLWidget* glWidget) {
     
     // 连接滑动条信号
     QObject::connect(meshOpSlider, &QSlider::valueChanged, [glWidget, meshOpLabel](int value) {
-        if (value < 50) {
+        if (value != 100) {
             float ratio = 0.1f + (value / 50.0f) * 0.9f;
             meshOpLabel->setText(QString("Simplify: %1%").arg(qRound(100 * (1.0 - ratio))));
-        } 
-        else if (value > 50) {
-            int level = static_cast<int>((value - 50) / 12.5f);
-            meshOpLabel->setText(QString("Subdivide: Level %1").arg(level));
-        } 
-        else {
+        } else {
             meshOpLabel->setText("Original Mesh");
         }
         
@@ -56,7 +51,7 @@ QGroupBox* createMeshOpGroup(GLWidget* glWidget) {
     });
     
     // 添加滑动条和标签
-    meshOpLayout->addWidget(new QLabel("Simplify        Original        Subdivide"));
+    meshOpLayout->addWidget(new QLabel("Original                                                     simplify"));
     meshOpLayout->addWidget(meshOpSlider);
     meshOpLayout->addWidget(meshOpLabel);
     
@@ -74,13 +69,80 @@ QGroupBox* createMeshOpGroup(GLWidget* glWidget) {
         "QPushButton:hover { background-color: #606060; }"
     );
     QObject::connect(resetMeshOpButton, &QPushButton::clicked, [glWidget, meshOpSlider, meshOpLabel]() {
-        meshOpSlider->setValue(50);
+        meshOpSlider->setValue(0);
         meshOpLabel->setText("Original Mesh");
         glWidget->resetMeshOperation();
     });
     meshOpLayout->addWidget(resetMeshOpButton);
     
     return meshOpGroup;
+}
+
+// 创建Loop细分控制组
+QGroupBox* createLoopSubdivisionGroup(GLWidget* glWidget) {
+    QGroupBox *loopGroup = new QGroupBox("Loop Subdivision");
+    QVBoxLayout *loopLayout = new QVBoxLayout(loopGroup);
+    
+    // 创建当前细分级别标签
+    QLabel *levelLabel = new QLabel("Current Level: 0");
+    levelLabel->setAlignment(Qt::AlignCenter);
+    levelLabel->setStyleSheet("font-weight: bold; color: white;");
+    
+    // 创建细分按钮
+    QPushButton *subdivideButton = new QPushButton("Perform Loop Subdivision");
+    subdivideButton->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #505050;"
+        "   color: white;"
+        "   border: none;"
+        "   padding: 8px 16px;"
+        "   font-size: 14px;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:hover { background-color: #606060; }"
+        "QPushButton:disabled { background-color: #404040; color: #808080; }"
+    );
+    
+    // 连接按钮信号
+    QObject::connect(subdivideButton, &QPushButton::clicked, [glWidget, levelLabel, subdivideButton]() {
+        // 执行细分操作
+        glWidget->performLoopSubdivision();
+        
+        // 更新级别标签
+        int currentLevel = glWidget->getCurrentSubdivisionLevel();
+        levelLabel->setText(QString("Current Level: %1").arg(currentLevel));
+        
+        // 如果达到最大级别，禁用按钮
+        if (currentLevel >= 3) {
+            subdivideButton->setEnabled(false);
+        }
+    });
+    
+    // 添加重置按钮
+    QPushButton *resetButton = new QPushButton("Reset Subdivision");
+    resetButton->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #505050;"
+        "   color: white;"
+        "   border: none;"
+        "   padding: 8px 16px;"
+        "   font-size: 14px;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:hover { background-color: #606060; }"
+    );
+    QObject::connect(resetButton, &QPushButton::clicked, [glWidget, levelLabel, subdivideButton]() {
+        glWidget->resetMeshOperation();
+        levelLabel->setText("Current Level: 0");
+        subdivideButton->setEnabled(true);
+    });
+    
+    // 添加控件到布局
+    loopLayout->addWidget(levelLabel);
+    loopLayout->addWidget(subdivideButton);
+    loopLayout->addWidget(resetButton);
+    
+    return loopGroup;
 }
 
 // 创建模型信息组
@@ -188,12 +250,8 @@ QGroupBox* createColorGroup(GLWidget* glWidget, QWidget* mainWindow) {
     return colorGroup;
 }
 
-// 创建OBJ控制面板
-QWidget* createOBJControlPanel(GLWidget* glWidget, QLabel* pointInfoLabel, QWidget* mainWindow) {
-    QWidget *objControlPanel = new QWidget;
-    QVBoxLayout *objControlLayout = new QVBoxLayout(objControlPanel);
-    
-    // 添加OBJ加载按钮
+// 创建OBJ加载按钮
+QWidget* createLoadButton(GLWidget* glWidget, QLabel* pointInfoLabel, QWidget* mainWindow) {
     QPushButton *loadButton = new QPushButton("Load OBJ File");
     loadButton->setStyleSheet(
         "QPushButton {"
@@ -216,9 +274,11 @@ QWidget* createOBJControlPanel(GLWidget* glWidget, QLabel* pointInfoLabel, QWidg
             mainWindow->setWindowTitle("OBJ Viewer - " + QFileInfo(filePath).fileName());
         }
     });
-    objControlLayout->addWidget(loadButton);
-    
-    // 创建渲染模式选择组
+    return loadButton;
+}
+
+// 创建渲染模式选择组
+QGroupBox* createRenderModeGroup(GLWidget* glWidget) {
     QGroupBox *renderModeGroup = new QGroupBox("Rendering Mode");
     QVBoxLayout *renderModeLayout = new QVBoxLayout(renderModeGroup);
     
@@ -227,51 +287,53 @@ QWidget* createOBJControlPanel(GLWidget* glWidget, QLabel* pointInfoLabel, QWidg
     QRadioButton *meanRadio = new QRadioButton("Mean Curvature");
     QRadioButton *maxRadio = new QRadioButton("Max Curvature");
     
-    solidRadio->setChecked(true);  // 默认选择实体模式
+    solidRadio->setChecked(true);
     
-    // 添加到布局
     renderModeLayout->addWidget(solidRadio);
     renderModeLayout->addWidget(gaussianRadio);
     renderModeLayout->addWidget(meanRadio);
     renderModeLayout->addWidget(maxRadio);
     
-    // 连接信号
     QObject::connect(solidRadio, &QRadioButton::clicked, [glWidget]() {
         glWidget->setRenderMode(GLWidget::BlinnPhong);
     });
-    
     QObject::connect(gaussianRadio, &QRadioButton::clicked, [glWidget]() {
         glWidget->setRenderMode(GLWidget::GaussianCurvature);
     });
-    
     QObject::connect(meanRadio, &QRadioButton::clicked, [glWidget]() {
         glWidget->setRenderMode(GLWidget::MeanCurvature);
     });
-    
     QObject::connect(maxRadio, &QRadioButton::clicked, [glWidget]() {
         glWidget->setRenderMode(GLWidget::MaxCurvature);
     });
     
-    // 添加到控制面板
-    objControlLayout->addWidget(renderModeGroup);
+    return renderModeGroup;
+}
+
+// 创建显示选项组
+QWidget* createDisplayOptions(GLWidget* glWidget) {
+    QWidget *displayOptions = new QWidget;
+    QVBoxLayout *optionsLayout = new QVBoxLayout(displayOptions);
     
-    // 添加线框叠加选项
     QCheckBox *wireframeOverlayCheckbox = new QCheckBox("Show Wireframe Overlay");
     wireframeOverlayCheckbox->setStyleSheet("color: white;");
     QObject::connect(wireframeOverlayCheckbox, &QCheckBox::stateChanged, [glWidget](int state) {
         glWidget->setShowWireframeOverlay(state == Qt::Checked);
     });
-    objControlLayout->addWidget(wireframeOverlayCheckbox);
     
-    // 添加隐藏面选项
     QCheckBox *hideFacesCheckbox = new QCheckBox("Hide Faces");
     hideFacesCheckbox->setStyleSheet("color: white;");
     QObject::connect(hideFacesCheckbox, &QCheckBox::stateChanged, [glWidget](int state) {
         glWidget->setHideFaces(state == Qt::Checked);
     });
-    objControlLayout->addWidget(hideFacesCheckbox);
     
-    // 添加重置视图按钮
+    optionsLayout->addWidget(wireframeOverlayCheckbox);
+    optionsLayout->addWidget(hideFacesCheckbox);
+    return displayOptions;
+}
+
+// 创建重置视图按钮
+QPushButton* createResetViewButton(GLWidget* glWidget) {
     QPushButton *resetButton = new QPushButton("Reset View");
     resetButton->setStyleSheet(
         "QPushButton {"
@@ -287,9 +349,11 @@ QWidget* createOBJControlPanel(GLWidget* glWidget, QLabel* pointInfoLabel, QWidg
     QObject::connect(resetButton, &QPushButton::clicked, [glWidget]() {
         glWidget->resetView();
     });
-    objControlLayout->addWidget(resetButton);
-    
-    // 添加迭代方法选择组
+    return resetButton;
+}
+
+// 创建迭代方法选择组
+QGroupBox* createMethodGroup(GLWidget* glWidget) {
     QGroupBox *methodGroup = new QGroupBox("Iteration Method");
     methodGroup->setStyleSheet("QGroupBox { color: white; font-size: 14px; }");
     QVBoxLayout *methodLayout = new QVBoxLayout(methodGroup);
@@ -298,14 +362,12 @@ QWidget* createOBJControlPanel(GLWidget* glWidget, QLabel* pointInfoLabel, QWidg
     QRadioButton *cotangentRadio = new QRadioButton("Cotangent Weights");
     QRadioButton *cotangentAreaRadio = new QRadioButton("Cotangent with Area (Laplace-Beltrami)"); 
     
-    // 默认选择余切权重
     uniformRadio->setChecked(true);
     
     methodLayout->addWidget(uniformRadio);
     methodLayout->addWidget(cotangentRadio);
     methodLayout->addWidget(cotangentAreaRadio);
     
-    // 连接信号
     QObject::connect(uniformRadio, &QRadioButton::clicked, [glWidget]() {
         glWidget->setIterationMethod(GLWidget::UniformLaplacian);
     });
@@ -316,29 +378,25 @@ QWidget* createOBJControlPanel(GLWidget* glWidget, QLabel* pointInfoLabel, QWidg
         glWidget->setIterationMethod(GLWidget::CotangentWithArea);
     });
     
-    // 添加到控制面板
-    objControlLayout->addWidget(methodGroup);
-    
-    // 添加极小曲面迭代控制组
+    return methodGroup;
+}
+
+// 创建极小曲面迭代控制组
+QGroupBox* createMinimalSurfaceGroup(GLWidget* glWidget) {
     QGroupBox *minimalSurfaceGroup = new QGroupBox("Minimal Surface Iteration");
     minimalSurfaceGroup->setStyleSheet("QGroupBox { color: white; font-size: 14px; }");
     QFormLayout *minimalLayout = new QFormLayout(minimalSurfaceGroup);
     
-    // 迭代次数
     QSpinBox *iterationsSpinBox = new QSpinBox;
     iterationsSpinBox->setRange(1, 1000);
     iterationsSpinBox->setValue(10);
-    minimalLayout->addRow("Iterations:", iterationsSpinBox);
     
-    // 步长参数
     QDoubleSpinBox *lambdaSpinBox = new QDoubleSpinBox;
     lambdaSpinBox->setRange(0.0001, 0.5);
     lambdaSpinBox->setValue(0.1);
     lambdaSpinBox->setSingleStep(0.01);
     lambdaSpinBox->setDecimals(4);
-    minimalLayout->addRow("Step Size (λ):", lambdaSpinBox);
     
-    // 应用迭代按钮
     QPushButton *applyIterationButton = new QPushButton("Apply Iteration");
     applyIterationButton->setStyleSheet(
         "QPushButton {"
@@ -351,18 +409,35 @@ QWidget* createOBJControlPanel(GLWidget* glWidget, QLabel* pointInfoLabel, QWidg
         "}"
         "QPushButton:hover { background-color: #606060; }"
     );
+    
     QObject::connect(applyIterationButton, &QPushButton::clicked, [glWidget, iterationsSpinBox, lambdaSpinBox]() {
         glWidget->performMinimalSurfaceIteration(
             iterationsSpinBox->value(),
             lambdaSpinBox->value()
         );
     });
+    
+    minimalLayout->addRow("Iterations:", iterationsSpinBox);
+    minimalLayout->addRow("Step Size (λ):", lambdaSpinBox);
     minimalLayout->addRow(applyIterationButton);
     
-    objControlLayout->addWidget(minimalSurfaceGroup);
+    return minimalSurfaceGroup;
+}
+
+// 创建OBJ控制面板（使用拆分后的子函数）
+QWidget* createOBJControlPanel(GLWidget* glWidget, QLabel* pointInfoLabel, QWidget* mainWindow) {
+    QWidget *objControlPanel = new QWidget;
+    QVBoxLayout *objControlLayout = new QVBoxLayout(objControlPanel);
+    
+    // 使用子函数创建各个控件组
+    objControlLayout->addWidget(createLoadButton(glWidget, pointInfoLabel, mainWindow));
+    objControlLayout->addWidget(createRenderModeGroup(glWidget));
+    objControlLayout->addWidget(createDisplayOptions(glWidget));
+    objControlLayout->addWidget(createResetViewButton(glWidget));
+    objControlLayout->addWidget(createMethodGroup(glWidget));
+    objControlLayout->addWidget(createMinimalSurfaceGroup(glWidget));
     
     objControlLayout->addStretch();
-    
     return objControlPanel;
 }
 
@@ -415,24 +490,24 @@ int main(int argc, char *argv[])
     controlLayout->setAlignment(Qt::AlignTop);
     controlPanel->setFixedWidth(400);
 
-    // ==== 网格操作组 ====
-    controlLayout->addWidget(createMeshOpGroup(glWidget));
-
     // ==== 模型信息组 ====
     QGroupBox *pointGroup = createModelInfoGroup();
     QLabel *pointInfoLabel = pointGroup->findChild<QLabel*>(); // 获取标签引用
     controlLayout->addWidget(pointGroup);
     
-    // 创建堆叠布局用于切换控制面板
-    QStackedLayout *stackedControlLayout = new QStackedLayout;
-    controlLayout->addLayout(stackedControlLayout);
-    
     // ==== 颜色设置组 ====
     controlLayout->addWidget(createColorGroup(glWidget, &mainWindow));
     
+    // 创建堆叠布局用于切换控制面板
+    QStackedLayout *stackedControlLayout = new QStackedLayout;
+    controlLayout->addLayout(stackedControlLayout);
+
     // ==== OBJ控制面板 ====
     stackedControlLayout->addWidget(createOBJControlPanel(glWidget, pointInfoLabel, &mainWindow));
-    
+
+    // ==== 网格操作组 ====
+    controlLayout->addWidget(createMeshOpGroup(glWidget));
+    controlLayout->addWidget(createLoopSubdivisionGroup(glWidget));
     // 将控制面板添加到主布局
     mainLayout->addWidget(controlPanel);
     

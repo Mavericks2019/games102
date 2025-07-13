@@ -60,8 +60,10 @@ public:
     void setSimplificationRatio(float ratio) {
         simplificationRatio = ratio;
     };
-
-    void resetView();
+    int getSubdivisionLevel() const { return subdivisionLevel; }
+    void resetView(); // 现在会重置网格和视角
+    void resetLoopSubdivision();
+    int getCurrentSubdivisionLevel() const { return subdivisionLevel; } // 新增获取当前细分级别的方法
     void setBackgroundColor(const QColor& color);
     void setRenderMode(RenderMode mode);
     void loadOBJ(const QString &path);
@@ -88,7 +90,7 @@ protected:
     void wheelEvent(QWheelEvent *event) override;
 
 public:
-    QVector3D surfaceColor = QVector3D(0.7f, 0.7f, 0.8f); // 默认表面颜色
+    QVector3D surfaceColor = QVector3D(1.0f, 1.0f, 0.0f); // 默认表面颜色
     bool specularEnabled = true; // 是否启用高光
     
     void initializeShaders();
@@ -116,6 +118,7 @@ public:
     // 视图参数
     float rotationX, rotationY;
     float zoom;
+    int subdivisionLevel = 0;    // 当前细分级别（0表示未细分）
     bool modelLoaded;
     QColor bgColor;
     RenderMode currentRenderMode;
@@ -135,7 +138,6 @@ public:
     std::vector<unsigned int> edges;
 
         // 新增成员变量
-    int subdivisionLevel = 1;    // Loop细分级别
     float simplificationRatio = 0.5f; // 网格简化比例
     
     // 新增OpenGL资源

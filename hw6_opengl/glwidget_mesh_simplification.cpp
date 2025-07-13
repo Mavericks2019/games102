@@ -50,10 +50,10 @@ void GLWidget::performMeshSimplification(float ratio) {
         // 更新法线
         openMesh.update_normals();
         
-        qDebug() << "Mesh simplification completed:"
-                 << "Original vertices:" << originalVertices
-                 << "Target vertices:" << targetVertices
-                 << "Actual vertices:" << openMesh.n_vertices();
+        // qDebug() << "Mesh simplification completed:"
+        //          << "Original vertices:" << originalVertices
+        //          << "Target vertices:" << targetVertices
+        //          << "Actual vertices:" << openMesh.n_vertices();
     } catch (const std::exception& e) {
         qCritical() << "Mesh simplification failed:" << e.what();
         openMesh = originalMesh; // 恢复原始网格

@@ -40,6 +40,7 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
     currentRenderMode = BlinnPhong;  // 默认改为实体模式
     wireframeColor = QVector4D(1.0f, 0.0f, 0.0f, 1.0f); // 红色线框
     meshOperationValue = 50;  // 默认居中
+    subdivisionLevel = 0; // 确保初始化为0
 
 }
 
@@ -366,7 +367,7 @@ void GLWidget::paintGL()
             blinnPhongProgram.setUniformValue("lightPos", QVector3D(2.0f, 2.0f, 2.0f));
             blinnPhongProgram.setUniformValue("viewPos", QVector3D(0.0f, 0.0f, 5.0f));
             blinnPhongProgram.setUniformValue("lightColor", QVector3D(1.0f, 1.0f, 1.0f));
-            blinnPhongProgram.setUniformValue("objectColor", QVector3D(0.7f, 0.7f, 0.8f));
+            blinnPhongProgram.setUniformValue("objectColor", surfaceColor);
             
             // 绘制简化后的网格
             glDrawElements(GL_TRIANGLES, simplifiedMesh.indices.size(), 
@@ -556,5 +557,20 @@ void GLWidget::setSurfaceColor(const QVector3D& color)
 void GLWidget::setSpecularEnabled(bool enabled)
 {
     specularEnabled = enabled;
+    update();
+}
+
+void GLWidget::resetLoopSubdivision()
+{
+    if (!hasOriginalMesh) return;
+    
+    // 恢复原始网格
+    openMesh = originalMesh;
+    
+    // 重置细分级别
+    subdivisionLevel = 0;
+    
+    // 更新网格数据
+    updateBuffersFromOpenMesh();
     update();
 }
