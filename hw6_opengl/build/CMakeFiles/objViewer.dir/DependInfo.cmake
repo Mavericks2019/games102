@@ -34,6 +34,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/usr/include/x86_64-linux-gnu/qt5/QtCore"
   "/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++"
   "/usr/include/x86_64-linux-gnu/qt5/QtOpenGL"
+  "/usr/include/eigen3"
   )
 
 # Targets to which this target links.

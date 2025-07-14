@@ -14,6 +14,8 @@
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
 #include <OpenMesh/Core/IO/MeshIO.hh> // 添加OpenMesh IO头文件
 #include <queue>
+#include <Eigen/Sparse>
+#include <Eigen/IterativeLinearSolvers>
 
 #define EPSILON 1E-4F 
 
@@ -45,7 +47,8 @@ public:
     enum IterationMethod {
         UniformLaplacian,
         CotangentWeights,
-        CotangentWithArea // 新增的带面积迭代方法
+        CotangentWithArea, // 新增的带面积迭代方法
+        EigenSparseSolver  // 新增Eigen稀疏求解器方法
     };
     explicit GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
@@ -74,6 +77,7 @@ public:
     void performLoopSubdivisionOrigin();
     void setHideFaces(bool hide);  // 新增函数
     IterationMethod iterationMethod = UniformLaplacian; // 默认使用余切权重
+    void performEigenSparseSolverIteration();  // 新增：使用Eigen求解稀疏方程组
     void setIterationMethod(IterationMethod method) { iterationMethod = method; }
         
     void applyMeshOperation(int sliderValue);  // 新增：处理滑动条操作

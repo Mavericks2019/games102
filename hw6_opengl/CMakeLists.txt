@@ -21,6 +21,9 @@ qt5_add_resources(RESOURCE_FILES ${SHADER_RESOURCES})
 
 find_package(OpenMesh REQUIRED)
 
+# 添加Eigen库支持
+find_package(Eigen3 REQUIRED)  # 添加Eigen库查找
+
 # 添加可执行文件
 add_executable(${PROJECT_NAME}
     main.cpp
@@ -32,7 +35,6 @@ add_executable(${PROJECT_NAME}
     glwidget_mesh_simplification.cpp
     glwidget.h
     ${RESOURCE_FILES}
-
 )
 
 # 链接库
@@ -42,6 +44,7 @@ target_link_libraries(${PROJECT_NAME}
     GL
     OpenMeshCore
     OpenMeshTools
+    Eigen3::Eigen  # 链接Eigen库
 )
 
 # 设置安装路径

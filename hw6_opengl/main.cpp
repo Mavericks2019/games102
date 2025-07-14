@@ -361,13 +361,15 @@ QGroupBox* createMethodGroup(GLWidget* glWidget) {
     QRadioButton *uniformRadio = new QRadioButton("Uniform Laplacian");
     QRadioButton *cotangentRadio = new QRadioButton("Cotangent Weights");
     QRadioButton *cotangentAreaRadio = new QRadioButton("Cotangent with Area (Laplace-Beltrami)"); 
-    
+    QRadioButton *eigenRadio = new QRadioButton("Eigen Sparse Solver"); // 新增Eigen求解器选项
+
     uniformRadio->setChecked(true);
     
     methodLayout->addWidget(uniformRadio);
     methodLayout->addWidget(cotangentRadio);
     methodLayout->addWidget(cotangentAreaRadio);
-    
+    methodLayout->addWidget(eigenRadio); // 添加新选项
+
     QObject::connect(uniformRadio, &QRadioButton::clicked, [glWidget]() {
         glWidget->setIterationMethod(GLWidget::UniformLaplacian);
     });
@@ -377,7 +379,10 @@ QGroupBox* createMethodGroup(GLWidget* glWidget) {
     QObject::connect(cotangentAreaRadio, &QRadioButton::clicked, [glWidget]() {
         glWidget->setIterationMethod(GLWidget::CotangentWithArea);
     });
-    
+    QObject::connect(eigenRadio, &QRadioButton::clicked, [glWidget]() { // 连接新选项
+        glWidget->setIterationMethod(GLWidget::EigenSparseSolver);
+    });
+
     return methodGroup;
 }
 
@@ -409,6 +414,20 @@ QGroupBox* createMinimalSurfaceGroup(GLWidget* glWidget) {
         "}"
         "QPushButton:hover { background-color: #606060; }"
     );
+
+    // 新增：Eigen求解按钮
+    QPushButton *eigenSolveButton = new QPushButton("Solve with Eigen");
+    eigenSolveButton->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #505050;"
+        "   color: white;"
+        "   border: none;"
+        "   padding: 10px 20px;"
+        "   font-size: 16px;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:hover { background-color: #606060; }"
+    );
     
     QObject::connect(applyIterationButton, &QPushButton::clicked, [glWidget, iterationsSpinBox, lambdaSpinBox]() {
         glWidget->performMinimalSurfaceIteration(
@@ -416,11 +435,18 @@ QGroupBox* createMinimalSurfaceGroup(GLWidget* glWidget) {
             lambdaSpinBox->value()
         );
     });
+
+    // 连接Eigen求解按钮
+    QObject::connect(eigenSolveButton, &QPushButton::clicked, [glWidget]() {
+        glWidget->setIterationMethod(GLWidget::EigenSparseSolver);
+        glWidget->performMinimalSurfaceIteration(0, 0); // 参数无意义，但会调用Eigen求解器
+    });
     
     minimalLayout->addRow("Iterations:", iterationsSpinBox);
     minimalLayout->addRow("Step Size (λ):", lambdaSpinBox);
     minimalLayout->addRow(applyIterationButton);
-    
+    minimalLayout->addRow(eigenSolveButton); // 添加新按钮
+
     return minimalSurfaceGroup;
 }
 
