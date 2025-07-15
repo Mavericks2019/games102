@@ -79,19 +79,28 @@ QGroupBox* createMeshOpGroup(GLWidget* glWidget) {
     return meshOpGroup;
 }
 
+// 创建参数化选项卡
 QWidget* createParameterizationTab(GLWidget* glWidget) {
     QWidget *paramTab = new QWidget;
     QHBoxLayout *paramLayout = new QHBoxLayout(paramTab);
     
-    // 左侧显示原始模型
-    GLWidget *paramGLWidget = new GLWidget;
-    // 这里需要同步模型数据，可以使用信号槽机制或直接复制网格数据
-    // 简化示例：paramGLWidget->setMesh(glWidget->getMesh());
-    
-    // 添加分割器
+    // 使用分割器创建左右两个视图
     QSplitter *splitter = new QSplitter(Qt::Horizontal);
-    splitter->addWidget(paramGLWidget);
-    splitter->setSizes(QList<int>() << 1000); // 初始大小比例
+    
+    // 左侧显示原始模型
+    GLWidget *leftGLWidget = new GLWidget;
+    // 复制主GLWidget的模型数据
+    leftGLWidget->openMesh = glWidget->openMesh;
+    leftGLWidget->originalMesh = glWidget->originalMesh;
+    leftGLWidget->modelLoaded = glWidget->modelLoaded;
+    leftGLWidget->updateBuffersFromOpenMesh();
+    
+    // 右侧显示参数化结果（初始为空）
+    GLWidget *rightGLWidget = new GLWidget;
+    
+    splitter->addWidget(leftGLWidget);
+    splitter->addWidget(rightGLWidget);
+    splitter->setSizes(QList<int>() << 500 << 500); // 平均分配空间
     
     paramLayout->addWidget(splitter);
     
@@ -487,10 +496,33 @@ QWidget* createOBJControlPanel(GLWidget* glWidget, QLabel* pointInfoLabel, QWidg
     return objControlPanel;
 }
 
-// 创建参数化控制面板
+// 创建参数化控制面板（移除网格操作部分）
 QWidget* createParameterizationControlPanel(GLWidget* glWidget) {
     QWidget *paramControlPanel = new QWidget;
     QVBoxLayout *paramLayout = new QVBoxLayout(paramControlPanel);
+    
+    // 添加加载OBJ按钮（保留加载功能）
+    QPushButton *loadButton = new QPushButton("Load OBJ File");
+    loadButton->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #505050;"
+        "   color: white;"
+        "   border: none;"
+        "   padding: 10px 20px;"
+        "   font-size: 16px;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:hover { background-color: #606060; }"
+    );
+    QObject::connect(loadButton, &QPushButton::clicked, [glWidget]() {
+        QString filePath = QFileDialog::getOpenFileName(
+            nullptr, "Open OBJ File", "", "OBJ Files (*.obj)");
+        
+        if (!filePath.isEmpty()) {
+            glWidget->loadOBJ(filePath);
+        }
+    });
+    paramLayout->addWidget(loadButton);
     
     // 添加边界选项
     QGroupBox *boundaryGroup = new QGroupBox("Boundary Type");
