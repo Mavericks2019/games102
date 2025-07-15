@@ -574,3 +574,34 @@ void GLWidget::resetLoopSubdivision()
     updateBuffersFromOpenMesh();
     update();
 }
+
+// void GLWidget::setBoundaryType(BoundaryType type) {
+//     boundaryType = type;
+// }
+
+// void GLWidget::performParameterization() {
+//     if (!modelLoaded || openMesh.n_vertices() == 0) return;
+    
+//     // 1. 检测边界顶点
+//     std::vector<Mesh::VertexHandle> boundaryVertices;
+//     // ... 实现边界检测代码
+    
+//     // 2. 根据选择的边界类型映射到2D
+//     switch(boundaryType) {
+//     case Rectangle:
+//         // 映射到矩形边界
+//         //mapToRectangle(boundaryVertices);
+//         break;
+//     case Circle:
+//         // 映射到圆形边界
+//         //mapToCircle(boundaryVertices);
+//         break;
+//     }
+    
+//     // 3. 内部顶点的参数化（使用谐波映射等）
+//     parameterizeInteriorVertices();
+    
+//     // 4. 更新网格和渲染
+//     updateBuffersFromOpenMesh();
+//     update();
+// }

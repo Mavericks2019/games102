@@ -19,6 +19,7 @@
 #include <QCheckBox>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
+#include <QSplitter>
 
 // 创建网格操作组
 QGroupBox* createMeshOpGroup(GLWidget* glWidget) {
@@ -76,6 +77,25 @@ QGroupBox* createMeshOpGroup(GLWidget* glWidget) {
     meshOpLayout->addWidget(resetMeshOpButton);
     
     return meshOpGroup;
+}
+
+QWidget* createParameterizationTab(GLWidget* glWidget) {
+    QWidget *paramTab = new QWidget;
+    QHBoxLayout *paramLayout = new QHBoxLayout(paramTab);
+    
+    // 左侧显示原始模型
+    GLWidget *paramGLWidget = new GLWidget;
+    // 这里需要同步模型数据，可以使用信号槽机制或直接复制网格数据
+    // 简化示例：paramGLWidget->setMesh(glWidget->getMesh());
+    
+    // 添加分割器
+    QSplitter *splitter = new QSplitter(Qt::Horizontal);
+    splitter->addWidget(paramGLWidget);
+    splitter->setSizes(QList<int>() << 1000); // 初始大小比例
+    
+    paramLayout->addWidget(splitter);
+    
+    return paramTab;
 }
 
 // 创建Loop细分控制组
@@ -467,6 +487,61 @@ QWidget* createOBJControlPanel(GLWidget* glWidget, QLabel* pointInfoLabel, QWidg
     return objControlPanel;
 }
 
+// 创建参数化控制面板
+QWidget* createParameterizationControlPanel(GLWidget* glWidget) {
+    QWidget *paramControlPanel = new QWidget;
+    QVBoxLayout *paramLayout = new QVBoxLayout(paramControlPanel);
+    
+    // 添加边界选项
+    QGroupBox *boundaryGroup = new QGroupBox("Boundary Type");
+    boundaryGroup->setStyleSheet("QGroupBox { color: white; }");
+    QVBoxLayout *boundaryLayout = new QVBoxLayout(boundaryGroup);
+    
+    QRadioButton *rectRadio = new QRadioButton("Rectangle");
+    QRadioButton *circleRadio = new QRadioButton("Circle");
+    rectRadio->setChecked(true);
+    
+    boundaryLayout->addWidget(rectRadio);
+    boundaryLayout->addWidget(circleRadio);
+    paramLayout->addWidget(boundaryGroup);
+    
+    // 添加执行按钮
+    QPushButton *paramButton = new QPushButton("Perform Parameterization");
+    paramButton->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #505050;"
+        "   color: white;"
+        "   border: none;"
+        "   padding: 10px 20px;"
+        "   font-size: 16px;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:hover { background-color: #606060; }"
+    );
+    paramLayout->addWidget(paramButton);
+    
+    // 添加参数化选项
+    QGroupBox *paramOptionsGroup = new QGroupBox("Parameterization Options");
+    paramOptionsGroup->setStyleSheet("QGroupBox { color: white; }");
+    QFormLayout *optionsLayout = new QFormLayout(paramOptionsGroup);
+    
+    QDoubleSpinBox *toleranceSpinBox = new QDoubleSpinBox;
+    toleranceSpinBox->setRange(0.0001, 0.1);
+    toleranceSpinBox->setValue(0.001);
+    toleranceSpinBox->setDecimals(5);
+    
+    QSpinBox *maxIterSpinBox = new QSpinBox;
+    maxIterSpinBox->setRange(10, 10000);
+    maxIterSpinBox->setValue(500);
+    
+    optionsLayout->addRow("Convergence Tolerance:", toleranceSpinBox);
+    optionsLayout->addRow("Max Iterations:", maxIterSpinBox);
+    paramLayout->addWidget(paramOptionsGroup);
+    
+    paramLayout->addStretch();
+    return paramControlPanel;
+}
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -497,7 +572,7 @@ int main(int argc, char *argv[])
 
     // 创建主窗口
     QWidget mainWindow;
-    mainWindow.resize(1920, 1080);
+    mainWindow.resize(1920, 1200); // 扩大窗口高度
     
     // 创建主布局
     QHBoxLayout *mainLayout = new QHBoxLayout(&mainWindow);
@@ -508,8 +583,9 @@ int main(int argc, char *argv[])
     // 创建TabWidget
     QTabWidget *tabWidget = new QTabWidget;
     tabWidget->addTab(glWidget, "OBJ Model");
-    mainLayout->addWidget(tabWidget, 5);
-    
+    tabWidget->addTab(createParameterizationTab(glWidget), "Parameterization"); // 参数化选项卡
+    mainLayout->addWidget(tabWidget, 5); // 5:1比例分配空间
+
     // 创建右侧控制面板
     QWidget *controlPanel = new QWidget;
     QVBoxLayout *controlLayout = new QVBoxLayout(controlPanel);
@@ -530,10 +606,23 @@ int main(int argc, char *argv[])
 
     // ==== OBJ控制面板 ====
     stackedControlLayout->addWidget(createOBJControlPanel(glWidget, pointInfoLabel, &mainWindow));
-
+    
+    // ==== 参数化控制面板 ====
+    stackedControlLayout->addWidget(createParameterizationControlPanel(glWidget));
+    
     // ==== 网格操作组 ====
     controlLayout->addWidget(createMeshOpGroup(glWidget));
     controlLayout->addWidget(createLoopSubdivisionGroup(glWidget));
+    
+    // 连接Tab切换信号
+    QObject::connect(tabWidget, &QTabWidget::currentChanged, [stackedControlLayout](int index) {
+        if (index == 1) { // 参数化选项卡
+            stackedControlLayout->setCurrentIndex(1); // 显示参数化控制面板
+        } else {
+            stackedControlLayout->setCurrentIndex(0); // 显示普通控制面板
+        }
+    });
+    
     // 将控制面板添加到主布局
     mainLayout->addWidget(controlPanel);
     

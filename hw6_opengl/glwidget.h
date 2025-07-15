@@ -50,6 +50,14 @@ public:
         CotangentWithArea, // 新增的带面积迭代方法
         EigenSparseSolver  // 新增Eigen稀疏求解器方法
     };
+        // 添加边界类型枚举
+    enum BoundaryType {
+        Rectangle,
+        Circle
+    };
+    BoundaryType boundaryType = Rectangle; // 当前边界类型
+    void setBoundaryType(BoundaryType type); // 设置边界类型
+    void performParameterization(); // 执行参数化
     explicit GLWidget(QWidget *parent = nullptr);
     ~GLWidget();
     void setSurfaceColor(const QVector3D& color);
