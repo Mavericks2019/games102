@@ -87,22 +87,22 @@ QWidget* createParameterizationTab(GLWidget* glWidget) {
     // 使用分割器创建左右两个视图
     QSplitter *splitter = new QSplitter(Qt::Horizontal);
     
-    // 左侧显示原始模型
+    // 创建专用左侧视图（不再使用主GLWidget）
     GLWidget *leftGLWidget = new GLWidget;
-    // 复制主GLWidget的模型数据
-    leftGLWidget->openMesh = glWidget->openMesh;
-    leftGLWidget->originalMesh = glWidget->originalMesh;
-    leftGLWidget->modelLoaded = glWidget->modelLoaded;
-    leftGLWidget->updateBuffersFromOpenMesh();
     
-    // 右侧显示参数化结果（初始为空）
+    // 创建右侧视图并初始化
     GLWidget *rightGLWidget = new GLWidget;
     
+    // 添加视图到分割器
     splitter->addWidget(leftGLWidget);
     splitter->addWidget(rightGLWidget);
     splitter->setSizes(QList<int>() << 500 << 500); // 平均分配空间
     
     paramLayout->addWidget(splitter);
+    
+    // 保存视图指针供后续使用
+    paramTab->setProperty("leftGLWidget", QVariant::fromValue(leftGLWidget));
+    paramTab->setProperty("rightGLWidget", QVariant::fromValue(rightGLWidget));
     
     return paramTab;
 }
@@ -496,12 +496,16 @@ QWidget* createOBJControlPanel(GLWidget* glWidget, QLabel* pointInfoLabel, QWidg
     return objControlPanel;
 }
 
-// 创建参数化控制面板（移除网格操作部分）
-QWidget* createParameterizationControlPanel(GLWidget* glWidget) {
+// 创建参数化控制面板（添加paramTab参数）
+QWidget* createParameterizationControlPanel(GLWidget* glWidget, QWidget* paramTab) {
     QWidget *paramControlPanel = new QWidget;
     QVBoxLayout *paramLayout = new QVBoxLayout(paramControlPanel);
     
-    // 添加加载OBJ按钮（保留加载功能）
+    // 获取参数化选项卡中的视图
+    GLWidget *leftGLWidget = paramTab->property("leftGLWidget").value<GLWidget*>();
+    GLWidget *rightGLWidget = paramTab->property("rightGLWidget").value<GLWidget*>();
+    
+    // 添加加载OBJ按钮（同时加载到左侧视图）
     QPushButton *loadButton = new QPushButton("Load OBJ File");
     loadButton->setStyleSheet(
         "QPushButton {"
@@ -514,12 +518,14 @@ QWidget* createParameterizationControlPanel(GLWidget* glWidget) {
         "}"
         "QPushButton:hover { background-color: #606060; }"
     );
-    QObject::connect(loadButton, &QPushButton::clicked, [glWidget]() {
+    QObject::connect(loadButton, &QPushButton::clicked, [glWidget, leftGLWidget]() {
         QString filePath = QFileDialog::getOpenFileName(
             nullptr, "Open OBJ File", "", "OBJ Files (*.obj)");
         
         if (!filePath.isEmpty()) {
+            // 同时加载到主视图和左侧视图
             glWidget->loadOBJ(filePath);
+            leftGLWidget->loadOBJ(filePath);
         }
     });
     paramLayout->addWidget(loadButton);
@@ -604,19 +610,35 @@ int main(int argc, char *argv[])
 
     // 创建主窗口
     QWidget mainWindow;
-    mainWindow.resize(1920, 1200); // 扩大窗口高度
+    mainWindow.resize(2480, 1200); // 扩大窗口尺寸
     
     // 创建主布局
     QHBoxLayout *mainLayout = new QHBoxLayout(&mainWindow);
+    mainLayout->setContentsMargins(10, 10, 10, 10); // 增加边距
     
     // 创建OpenGL窗口
     GLWidget *glWidget = new GLWidget;
     
     // 创建TabWidget
     QTabWidget *tabWidget = new QTabWidget;
-    tabWidget->addTab(glWidget, "OBJ Model");
-    tabWidget->addTab(createParameterizationTab(glWidget), "Parameterization"); // 参数化选项卡
-    mainLayout->addWidget(tabWidget, 5); // 5:1比例分配空间
+    tabWidget->setStyleSheet(
+        "QTabWidget::pane { border: 1px solid #444; }"
+        "QTabBar::tab { background: #505050; color: white; padding: 8px; }"
+        "QTabBar::tab:selected { background: #606060; }"
+    );
+    
+    // 创建OBJ选项卡
+    QWidget *objTab = new QWidget;
+    QHBoxLayout *objTabLayout = new QHBoxLayout(objTab);
+    objTabLayout->addWidget(glWidget); // 主视图全屏显示
+    tabWidget->addTab(objTab, "OBJ Model");
+    
+    // 创建参数化选项卡
+    QWidget *paramTab = createParameterizationTab(glWidget);
+    tabWidget->addTab(paramTab, "Parameterization");
+    
+    // 增加TabWidget在布局中的权重
+    mainLayout->addWidget(tabWidget, 8); // 8:2比例分配空间
 
     // 创建右侧控制面板
     QWidget *controlPanel = new QWidget;
@@ -640,7 +662,7 @@ int main(int argc, char *argv[])
     stackedControlLayout->addWidget(createOBJControlPanel(glWidget, pointInfoLabel, &mainWindow));
     
     // ==== 参数化控制面板 ====
-    stackedControlLayout->addWidget(createParameterizationControlPanel(glWidget));
+    stackedControlLayout->addWidget(createParameterizationControlPanel(glWidget, paramTab));
     
     // ==== 网格操作组 ====
     controlLayout->addWidget(createMeshOpGroup(glWidget));
