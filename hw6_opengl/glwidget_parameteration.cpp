@@ -4,43 +4,74 @@
 #include "glwidget.h"
 #include <vector>
 #include <queue>
-#include <fstream> // 用于输出到文件
+#include <fstream>
+#include <Eigen/SparseLU>
 
 // 边界映射到圆形
 void GLWidget::mapBoundaryToCircle() {
     if (!modelLoaded || openMesh.n_vertices() == 0) return;
 
-    // 收集边界顶点
-    std::vector<Mesh::VertexHandle> boundaryVertices;
-    for (auto vh : openMesh.vertices()) {
-        if (openMesh.is_boundary(vh)) {
-            boundaryVertices.push_back(vh);
+    // 查找起始边界点
+    Mesh::VertexHandle start_v;
+    for(auto vh : openMesh.vertices()) {
+        if(openMesh.is_boundary(vh)) {
+            start_v = vh;
+            break;
         }
     }
-    if (boundaryVertices.empty()) return;
-
-    // 按角度排序（逆时针）
-    Mesh::Point center(0, 0, 0);
-    for (auto vh : boundaryVertices) {
-        center += openMesh.point(vh);
+    
+    // 获取有序边界顶点
+    std::vector<Mesh::VertexHandle> boundary;
+    Mesh::VertexHandle pre, now;
+    boundary.push_back(start_v);
+    now = start_v;
+    
+    // 查找下一个边界点
+    for(auto vv_it = openMesh.vv_begin(now); vv_it != openMesh.vv_end(now); ++vv_it) {
+        if(openMesh.is_boundary(*vv_it)) {
+            pre = now;
+            now = *vv_it;
+            break;
+        }
     }
-    center /= boundaryVertices.size();
+    
+    // 遍历边界
+    while(now != start_v) {
+        boundary.push_back(now);
+        Mesh::VertexHandle next;
+        for(auto vv_it = openMesh.vv_begin(now); vv_it != openMesh.vv_end(now); ++vv_it) {
+            if(openMesh.is_boundary(*vv_it) && *vv_it != pre) {
+                next = *vv_it;
+                break;
+            }
+        }
+        pre = now;
+        now = next;
+    }
 
-    // 排序函数
-    auto angleSort = [&](const Mesh::VertexHandle& a, const Mesh::VertexHandle& b) {
-        Mesh::Point pa = openMesh.point(a) - center;
-        Mesh::Point pb = openMesh.point(b) - center;
-        return atan2(pa[1], pa[0]) < atan2(pb[1], pb[0]);
-    };
-    std::sort(boundaryVertices.begin(), boundaryVertices.end(), angleSort);
-
+    // 计算总弧长
+    float arc_len = 0.0f;
+    for(int i = 1; i < boundary.size(); ++i) {
+        arc_len += (openMesh.point(boundary[i]) - openMesh.point(boundary[i-1])).norm();
+    }
+    arc_len += (openMesh.point(boundary[boundary.size()-1]) - openMesh.point(boundary[0])).norm();
+    
+    // 计算每段弧长对应的角度增量
+    std::vector<float> delta;
+    for(int i = 1; i < boundary.size(); ++i) {
+        float seg_len = (openMesh.point(boundary[i]) - openMesh.point(boundary[i-1])).norm();
+        delta.push_back(2.0f * M_PI * (seg_len / arc_len));
+    }
+    
     // 映射到单位圆
-    const float PI = 3.14159265358979323846f;
-    for (size_t i = 0; i < boundaryVertices.size(); i++) {
-        float angle = 2 * PI * i / boundaryVertices.size();
-        float x = -cos(angle);
-        float y = -sin(angle);
-        openMesh.set_point(boundaryVertices[i], Mesh::Point(x, y, 0));
+    float angle_now = 0.0f;
+    for(size_t i = 0; i < boundary.size(); ++i) {
+        float x = cos(angle_now);
+        float y = sin(angle_now);
+        openMesh.set_point(boundary[i], Mesh::Point(x, y, 0));
+        if(i < boundary.size() - 1) {
+            angle_now += delta[i];
+        }
     }
 }
 
@@ -48,92 +79,88 @@ void GLWidget::mapBoundaryToCircle() {
 void GLWidget::mapBoundaryToRectangle() {
     if (!modelLoaded || openMesh.n_vertices() == 0) return;
 
-    // 收集边界顶点
-    std::vector<Mesh::VertexHandle> boundaryVertices;
-    for (auto vh : openMesh.vertices()) {
-        if (openMesh.is_boundary(vh)) {
-            boundaryVertices.push_back(vh);
+    // 查找起始边界点
+    Mesh::VertexHandle start_v;
+    for(auto vh : openMesh.vertices()) {
+        if(openMesh.is_boundary(vh)) {
+            start_v = vh;
+            break;
         }
     }
-    if (boundaryVertices.empty()) return;
-
-    // 按角度排序（逆时针）
-    Mesh::Point center(0, 0, 0);
-    for (auto vh : boundaryVertices) {
-        center += openMesh.point(vh);
-    }
-    center /= boundaryVertices.size();
-
-    // 排序函数
-    auto angleSort = [&](const Mesh::VertexHandle& a, const Mesh::VertexHandle& b) {
-        Mesh::Point pa = openMesh.point(a) - center;
-        Mesh::Point pb = openMesh.point(b) - center;
-        return atan2(pa[1], pa[0]) < atan2(pb[1], pb[0]);
-    };
-    std::sort(boundaryVertices.begin(), boundaryVertices.end(), angleSort);
-
-    // 计算边界弦长
-    float totalLength = 0.0f;
-    std::vector<float> lengths;
-    for (size_t i = 0; i < boundaryVertices.size(); i++) {
-        size_t next = (i + 1) % boundaryVertices.size();
-        Mesh::Point p1 = openMesh.point(boundaryVertices[i]);
-        Mesh::Point p2 = openMesh.point(boundaryVertices[next]);
-        float dist = (p2 - p1).norm();
-        lengths.push_back(dist);
-        totalLength += dist;
-    }
-
-    // 映射到矩形边界
-    int n = boundaryVertices.size();
-    int sides[4] = {n/4, n/4, n/4, n/4};
-    int remainder = n % 4;
-    for (int i = 0; i < remainder; i++) {
-        sides[i]++;
-    }
-
-    // 初始化边界点
-    int index = 0;
-    float accum = 0.0f;
     
-    // 左边 (x=-1, y从1到-1)
-    float y = 1.0f;
-    for (int i = 0; i < sides[0]; i++) {
-        accum += lengths[index];
-        float ratio = accum / totalLength;
-        float yPos = 1.0f - 2.0f * ratio * (sides[0]/float(n));
-        openMesh.set_point(boundaryVertices[index], Mesh::Point(-1.0f, yPos, 0));
-        index++;
+    // 获取有序边界顶点
+    std::vector<Mesh::VertexHandle> boundary;
+    Mesh::VertexHandle pre, now;
+    boundary.push_back(start_v);
+    now = start_v;
+    
+    // 查找下一个边界点
+    for(auto vv_it = openMesh.vv_begin(now); vv_it != openMesh.vv_end(now); ++vv_it) {
+        if(openMesh.is_boundary(*vv_it)) {
+            pre = now;
+            now = *vv_it;
+            break;
+        }
+    }
+    
+    // 遍历边界
+    while(now != start_v) {
+        boundary.push_back(now);
+        Mesh::VertexHandle next;
+        for(auto vv_it = openMesh.vv_begin(now); vv_it != openMesh.vv_end(now); ++vv_it) {
+            if(openMesh.is_boundary(*vv_it) && *vv_it != pre) {
+                next = *vv_it;
+                break;
+            }
+        }
+        pre = now;
+        now = next;
     }
 
-    // 下边 (x从-1到1, y=-1)
-    float x = -1.0f;
-    for (int i = 0; i < sides[1]; i++) {
-        accum += lengths[index];
-        float ratio = accum / totalLength;
-        float xPos = -1.0f + 2.0f * ratio * (sides[1]/float(n));
-        openMesh.set_point(boundaryVertices[index], Mesh::Point(xPos, -1.0f, 0));
-        index++;
+    const int n = boundary.size();
+    const float length = 1.0f; // 正方形边长
+    
+    // 计算四条边上的点数（尽可能平均分配）
+    int side1 = n / 4;
+    int side2 = n / 4;
+    int side3 = n / 4;
+    int side4 = n - 3 * (n / 4);
+    
+    // 设置四个角点
+    openMesh.set_point(boundary[0], Mesh::Point(0.0f, 0.0f, 0.0f));
+    openMesh.set_point(boundary[side1], Mesh::Point(0.0f, length, 0.0f));
+    openMesh.set_point(boundary[side1 + side2], Mesh::Point(length, length, 0.0f));
+    openMesh.set_point(boundary[side1 + side2 + side3], Mesh::Point(length, 0.0f, 0.0f));
+    
+    // 左边 (y: 0 → length)
+    float delta = length / side1;
+    for (int i = 1; i < side1; ++i) {
+        float y = i * delta;
+        openMesh.set_point(boundary[i], Mesh::Point(0.0f, y, 0.0f));
     }
-
-    // 右边 (x=1, y从-1到1)
-    y = -1.0f;
-    for (int i = 0; i < sides[2]; i++) {
-        accum += lengths[index];
-        float ratio = accum / totalLength;
-        float yPos = -1.0f + 2.0f * ratio * (sides[2]/float(n));
-        openMesh.set_point(boundaryVertices[index], Mesh::Point(1.0f, yPos, 0));
-        index++;
+    
+    // 上边 (x: 0 → length)
+    delta = length / side2;
+    for (int i = 1; i < side2; ++i) {
+        int idx = side1 + i;
+        float x = i * delta;
+        openMesh.set_point(boundary[idx], Mesh::Point(x, length, 0.0f));
     }
-
-    // 上边 (x从1到-1, y=1)
-    x = 1.0f;
-    for (int i = 0; i < sides[3]; i++) {
-        accum += lengths[index];
-        float ratio = accum / totalLength;
-        float xPos = 1.0f - 2.0f * ratio * (sides[3]/float(n));
-        openMesh.set_point(boundaryVertices[index], Mesh::Point(xPos, 1.0f, 0));
-        index++;
+    
+    // 右边 (y: length → 0)
+    delta = length / side3;
+    for (int i = 1; i < side3; ++i) {
+        int idx = side1 + side2 + i;
+        float y = length - i * delta;
+        openMesh.set_point(boundary[idx], Mesh::Point(length, y, 0.0f));
+    }
+    
+    // 下边 (x: length → 0)
+    delta = length / side4;
+    for (int i = 1; i < side4; ++i) {
+        int idx = side1 + side2 + side3 + i;
+        float x = length - i * delta;
+        openMesh.set_point(boundary[idx], Mesh::Point(x, 0.0f, 0.0f));
     }
 }
 
@@ -151,45 +178,52 @@ void GLWidget::solveParameterization() {
     std::vector<std::map<int, float>> weights(openMesh.n_vertices());
     for (auto vh : openMesh.vertices()) {
         int i = vh.idx();
-        for (auto vv_it = openMesh.vv_begin(vh); vv_it != openMesh.vv_end(vh); ++vv_it) {
-            int j = vv_it->idx();
-            float weight = 0.0f;
-            
-            auto heh = openMesh.find_halfedge(vh, *vv_it);
-            if (!heh.is_valid()) continue;
-            
-            auto fh = openMesh.face_handle(heh);
-            auto opp_heh = openMesh.opposite_halfedge_handle(heh);
-            auto opp_fh = openMesh.face_handle(opp_heh);
-            
-            if (fh.is_valid()) {
-                auto next_heh = openMesh.next_halfedge_handle(heh);
-                auto vk = openMesh.to_vertex_handle(next_heh);
-                weight += cotangent(openMesh.point(vk), openMesh.point(vh), openMesh.point(*vv_it));
+        for (auto heh : openMesh.voh_range(vh)) {
+            if (!openMesh.is_boundary(heh)) {
+                auto vj = openMesh.to_vertex_handle(heh);
+                int j = vj.idx();
+                
+                // 计算两个相邻三角形的角度
+                auto from = openMesh.from_vertex_handle(heh);
+                auto to = openMesh.to_vertex_handle(heh);
+                auto next = openMesh.next_halfedge_handle(heh);
+                auto opp_next = openMesh.next_halfedge_handle(openMesh.opposite_halfedge_handle(heh));
+                
+                auto p1 = openMesh.point(from);
+                auto p2 = openMesh.point(to);
+                auto p3 = openMesh.point(openMesh.to_vertex_handle(next));
+                auto p4 = openMesh.point(openMesh.to_vertex_handle(opp_next));
+                
+                // 计算两个角度
+                Eigen::Vector3f v1 = {p1[0]-p2[0], p1[1]-p2[1], p1[2]-p2[2]};
+                Eigen::Vector3f v2 = {p3[0]-p2[0], p3[1]-p2[1], p3[2]-p2[2]};
+                Eigen::Vector3f v3 = {p4[0]-p2[0], p4[1]-p2[1], p4[2]-p2[2]};
+                
+                float angle1 = acos(v1.dot(v2) / (v1.norm() * v2.norm()));
+                float angle2 = acos(v1.dot(v3) / (v1.norm() * v3.norm()));
+                
+                // 计算余切权重
+                float w1 = 1.0f / tan(angle1);
+                float w2 = 1.0f / tan(angle2);
+                float w = (w1 + w2) / 2.0f;  // 平均权重
+                
+                weights[i][j] = w;
             }
-            
-            if (opp_fh.is_valid()) {
-                auto opp_next_heh = openMesh.next_halfedge_handle(opp_heh);
-                auto vl = openMesh.to_vertex_handle(opp_next_heh);
-                weight += cotangent(openMesh.point(vl), openMesh.point(vh), openMesh.point(*vv_it));
-            }
-            
-            weights[i][j] = weight;
         }
     }
 
-    // 构建线性方程组 (只求解x和y坐标)
+    // 构建线性方程组
     using namespace Eigen;
     using SpMat = SparseMatrix<float>;
     using Triplet = Triplet<float>;
     
     int n = openMesh.n_vertices();
     SpMat A(n, n);
-    VectorXf bx(n), by(n);
+    VectorXf b_u(n), b_v(n);
     VectorXf x(n), y(n);
     
-    bx.setZero();
-    by.setZero();
+    b_u.setZero();
+    b_v.setZero();
     
     std::vector<Triplet> triplets;
     triplets.reserve(n * 10);
@@ -198,8 +232,8 @@ void GLWidget::solveParameterization() {
         if (isBoundary[i]) {
             // 边界顶点：固定位置
             triplets.push_back(Triplet(i, i, 1.0f));
-            bx[i] = openMesh.point(Mesh::VertexHandle(i))[0];
-            by[i] = openMesh.point(Mesh::VertexHandle(i))[1];
+            b_u[i] = openMesh.point(Mesh::VertexHandle(i))[0];
+            b_v[i] = openMesh.point(Mesh::VertexHandle(i))[1];
         } else {
             // 内部顶点：使用余切权重
             float totalWeight = 0.0f;
@@ -208,8 +242,8 @@ void GLWidget::solveParameterization() {
                 totalWeight += w;
             }
             triplets.push_back(Triplet(i, i, -totalWeight));
-            bx[i] = 0.0f;
-            by[i] = 0.0f;
+            b_u[i] = 0.0f;
+            b_v[i] = 0.0f;
         }
     }
     
@@ -217,20 +251,21 @@ void GLWidget::solveParameterization() {
     A.setFromTriplets(triplets.begin(), triplets.end());
     A.makeCompressed();
     
-    // 使用BiCGSTAB求解器
-    Eigen::BiCGSTAB<SpMat> solver;
-    solver.setMaxIterations(1000);
-    solver.setTolerance(1e-6);
+    // 使用SparseLU求解器
+    Eigen::SparseLU<SpMat> solver;
+    solver.analyzePattern(A);
+    solver.factorize(A);
     
-    // 求解x坐标
-    solver.compute(A);
-    x = solver.solve(bx);
+    if (solver.info() != Eigen::Success) {
+        std::cerr << "Matrix factorization failed!" << std::endl;
+        return;
+    }
     
-    // 求解y坐标
-    solver.compute(A); // 重新计算分解
-    y = solver.solve(by);
+    // 求解坐标
+    x = solver.solve(b_u);
+    y = solver.solve(b_v);
     
-    // 更新顶点位置 (z坐标设为0)
+    // 更新顶点位置
     for (int i = 0; i < n; i++) {
         Mesh::Point newPos(x[i], y[i], 0.0f);
         openMesh.set_point(Mesh::VertexHandle(i), newPos);

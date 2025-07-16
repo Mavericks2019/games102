@@ -651,11 +651,11 @@ namespace UIUtils {
         rectRadio->setChecked(true);
 
         // 连接边界选项信号
-        QObject::connect(rectRadio, &QRadioButton::clicked, [glWidget]() {
-            glWidget->setBoundaryType(GLWidget::Rectangle);
+        QObject::connect(rectRadio, &QRadioButton::clicked, [rightView]() {
+            rightView->setBoundaryType(GLWidget::Rectangle);
         });
-        QObject::connect(circleRadio, &QRadioButton::clicked, [glWidget]() {
-            glWidget->setBoundaryType(GLWidget::Circle);
+        QObject::connect(circleRadio, &QRadioButton::clicked, [rightView]() {
+            rightView->setBoundaryType(GLWidget::Circle);
         });
 
         boundaryLayout->addWidget(rectRadio);
