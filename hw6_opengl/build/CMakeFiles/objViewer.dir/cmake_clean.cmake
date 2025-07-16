@@ -8,6 +8,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o"
   "CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o"
   "CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o"
+  "CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o"
   "CMakeFiles/objViewer.dir/main.cpp.o"
   "CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o"
   "CMakeFiles/objViewer.dir/qrc_shaders.cpp.o"

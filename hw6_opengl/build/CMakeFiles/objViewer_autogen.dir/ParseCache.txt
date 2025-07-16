@@ -8,3 +8,4 @@
 /opt/games102/hw6_opengl/glwidget_mesh_simplification.cpp
 /opt/games102/hw6_opengl/main.cpp
 /opt/games102/hw6_opengl/glwidget_minimal_surface.cpp
+/opt/games102/hw6_opengl/glwidget_parameteration.cpp

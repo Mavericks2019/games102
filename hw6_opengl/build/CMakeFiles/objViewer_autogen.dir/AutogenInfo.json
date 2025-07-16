@@ -77,6 +77,7 @@
 		[ "/opt/games102/hw6_opengl/glwidget_mesh_loader.cpp", "MU" ],
 		[ "/opt/games102/hw6_opengl/glwidget_mesh_simplification.cpp", "MU" ],
 		[ "/opt/games102/hw6_opengl/glwidget_minimal_surface.cpp", "MU" ],
+		[ "/opt/games102/hw6_opengl/glwidget_parameteration.cpp", "MU" ],
 		[ "/opt/games102/hw6_opengl/main.cpp", "MU" ]
 	],
 	"UIC_OPTIONS" : [],

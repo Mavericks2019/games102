@@ -102,7 +102,6 @@ public:
     void resetMeshOperation();                        // Reset to original mesh (重置到原始网格)
     void resetLoopSubdivision();                      // Reset subdivision state (重置细分状态)
     void setBoundaryType(BoundaryType type);          // Set parameterization boundary type (设置参数化边界类型)
-    void performParameterization();                   // Perform mesh parameterization (执行网格参数化)
      int getCurrentSubdivisionLevel()                // Get current subdivision level (获取当前细分级别)
      const { return subdivisionLevel; }           
 
@@ -126,9 +125,21 @@ public:
     void performCotangentWithAreaIteration(int iterations, float lambda); // Area-weighted smoothing (带面积加权的平滑)
     void performEigenSparseSolverIteration();         // Solve with Eigen sparse solver (使用Eigen稀疏求解器求解)
     void setIterationMethod(IterationMethod method) { iterationMethod = method; } // Set smoothing method (设置平滑方法)
-
+// ========== PARAMETERIZATION ========== //
+public:
+    void performParameterization();                   // Perform mesh parameterization (执行网格参数化)
+    void mapBoundaryToCircle();                      // Map boundary to circle (映射边界到圆形)
+    void mapBoundaryToRectangle();                   // Map boundary to rectangle (映射边界到矩形)
+    void resetViewForParameterization()
+    {
+        rotationX = 0;
+        rotationY = 0;
+        zoom = 1.0f;
+        update();
+    }                                                // 新增：为参数化重置视图
+    void solveParameterization();                    // Solve parameterization using Eigen (使用Eigen求解参数化)
     // ========== OPENGL RESOURCES ========== //
-protected:
+public:
     void initializeShaders();                         // Compile/link shaders (编译/链接着色器)
     void updateBuffersFromOpenMesh();                 // Update GPU buffers from mesh data (从网格数据更新GPU缓冲区)
 

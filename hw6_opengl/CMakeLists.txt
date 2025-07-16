@@ -33,6 +33,7 @@ add_executable(${PROJECT_NAME}
     glwidget_minimal_surface.cpp
     glwidget_loop_subdivision.cpp
     glwidget_mesh_simplification.cpp
+    glwidget_parameteration.cpp
     glwidget.h
     ${RESOURCE_FILES}
 )

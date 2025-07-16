@@ -648,7 +648,15 @@ namespace UIUtils {
         QRadioButton *rectRadio = new QRadioButton("Rectangle");
         QRadioButton *circleRadio = new QRadioButton("Circle");
         rectRadio->setChecked(true);
-        
+
+        // 连接边界选项信号
+        QObject::connect(rectRadio, &QRadioButton::clicked, [glWidget]() {
+            glWidget->setBoundaryType(GLWidget::Rectangle);
+        });
+        QObject::connect(circleRadio, &QRadioButton::clicked, [glWidget]() {
+            glWidget->setBoundaryType(GLWidget::Circle);
+        });
+
         boundaryLayout->addWidget(rectRadio);
         boundaryLayout->addWidget(circleRadio);
         layout->addWidget(boundaryGroup);
@@ -666,6 +674,20 @@ namespace UIUtils {
             "}"
             "QPushButton:hover { background-color: #606060; }"
         );
+
+        // 连接参数化按钮信号
+        QObject::connect(paramButton, &QPushButton::clicked, [glWidget, paramTab]() {
+            // 获取左视图并执行参数化
+            GLWidget* leftView = paramTab->property("leftGLWidget").value<GLWidget*>();
+            leftView->performParameterization();
+            
+            // 在右视图显示参数化结果
+            GLWidget* rightView = paramTab->property("rightGLWidget").value<GLWidget*>();
+            rightView->openMesh = leftView->openMesh; // 复制网格
+            rightView->updateBuffersFromOpenMesh();
+            rightView->update();
+        });
+        
         layout->addWidget(paramButton);
         
         // 添加参数化选项

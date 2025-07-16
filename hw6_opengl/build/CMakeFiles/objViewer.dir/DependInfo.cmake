@@ -10,6 +10,7 @@ set(CMAKE_DEPENDS_CHECK_CXX
   "/opt/games102/hw6_opengl/glwidget_mesh_loader.cpp" "/opt/games102/hw6_opengl/build/CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o"
   "/opt/games102/hw6_opengl/glwidget_mesh_simplification.cpp" "/opt/games102/hw6_opengl/build/CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o"
   "/opt/games102/hw6_opengl/glwidget_minimal_surface.cpp" "/opt/games102/hw6_opengl/build/CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o"
+  "/opt/games102/hw6_opengl/glwidget_parameteration.cpp" "/opt/games102/hw6_opengl/build/CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o"
   "/opt/games102/hw6_opengl/main.cpp" "/opt/games102/hw6_opengl/build/CMakeFiles/objViewer.dir/main.cpp.o"
   "/opt/games102/hw6_opengl/build/objViewer_autogen/mocs_compilation.cpp" "/opt/games102/hw6_opengl/build/CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o"
   "/opt/games102/hw6_opengl/build/qrc_shaders.cpp" "/opt/games102/hw6_opengl/build/CMakeFiles/objViewer.dir/qrc_shaders.cpp.o"

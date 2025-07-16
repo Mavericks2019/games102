@@ -195,7 +195,6 @@ void GLWidget::initializeShaders()
 void GLWidget::updateBuffersFromOpenMesh()
 {
     if (openMesh.n_vertices() == 0) return;
-    
     // 准备顶点数据 - 按顶点索引顺序存储
     std::vector<float> vertices(openMesh.n_vertices() * 3);
     std::vector<float> normals(openMesh.n_vertices() * 3);
@@ -575,9 +574,9 @@ void GLWidget::resetLoopSubdivision()
     update();
 }
 
-// void GLWidget::setBoundaryType(BoundaryType type) {
-//     boundaryType = type;
-// }
+void GLWidget::setBoundaryType(BoundaryType type) {
+    boundaryType = type;
+}
 
 // void GLWidget::performParameterization() {
 //     if (!modelLoaded || openMesh.n_vertices() == 0) return;

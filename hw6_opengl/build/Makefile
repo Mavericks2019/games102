@@ -344,6 +344,33 @@ glwidget_minimal_surface.cpp.s:
 	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.s
 .PHONY : glwidget_minimal_surface.cpp.s
 
+glwidget_parameteration.o: glwidget_parameteration.cpp.o
+
+.PHONY : glwidget_parameteration.o
+
+# target to build an object file
+glwidget_parameteration.cpp.o:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o
+.PHONY : glwidget_parameteration.cpp.o
+
+glwidget_parameteration.i: glwidget_parameteration.cpp.i
+
+.PHONY : glwidget_parameteration.i
+
+# target to preprocess a source file
+glwidget_parameteration.cpp.i:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.i
+.PHONY : glwidget_parameteration.cpp.i
+
+glwidget_parameteration.s: glwidget_parameteration.cpp.s
+
+.PHONY : glwidget_parameteration.s
+
+# target to generate assembly for a file
+glwidget_parameteration.cpp.s:
+	$(MAKE) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.s
+.PHONY : glwidget_parameteration.cpp.s
+
 main.o: main.cpp.o
 
 .PHONY : main.o
@@ -457,6 +484,9 @@ help:
 	@echo "... glwidget_minimal_surface.o"
 	@echo "... glwidget_minimal_surface.i"
 	@echo "... glwidget_minimal_surface.s"
+	@echo "... glwidget_parameteration.o"
+	@echo "... glwidget_parameteration.i"
+	@echo "... glwidget_parameteration.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
