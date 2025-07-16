@@ -577,29 +577,35 @@ void GLWidget::setBoundaryType(BoundaryType type) {
     boundaryType = type;
 }
 
-// void GLWidget::performParameterization() {
-//     if (!modelLoaded || openMesh.n_vertices() == 0) return;
+// 实现centerView函数
+void GLWidget::centerView()
+{
+    if (openMesh.n_vertices() == 0) return;
     
-//     // 1. 检测边界顶点
-//     std::vector<Mesh::VertexHandle> boundaryVertices;
-//     // ... 实现边界检测代码
+    // 计算网格的边界框
+    Mesh::Point min, max;
+    min = max = openMesh.point(*openMesh.vertices_begin());
+    for (auto vh : openMesh.vertices()) {
+        min.minimize(openMesh.point(vh));
+        max.maximize(openMesh.point(vh));
+    }
     
-//     // 2. 根据选择的边界类型映射到2D
-//     switch(boundaryType) {
-//     case Rectangle:
-//         // 映射到矩形边界
-//         //mapToRectangle(boundaryVertices);
-//         break;
-//     case Circle:
-//         // 映射到圆形边界
-//         //mapToCircle(boundaryVertices);
-//         break;
-//     }
+    // 计算中心点
+    Mesh::Point center = (min + max) * 0.5f;
     
-//     // 3. 内部顶点的参数化（使用谐波映射等）
-//     parameterizeInteriorVertices();
+    // 计算最大尺寸
+    Mesh::Point size = max - min;
+    float maxSize = std::max({size[0], size[1], size[2]});
     
-//     // 4. 更新网格和渲染
-//     updateBuffersFromOpenMesh();
-//     update();
-// }
+    // 设置合适的缩放级别
+    zoom = 1.0f;
+    if (maxSize > 0.1f) {
+        zoom = 1.0f / maxSize;
+    }
+    
+    // 重置旋转角度
+    rotationX = 0;
+    rotationY = 0;
+    
+    update();
+}

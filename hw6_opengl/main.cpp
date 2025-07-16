@@ -35,6 +35,28 @@ namespace UIUtils {
         return nullptr;
     }
 
+    QPushButton* createCenterViewButton(GLWidget* glWidget, QTabWidget* tabWidget) {
+        QPushButton *button = new QPushButton("Center View");
+        button->setStyleSheet(
+            "QPushButton {"
+            "   background-color: #505050;"
+            "   color: white;"
+            "   border: none;"
+            "   padding: 10px 20px;"
+            "   font-size: 16px;"
+            "   border-radius: 5px;"
+            "}"
+            "QPushButton:hover { background-color: #606060; }"
+        );
+        QObject::connect(button, &QPushButton::clicked, [glWidget, tabWidget]() {
+            GLWidget* targetWidget = UIUtils::getCurrentGLWidget(glWidget, tabWidget);
+            if (targetWidget) {
+                targetWidget->centerView();
+            }
+        });
+        return button;
+    }
+
     // 创建网格操作控制组
     QGroupBox* createMeshOperationsGroup(GLWidget* glWidget, QTabWidget* tabWidget) {
         QGroupBox *group = new QGroupBox("Mesh Operations");
@@ -567,6 +589,7 @@ namespace UIUtils {
         layout->addWidget(createRenderingModeGroup(glWidget, tabWidget));
         layout->addWidget(createDisplayOptionsGroup(glWidget, tabWidget)); // 单视图显示选项
         layout->addWidget(createViewResetButton(glWidget, tabWidget));
+        layout->addWidget(createCenterViewButton(glWidget, tabWidget)); // 新增：自适应视图按钮
         layout->addWidget(createIterationMethodGroup(glWidget, tabWidget));
         layout->addWidget(createMinimalSurfaceGroup(glWidget, tabWidget));
         

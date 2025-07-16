@@ -162,6 +162,8 @@ public:
     // ========== PUBLIC MEMBER VARIABLES ========== //
 public:
     // Rendering state
+    void centerView(); // 新增：自适应调整视图
+    void normalizeMesh();
     QVector3D surfaceColor = QVector3D(1.0f, 1.0f, 0.0f);  // Surface color (表面颜色)
     bool specularEnabled = true;          // Specular highlights enabled (高光效果启用)
     QVector4D wireframeColor;             // Wireframe RGBA color (线框RGBA颜色)

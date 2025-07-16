@@ -164,6 +164,39 @@ void GLWidget::mapBoundaryToRectangle() {
     }
 }
 
+// 归一化网格到[-1,1]×[-1,1]范围内，中心在原点
+void GLWidget::normalizeMesh() {
+    if (!modelLoaded || openMesh.n_vertices() == 0) return;
+    
+    // 计算边界框
+    Mesh::Point min(1e9, 1e9, 0), max(-1e9, -1e9, 0);
+    for (auto vh : openMesh.vertices()) {
+        auto p = openMesh.point(vh);
+        min[0] = std::min(min[0], p[0]);
+        min[1] = std::min(min[1], p[1]);
+        max[0] = std::max(max[0], p[0]);
+        max[1] = std::max(max[1], p[1]);
+    }
+    
+    // 计算中心点和范围
+    Mesh::Point center((min[0] + max[0]) / 2, (min[1] + max[1]) / 2, 0);
+    float range_x = max[0] - min[0];
+    float range_y = max[1] - min[1];
+    float max_range = std::max(range_x, range_y);
+    
+    // 避免除以零
+    if (max_range < 1e-6) max_range = 1.0f;
+    
+    // 归一化所有顶点到[-1,1]×[-1,1]
+    for (auto vh : openMesh.vertices()) {
+        auto p = openMesh.point(vh);
+        p -= center; // 平移到中心
+        p[0] /= max_range / 2.0f; // 缩放到[-1,1]
+        p[1] /= max_range / 2.0f;
+        openMesh.set_point(vh, p);
+    }
+}
+
 // 求解参数化
 void GLWidget::solveParameterization() {
     if (!modelLoaded || openMesh.n_vertices() == 0) return;
@@ -283,6 +316,9 @@ void GLWidget::performParameterization() {
     
     // 求解参数化
     solveParameterization();
+    
+    // 归一化网格到中心原点，范围[-1,1]
+    normalizeMesh();
     
     // 重新计算曲率
     calculateCurvatures();
