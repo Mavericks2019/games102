@@ -199,7 +199,6 @@ void GLWidget::updateBuffersFromOpenMesh()
     std::vector<float> vertices(openMesh.n_vertices() * 3);
     std::vector<float> normals(openMesh.n_vertices() * 3);
     std::vector<float> curvatures(openMesh.n_vertices());
-    
     for (auto vh : openMesh.vertices()) {
         int idx = vh.idx();
         const auto& p = openMesh.point(vh);

@@ -596,11 +596,12 @@ namespace UIUtils {
             "}"
             "QPushButton:hover { background-color: #606060; }"
         );
-        QObject::connect(loadButton, &QPushButton::clicked, [leftView]() {
+        QObject::connect(loadButton, &QPushButton::clicked, [rightView, leftView]() {
             QString filePath = QFileDialog::getOpenFileName(
                 nullptr, "Open OBJ File", "", "OBJ Files (*.obj)");
             
             if (!filePath.isEmpty()) {
+                rightView->loadOBJ(filePath);
                 leftView->loadOBJ(filePath);
             }
         });
@@ -679,13 +680,12 @@ namespace UIUtils {
         QObject::connect(paramButton, &QPushButton::clicked, [glWidget, paramTab]() {
             // 获取左视图并执行参数化
             GLWidget* leftView = paramTab->property("leftGLWidget").value<GLWidget*>();
-            leftView->performParameterization();
+            // leftView->performParameterization();
             
             // 在右视图显示参数化结果
             GLWidget* rightView = paramTab->property("rightGLWidget").value<GLWidget*>();
-            rightView->openMesh = leftView->openMesh; // 复制网格
-            rightView->updateBuffersFromOpenMesh();
-            rightView->update();
+            //rightView->openMesh = leftView->openMesh; // 复制网格
+            rightView->performParameterization();
         });
         
         layout->addWidget(paramButton);
