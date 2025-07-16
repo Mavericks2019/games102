@@ -103,7 +103,14 @@ public:
     void resetLoopSubdivision();                      // Reset subdivision state (重置细分状态)
     void setBoundaryType(BoundaryType type);          // Set parameterization boundary type (设置参数化边界类型)
      int getCurrentSubdivisionLevel()                // Get current subdivision level (获取当前细分级别)
-     const { return subdivisionLevel; }           
+     const { return subdivisionLevel; }
+    void clearMeshData(); // 清除当前网格数据
+    bool loadOBJToOpenMesh(const QString &path); // 加载OBJ文件到OpenMesh
+    void computeBoundingBox(Mesh::Point& min, Mesh::Point& max); // 计算网格的边界框
+    void centerAndScaleMesh(const Mesh::Point& center, float maxSize); // 中心化并缩放网格
+    void prepareFaceIndices(); // 准备面索引数据（包括三角剖分）
+    void prepareEdgeIndices(); // 准备边索引数据
+    void saveOriginalMesh(); // 保存原始网格状态           
 
     // ========== CURVATURE & GEOMETRY ========== //
 public:
