@@ -16,6 +16,7 @@
 #include <OpenMesh/Core/IO/Options.hh>
 #include <unordered_set>
 #include <Eigen/Dense>
+#include <QImage> // 用于生成棋格纹理
 
 using namespace OpenMesh;
 
@@ -23,6 +24,7 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
     vbo(QOpenGLBuffer::VertexBuffer),
     ebo(QOpenGLBuffer::IndexBuffer),
     faceEbo(QOpenGLBuffer::IndexBuffer),
+    texCoordBuffer(QOpenGLBuffer::VertexBuffer), // 初始化纹理坐标缓冲区
     showWireframeOverlay(false),
     hideFaces(false)  // 初始化新增成员
 {
@@ -69,6 +71,8 @@ GLWidget::~GLWidget()
     vbo.destroy();
     ebo.destroy();
     faceEbo.destroy();
+    texCoordBuffer.destroy(); // 销毁纹理坐标缓冲区
+    if (checkerboardTexture) delete checkerboardTexture; // 删除纹理对象
     doneCurrent();
 }
 
@@ -109,11 +113,15 @@ void GLWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE); // 启用多重采样抗锯齿
 
-    // 创建缓冲区和VAO - 只在这里创建一次
+    // 创建缓冲区和VAO
     vao.create();
     vbo.create();
     ebo.create();
     faceEbo.create();
+    texCoordBuffer.create(); // 创建纹理坐标缓冲区
+
+    // 生成棋格纹理
+    generateCheckerboardTexture();
 
     initializeShaders();
 }
@@ -124,6 +132,7 @@ void GLWidget::initializeShaders()
     if (wireframeProgram.isLinked()) {
         wireframeProgram.removeAllShaders();
     }
+
     if (blinnPhongProgram.isLinked()) {
         blinnPhongProgram.removeAllShaders();
     }
@@ -134,6 +143,26 @@ void GLWidget::initializeShaders()
     if (loopSubdivisionProgram.isLinked()) {
         loopSubdivisionProgram.removeAllShaders();
     }
+
+    // 初始化纹理着色器
+    if (textureProgram.isLinked()) {
+        textureProgram.removeAllShaders();
+    }
+
+    // 纹理顶点着色器
+    if (!textureProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/texture.vert")) {
+        qWarning() << "Texture vertex shader error:" << textureProgram.log();
+    }
+    
+    // 纹理片段着色器
+    if (!textureProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/texture.frag")) {
+        qWarning() << "Texture fragment shader error:" << textureProgram.log();
+    }
+    
+    if (!textureProgram.link()) {
+        qWarning() << "Texture shader link error:" << textureProgram.log();
+    }
+    
     
     if (!curvatureProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/curvature.vert")) {
         qWarning() << "Curvature vertex shader error:" << curvatureProgram.log();
@@ -271,6 +300,35 @@ void GLWidget::updateBuffersFromOpenMesh()
     } else {
         qWarning() << "Failed to find attribute location for aCurvature in curvature shader";
     }
+    
+    // // 设置纹理着色器属性
+    // textureProgram.bind();
+    // posLoc = textureProgram.attributeLocation("aPos");
+    // if (posLoc != -1) {
+    //     textureProgram.enableAttributeArray(posLoc);
+    //     textureProgram.setAttributeBuffer(posLoc, GL_FLOAT, 0, 3, 3 * sizeof(float));
+    // }
+    
+    // normalLoc = textureProgram.attributeLocation("aNormal");
+    // if (normalLoc != -1) {
+    //     textureProgram.enableAttributeArray(normalLoc);
+    //     textureProgram.setAttributeBuffer(normalLoc, GL_FLOAT, vertexSize, 3, 3 * sizeof(float));
+    // }
+
+    // // 更新纹理坐标缓冲区
+    // updateTextureCoordinates();
+    
+    // // 绑定纹理坐标缓冲区
+    // texCoordBuffer.bind();
+    // texCoordBuffer.allocate(texCoords.data(), texCoords.size() * sizeof(float));
+    
+    // int texCoordLoc = textureProgram.attributeLocation("aTexCoord");
+    // if (texCoordLoc != -1) {
+    //     textureProgram.enableAttributeArray(texCoordLoc);
+    //     textureProgram.setAttributeBuffer(texCoordLoc, GL_FLOAT, 0, 2, 2 * sizeof(float));
+    // } else {
+    //     qWarning() << "Failed to find attribute location for aTexCoord in texture shader";
+    // }
 
     ebo.bind();
     ebo.allocate(edges.data(), edges.size() * sizeof(unsigned int));
@@ -284,6 +342,19 @@ void GLWidget::updateBuffersFromOpenMesh()
 void GLWidget::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
+}
+
+void GLWidget::updateTextureCoordinates()
+{
+    texCoords.clear();
+    texCoords.reserve(openMesh.n_vertices() * 2);
+    
+    for (auto vh : openMesh.vertices()) {
+        const auto& p = openMesh.point(vh);
+        // 将顶点坐标映射到[0,1]范围作为纹理坐标
+        texCoords.push_back((p[0] + 1.0f) * 0.5f);
+        texCoords.push_back((p[1] + 1.0f) * 0.5f);
+    }
 }
 
 void GLWidget::paintGL()
@@ -335,7 +406,35 @@ void GLWidget::paintGL()
         wireframeProgram.release();
     } else {
         // 正常绘制模式
-        if (currentRenderMode == LoopSubdivision) {
+        if (currentRenderMode == TextureMapping) {
+            // 纹理映射模式
+            textureProgram.bind();
+            vao.bind();
+            faceEbo.bind();
+            
+            // 设置多边形填充
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            
+            // 设置变换矩阵
+            textureProgram.setUniformValue("model", model);
+            textureProgram.setUniformValue("view", view);
+            textureProgram.setUniformValue("projection", projection);
+            textureProgram.setUniformValue("normalMatrix", normalMatrix);
+            
+            // 绑定纹理
+            if (checkerboardTexture) {
+                checkerboardTexture->bind(0);
+                textureProgram.setUniformValue("textureSampler", 0);
+            }
+            
+            // 绘制模型
+            glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, 0);
+            
+            faceEbo.release();
+            vao.release();
+            textureProgram.release();
+        }
+        else if (currentRenderMode == LoopSubdivision) {
             loopSubdivisionProgram.bind();
             vao.bind();
             
@@ -499,8 +598,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     // 如果是参数化视图，只允许缩放，不允许旋转
-    // if (isParameterizationView) return;
-    
+    if (isParameterizationView) return;
     if (event->button() == Qt::LeftButton) {
         isDragging = true;
         lastMousePos = event->pos();
@@ -510,7 +608,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
-    // if (isParameterizationView) return;
+    if (isParameterizationView) return;
     if (event->button() == Qt::LeftButton) {
         isDragging = false;
         setCursor(Qt::ArrowCursor);
@@ -519,7 +617,8 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    // if (isParameterizationView) return;
+    // 如果是参数化视图，只允许缩放，不允许旋转
+    if (isParameterizationView) return;
     if (isDragging) {
         QPoint currentPos = event->pos();
         QPoint delta = currentPos - lastMousePos;
@@ -613,4 +712,26 @@ void GLWidget::centerView()
     rotationY = 0;
     
     update();
+}
+
+void GLWidget::generateCheckerboardTexture()
+{
+    const int size = 512;
+    QImage image(size, size, QImage::Format_RGB32);
+    
+    // 创建棋格图案
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
+            // 每16像素一个格子
+            bool isBlack = ((x / 32) % 2) ^ ((y / 32) % 2);
+            image.setPixel(x, y, isBlack ? qRgb(0, 0, 0) : qRgb(255, 255, 255));
+        }
+    }
+    
+    // 创建OpenGL纹理
+    if (checkerboardTexture) delete checkerboardTexture;
+    checkerboardTexture = new QOpenGLTexture(image.mirrored());
+    checkerboardTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    checkerboardTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+    checkerboardTexture->setWrapMode(QOpenGLTexture::Repeat);
 }

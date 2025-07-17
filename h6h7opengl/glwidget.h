@@ -94,7 +94,6 @@ public:
     void setShowWireframeOverlay(bool show);           // Show/hide wireframe overlay (显示/隐藏线框叠加)
     void setHideFaces(bool hide);                     // Hide face rendering (show wireframe only) (隐藏面渲染，仅显示线框)
     void resetView();                                 // Reset camera position (重置相机位置)
-    bool isParameterizationView = false;
 
     // ========== MESH OPERATIONS ========== //
 public:
@@ -148,10 +147,13 @@ public:
         update();
     }                                                // 新增：为参数化重置视图
     void solveParameterization();                    // Solve parameterization using Eigen (使用Eigen求解参数化)
+    void generateCheckerboardTexture();              // 生成棋格纹理
+    void updateTextureCoordinates();                 // 更新纹理坐标
     // ========== OPENGL RESOURCES ========== //
 public:
     void initializeShaders();                         // Compile/link shaders (编译/链接着色器)
     void updateBuffersFromOpenMesh();                 // Update GPU buffers from mesh data (从网格数据更新GPU缓冲区)
+    bool isParameterizationView = false;
 
     // ========== DATA STRUCTURES ========== //
     // Structure for storing Loop subdivision results
@@ -173,6 +175,10 @@ public:
     QColor bgColor;                       // Background color (背景颜色)
     RenderMode currentRenderMode;         // Current rendering mode (当前渲染模式)
     BoundaryType boundaryType = Rectangle;// Current boundary type (当前边界类型)
+
+    // 纹理相关
+    QOpenGLTexture* checkerboardTexture = nullptr; // 棋格纹理
+    std::vector<float> texCoords;          // 纹理坐标
     
     // Mesh data
     Mesh openMesh;                        // Current mesh (当前网格)
@@ -205,7 +211,7 @@ protected:
     QOpenGLShaderProgram curvatureProgram;    // Curvature visualization shader (曲率可视化着色器)
     QOpenGLShaderProgram loopSubdivisionProgram; // Loop subdivision shader (Loop细分着色器)
     QOpenGLShaderProgram textureProgram;      // 新增：纹理着色器
-    
+
     QOpenGLVertexArrayObject vao;         // Vertex array object (顶点数组对象)
     QOpenGLBuffer vbo;                    // Vertex buffer (顶点缓冲区)
     QOpenGLBuffer ebo;                    // Edge index buffer (边索引缓冲区)

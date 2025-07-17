@@ -6,6 +6,8 @@
 
 #IncludeRegexTransform: 
 
+/opt/games102/h6h7opengl/build/qrc_shaders.cpp
+
 /opt/games102/h6h7opengl/glwidget.h
 QOpenGLWidget
 -
@@ -76,6 +78,8 @@ OpenMesh/Core/IO/Options.hh
 unordered_set
 -
 Eigen/Dense
+-
+QImage
 -
 
 /usr/include/eigen3/Eigen/Cholesky
@@ -2209,6 +2213,10 @@ QtCore/qglobal.h
 /usr/include/x86_64-linux-gnu/qt5/QtGui/QColor
 qcolor.h
 /usr/include/x86_64-linux-gnu/qt5/QtGui/qcolor.h
+
+/usr/include/x86_64-linux-gnu/qt5/QtGui/QImage
+qimage.h
+/usr/include/x86_64-linux-gnu/qt5/QtGui/qimage.h
 
 /usr/include/x86_64-linux-gnu/qt5/QtGui/QKeyEvent
 qevent.h

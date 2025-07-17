@@ -361,6 +361,7 @@ CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtCore/qversiontagging.h
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QColor
+CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QImage
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QKeyEvent
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QMatrix4x4
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QMouseEvent
