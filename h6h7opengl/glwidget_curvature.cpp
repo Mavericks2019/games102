@@ -7,6 +7,9 @@ void GLWidget::calculateCurvatures()
 {
     if (openMesh.n_vertices() == 0) return;
     
+    // 如果是参数化视图，不需要重新计算曲率
+    if (isParameterizationView) return;
+    
     // 标记边界顶点
     std::vector<bool> isBoundary(openMesh.n_vertices(), false);
     for (auto vh : openMesh.vertices()) {
@@ -112,6 +115,7 @@ void GLWidget::calculateCurvatures()
         // 边界顶点保持为0
     }
 }
+
 
 Mesh::Point GLWidget::computeMeanCurvatureVector(const Mesh::VertexHandle& vh) {
     Mesh::Point H(0, 0, 0);

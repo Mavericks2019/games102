@@ -333,6 +333,12 @@ void GLWidget::solveParameterization() {
 
 // 执行参数化
 void GLWidget::performParameterization() {
+    // 保存原始曲率值
+    std::vector<float> originalCurvatures(openMesh.n_vertices());
+    for (auto vh : openMesh.vertices()) {
+        originalCurvatures[vh.idx()] = openMesh.data(vh).curvature;
+    }
+    
     // 根据边界类型映射边界
     if (boundaryType == Circle) {
         mapBoundaryToCircle();
@@ -346,8 +352,10 @@ void GLWidget::performParameterization() {
     // 归一化网格到中心原点，范围[-1,1]
     normalizeMesh();
     
-    // 重新计算曲率
-    calculateCurvatures();
+    // 恢复原始曲率值
+    for (auto vh : openMesh.vertices()) {
+        openMesh.data(vh).curvature = originalCurvatures[vh.idx()];
+    }
     
     // 更新OpenGL缓冲区
     makeCurrent();

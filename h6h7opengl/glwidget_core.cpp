@@ -96,8 +96,10 @@ void GLWidget::setRenderMode(RenderMode mode)
 {
     currentRenderMode = mode;
     if (modelLoaded) {
-        // 重新计算曲率
-        calculateCurvatures();
+        // 如果是参数化视图且是纹理模式，不需要计算曲率
+        if (!(isParameterizationView && mode == TextureMapping)) {
+            calculateCurvatures();
+        }
         
         makeCurrent();
         initializeShaders();  // 更新着色器和缓冲区
@@ -421,6 +423,9 @@ void GLWidget::paintGL()
             textureProgram.setUniformValue("projection", projection);
             textureProgram.setUniformValue("normalMatrix", normalMatrix);
             
+            // 设置是否参数化视图标志
+            textureProgram.setUniformValue("isParameterizationView", isParameterizationView);
+            
             // 绑定纹理
             if (checkerboardTexture) {
                 checkerboardTexture->bind(0);
@@ -433,6 +438,30 @@ void GLWidget::paintGL()
             faceEbo.release();
             vao.release();
             textureProgram.release();
+            
+            // 如果是参数化视图，始终显示黑色线框
+            if (isParameterizationView) {
+                // 使用线框着色器
+                wireframeProgram.bind();
+                vao.bind();
+                ebo.bind();
+
+                // 设置线条宽度
+                glLineWidth(1.0f);
+
+                // 设置黑色线框
+                wireframeProgram.setUniformValue("model", model);
+                wireframeProgram.setUniformValue("view", view);
+                wireframeProgram.setUniformValue("projection", projection);
+                wireframeProgram.setUniformValue("lineColor", QVector4D(0.0f, 0.0f, 0.0f, 1.0f)); // 黑色
+
+                // 绘制线框
+                glDrawElements(GL_LINES, edges.size(), GL_UNSIGNED_INT, 0);
+                
+                ebo.release();
+                vao.release();
+                wireframeProgram.release();
+            }
         }
         else if (currentRenderMode == LoopSubdivision) {
             loopSubdivisionProgram.bind();
@@ -528,8 +557,8 @@ void GLWidget::paintGL()
             blinnPhongProgram.release();
         }
 
-        // 如果启用了线框叠加
-        if (showWireframeOverlay) {
+        // 如果启用了线框叠加且不是参数化视图
+        if (showWireframeOverlay && !isParameterizationView) {
             // 启用多边形偏移以避免深度冲突
             glEnable(GL_POLYGON_OFFSET_LINE);
             glPolygonOffset(-1.0, -1.0);
