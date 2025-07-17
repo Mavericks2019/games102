@@ -1,0 +1,15 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource>
+    <file>shaders/wireframe.vert</file>
+    <file>shaders/wireframe.frag</file>
+    <file>shaders/blinnphong.vert</file>
+    <file>shaders/blinnphong.frag</file>
+    <file>shaders/curvature.vert</file>
+    <file>shaders/curvature.frag</file>
+    <file>shaders/loop_subdivision.vert</file>
+    <file>shaders/loop_subdivision.frag</file>
+    <file>shaders/texture.vert</file>
+    <file>shaders/texture.frag</file>
+</qresource>
+</RCC>
