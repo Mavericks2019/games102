@@ -149,6 +149,7 @@ public:
 public:
     void initializeShaders();                         // Compile/link shaders (编译/链接着色器)
     void updateBuffersFromOpenMesh();                 // Update GPU buffers from mesh data (从网格数据更新GPU缓冲区)
+    bool isParameterizationView = false;
 
     // ========== DATA STRUCTURES ========== //
     // Structure for storing Loop subdivision results

@@ -111,7 +111,6 @@ void GLWidget::loadOBJ(const QString &path)
 {
     // 1. 清除旧数据
     clearMeshData();
-    
     // 2. 加载OBJ文件
     if (!loadOBJToOpenMesh(path)) {
         qWarning() << "Failed to load mesh:" << path;

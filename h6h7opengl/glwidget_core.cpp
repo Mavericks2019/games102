@@ -498,6 +498,8 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
+    // 如果是参数化视图，只允许缩放，不允许旋转
+    if (isParameterizationView) return;
     if (event->button() == Qt::LeftButton) {
         isDragging = true;
         lastMousePos = event->pos();
@@ -507,6 +509,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 
 void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (isParameterizationView) return;
     if (event->button() == Qt::LeftButton) {
         isDragging = false;
         setCursor(Qt::ArrowCursor);
@@ -515,6 +518,8 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
+    // 如果是参数化视图，只允许缩放，不允许旋转
+    if (isParameterizationView) return;
     if (isDragging) {
         QPoint currentPos = event->pos();
         QPoint delta = currentPos - lastMousePos;

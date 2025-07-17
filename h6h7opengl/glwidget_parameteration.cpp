@@ -187,12 +187,13 @@ void GLWidget::normalizeMesh() {
     // 避免除以零
     if (max_range < 1e-6) max_range = 1.0f;
     
-    // 归一化所有顶点到[-1,1]×[-1,1]
+    // 归一化所有顶点到[-1,1]×[-1,1]并设置z=0
     for (auto vh : openMesh.vertices()) {
         auto p = openMesh.point(vh);
         p -= center; // 平移到中心
         p[0] /= max_range / 2.0f; // 缩放到[-1,1]
         p[1] /= max_range / 2.0f;
+        p[2] = 0.0f;
         openMesh.set_point(vh, p);
     }
 }
