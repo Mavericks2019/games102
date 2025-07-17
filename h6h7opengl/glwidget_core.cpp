@@ -134,7 +134,6 @@ void GLWidget::initializeShaders()
     if (wireframeProgram.isLinked()) {
         wireframeProgram.removeAllShaders();
     }
-    
     if (blinnPhongProgram.isLinked()) {
         blinnPhongProgram.removeAllShaders();
     }
@@ -145,26 +144,6 @@ void GLWidget::initializeShaders()
     if (loopSubdivisionProgram.isLinked()) {
         loopSubdivisionProgram.removeAllShaders();
     }
-
-    // 初始化纹理着色器
-    if (textureProgram.isLinked()) {
-        textureProgram.removeAllShaders();
-    }
-
-    // 纹理顶点着色器
-    if (!textureProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/texture.vert")) {
-        qWarning() << "Texture vertex shader error:" << textureProgram.log();
-    }
-    
-    // 纹理片段着色器
-    if (!textureProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/texture.frag")) {
-        qWarning() << "Texture fragment shader error:" << textureProgram.log();
-    }
-    
-    if (!textureProgram.link()) {
-        qWarning() << "Texture shader link error:" << textureProgram.log();
-    }
-    
     
     if (!curvatureProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/curvature.vert")) {
         qWarning() << "Curvature vertex shader error:" << curvatureProgram.log();
