@@ -65,8 +65,6 @@ qrc_shaders.cpp: ../shaders/curvature.vert
 qrc_shaders.cpp: ../shaders/curvature.frag
 qrc_shaders.cpp: ../shaders/loop_subdivision.vert
 qrc_shaders.cpp: ../shaders/loop_subdivision.frag
-qrc_shaders.cpp: ../shaders/texture.vert
-qrc_shaders.cpp: ../shaders/texture.frag
 qrc_shaders.cpp: shaders.qrc.depends
 qrc_shaders.cpp: ../shaders.qrc
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/opt/games102/h6h7opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Generating qrc_shaders.cpp"

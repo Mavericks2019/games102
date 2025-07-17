@@ -362,14 +362,12 @@ CMakeFiles/objViewer.dir/glwidget_core.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qversiontagging.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QColor
- /usr/include/x86_64-linux-gnu/qt5/QtGui/QImage
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QKeyEvent
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QMatrix4x4
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QMouseEvent
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
- /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -393,7 +391,6 @@ CMakeFiles/objViewer.dir/glwidget_core.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
- /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -715,7 +712,6 @@ CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
- /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -738,7 +734,6 @@ CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
- /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -1060,7 +1055,6 @@ CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
- /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -1083,7 +1077,6 @@ CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
- /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -1407,7 +1400,6 @@ CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
- /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -1430,7 +1422,6 @@ CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
- /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -1752,7 +1743,6 @@ CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
- /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -1775,7 +1765,6 @@ CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
- /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -2097,7 +2086,6 @@ CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
- /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -2120,7 +2108,6 @@ CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
- /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -2442,7 +2429,6 @@ CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
- /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -2465,7 +2451,6 @@ CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
- /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -2793,7 +2778,6 @@ CMakeFiles/objViewer.dir/main.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
- /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QPalette
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
@@ -2820,7 +2804,6 @@ CMakeFiles/objViewer.dir/main.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
- /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -3190,7 +3173,6 @@ CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
- /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -3213,7 +3195,6 @@ CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
- /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
