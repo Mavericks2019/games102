@@ -345,66 +345,7 @@ void GLWidget::paintGL()
         wireframeProgram.release();
     } else {
         // 正常绘制模式
-<<<<<<< HEAD
-        if (currentRenderMode == TextureMapping) {
-            // 纹理映射模式
-            textureProgram.bind();
-            vao.bind();
-            faceEbo.bind();
-            
-            // 设置多边形填充
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-            
-            // 设置变换矩阵
-            textureProgram.setUniformValue("model", model);
-            textureProgram.setUniformValue("view", view);
-            textureProgram.setUniformValue("projection", projection);
-            textureProgram.setUniformValue("normalMatrix", normalMatrix);
-            
-            // 设置是否参数化视图标志
-            textureProgram.setUniformValue("isParameterizationView", isParameterizationView);
-            
-            // 绑定纹理
-            if (checkerboardTexture) {
-                checkerboardTexture->bind(0);
-                textureProgram.setUniformValue("textureSampler", 0);
-            }
-            
-            // 绘制模型
-            glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, 0);
-            
-            faceEbo.release();
-            vao.release();
-            textureProgram.release();
-            
-            // 如果是参数化视图，始终显示黑色线框
-            if (isParameterizationView) {
-                // 使用线框着色器
-                wireframeProgram.bind();
-                vao.bind();
-                ebo.bind();
-
-                // 设置线条宽度
-                glLineWidth(1.0f);
-
-                // 设置黑色线框
-                wireframeProgram.setUniformValue("model", model);
-                wireframeProgram.setUniformValue("view", view);
-                wireframeProgram.setUniformValue("projection", projection);
-                wireframeProgram.setUniformValue("lineColor", QVector4D(0.0f, 0.0f, 0.0f, 1.0f)); // 黑色
-
-                // 绘制线框
-                glDrawElements(GL_LINES, edges.size(), GL_UNSIGNED_INT, 0);
-                
-                ebo.release();
-                vao.release();
-                wireframeProgram.release();
-            }
-        }
-        else if (currentRenderMode == LoopSubdivision) {
-=======
         if (currentRenderMode == LoopSubdivision) {
->>>>>>> parent of d7a8a0f... add texture
             loopSubdivisionProgram.bind();
             vao.bind();
             
@@ -498,8 +439,8 @@ void GLWidget::paintGL()
             blinnPhongProgram.release();
         }
 
-        // 如果启用了线框叠加且不是参数化视图
-        if (showWireframeOverlay && !isParameterizationView) {
+        // 如果启用了线框叠加
+        if (showWireframeOverlay) {
             // 启用多边形偏移以避免深度冲突
             glEnable(GL_POLYGON_OFFSET_LINE);
             glPolygonOffset(-1.0, -1.0);
