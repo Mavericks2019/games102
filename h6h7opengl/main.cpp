@@ -348,6 +348,7 @@ namespace UIUtils {
         QRadioButton *gaussianRadio = new QRadioButton("Gaussian Curvature");
         QRadioButton *meanRadio = new QRadioButton("Mean Curvature");
         QRadioButton *maxRadio = new QRadioButton("Max Curvature");
+        
         solidRadio->setChecked(true);
         
         layout->addWidget(solidRadio);
@@ -369,6 +370,7 @@ namespace UIUtils {
         connectMode(gaussianRadio, GLWidget::GaussianCurvature);
         connectMode(meanRadio, GLWidget::MeanCurvature);
         connectMode(maxRadio, GLWidget::MaxCurvature);
+        
         return group;
     }
 
@@ -563,9 +565,6 @@ namespace UIUtils {
         GLWidget *leftView = new GLWidget;
         GLWidget *rightView = new GLWidget;
         
-        // 设置右侧视图为参数化视图（禁止旋转）
-        rightView->isParameterizationView = false;// 新增
-        
         // 添加视图
         splitter->addWidget(leftView);
         splitter->addWidget(rightView);
@@ -639,8 +638,6 @@ namespace UIUtils {
         QRadioButton *gaussianRadio = new QRadioButton("Gaussian Curvature");
         QRadioButton *meanRadio = new QRadioButton("Mean Curvature");
         QRadioButton *maxRadio = new QRadioButton("Max Curvature");
-        // 添加纹理映射选项
-        QRadioButton *textureRadio = new QRadioButton("Texture Mapping");
         
         solidRadio->setChecked(true);
         
@@ -648,7 +645,6 @@ namespace UIUtils {
         renderLayout->addWidget(gaussianRadio);
         renderLayout->addWidget(meanRadio);
         renderLayout->addWidget(maxRadio);
-        renderLayout->addWidget(textureRadio); // 新增
         
         // 连接信号：同时设置左右视图
         auto connectMode = [leftView, rightView](QRadioButton* radio, GLWidget::RenderMode mode) {
@@ -662,8 +658,6 @@ namespace UIUtils {
         connectMode(gaussianRadio, GLWidget::GaussianCurvature);
         connectMode(meanRadio, GLWidget::MeanCurvature);
         connectMode(maxRadio, GLWidget::MaxCurvature);
-        // 添加纹理映射模式
-        connectMode(textureRadio, GLWidget::TextureMapping);
         
         layout->addWidget(renderModeGroup);
         

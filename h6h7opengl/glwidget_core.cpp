@@ -124,7 +124,6 @@ void GLWidget::initializeShaders()
     if (wireframeProgram.isLinked()) {
         wireframeProgram.removeAllShaders();
     }
-
     if (blinnPhongProgram.isLinked()) {
         blinnPhongProgram.removeAllShaders();
     }
@@ -135,12 +134,7 @@ void GLWidget::initializeShaders()
     if (loopSubdivisionProgram.isLinked()) {
         loopSubdivisionProgram.removeAllShaders();
     }
-    // 纹理着色器程序
-    if (textureProgram.isLinked()) {
-        textureProgram.removeAllShaders();
-    }
     
-    // 曲率着色器
     if (!curvatureProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/curvature.vert")) {
         qWarning() << "Curvature vertex shader error:" << curvatureProgram.log();
     }
@@ -191,19 +185,6 @@ void GLWidget::initializeShaders()
     if (!loopSubdivisionProgram.link()) {
         qWarning() << "Loop subdivision shader link error:" << loopSubdivisionProgram.log();
     }
-    
-    // 纹理着色器程序
-    if (!textureProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/texture.vert")) {
-        qWarning() << "Texture vertex shader error:" << textureProgram.log();
-    }
-    
-    if (!textureProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/texture.frag")) {
-        qWarning() << "Texture fragment shader error:" << textureProgram.log();
-    }
-    
-    if (!textureProgram.link()) {
-        qWarning() << "Texture shader link error:" << textureProgram.log();
-    }
 
     // 如果模型已加载，更新缓冲区
     if (modelLoaded) {
@@ -214,13 +195,10 @@ void GLWidget::initializeShaders()
 void GLWidget::updateBuffersFromOpenMesh()
 {
     if (openMesh.n_vertices() == 0) return;
-    
     // 准备顶点数据 - 按顶点索引顺序存储
     std::vector<float> vertices(openMesh.n_vertices() * 3);
     std::vector<float> normals(openMesh.n_vertices() * 3);
     std::vector<float> curvatures(openMesh.n_vertices());
-    std::vector<float> texCoords(openMesh.n_vertices() * 2); // 纹理坐标
-    
     for (auto vh : openMesh.vertices()) {
         int idx = vh.idx();
         const auto& p = openMesh.point(vh);
@@ -234,19 +212,6 @@ void GLWidget::updateBuffersFromOpenMesh()
         normals[idx*3+2] = n[2];
         
         curvatures[idx] = openMesh.data(vh).curvature;
-        
-        // 计算纹理坐标 (基于参数化后的位置)
-        if (boundaryType == Rectangle) {
-            // 矩形边界: 直接使用参数化坐标
-            texCoords[idx*2]   = p[0]; // u
-            texCoords[idx*2+1] = p[1]; // v
-        } else {
-            // 圆形边界: 使用极坐标
-            float r = sqrt(p[0]*p[0] + p[1]*p[1]);
-            float theta = atan2(p[1], p[0]);
-            texCoords[idx*2]   = (theta + M_PI) / (2 * M_PI); // u [0,1]
-            texCoords[idx*2+1] = r; // v [0,1]
-        }
     }
     
     vao.bind();
@@ -256,13 +221,10 @@ void GLWidget::updateBuffersFromOpenMesh()
     int vertexSize = vertices.size() * sizeof(float);
     int normalSize = normals.size() * sizeof(float);
     int curvatureSize = curvatures.size() * sizeof(float);
-    int texCoordSize = texCoords.size() * sizeof(float);
-    
-    vbo.allocate(vertexSize + normalSize + curvatureSize + texCoordSize);
+    vbo.allocate(vertexSize + normalSize + curvatureSize);
     vbo.write(0, vertices.data(), vertexSize);
     vbo.write(vertexSize, normals.data(), normalSize);
     vbo.write(vertexSize + normalSize, curvatures.data(), curvatureSize);
-    vbo.write(vertexSize + normalSize + curvatureSize, texCoords.data(), texCoordSize);
     
     // 设置线框着色器属性
     wireframeProgram.bind();
@@ -324,19 +286,6 @@ void GLWidget::resizeGL(int w, int h)
     glViewport(0, 0, w, h);
 }
 
-void GLWidget::updateTextureCoordinates()
-{
-    texCoords.clear();
-    texCoords.reserve(openMesh.n_vertices() * 2);
-    
-    for (auto vh : openMesh.vertices()) {
-        const auto& p = openMesh.point(vh);
-        // 将顶点坐标映射到[0,1]范围作为纹理坐标
-        texCoords.push_back((p[0] + 1.0f) * 0.5f);
-        texCoords.push_back((p[1] + 1.0f) * 0.5f);
-    }
-}
-
 void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -362,11 +311,6 @@ void GLWidget::paintGL()
 
     GLint oldPolygonMode[2];
     glGetIntegerv(GL_POLYGON_MODE, oldPolygonMode);
-
-    // 新增: 绑定纹理
-    if (currentRenderMode == TextureMapping && checkerboardTexture) {
-        checkerboardTexture->bind(0);
-    }
 
     // 如果启用了隐藏面，只绘制线框
     if (hideFaces) {
@@ -455,27 +399,6 @@ void GLWidget::paintGL()
             faceEbo.release();
             vao.release();
             curvatureProgram.release();
-        }  else if (currentRenderMode == TextureMapping) {
-            // 纹理映射模式
-            textureProgram.bind();
-            vao.bind();
-            faceEbo.bind();
-            
-            // 设置变换矩阵
-            textureProgram.setUniformValue("model", model);
-            textureProgram.setUniformValue("view", view);
-            textureProgram.setUniformValue("projection", projection);
-            textureProgram.setUniformValue("normalMatrix", normalMatrix);
-            
-            // 设置纹理采样器
-            textureProgram.setUniformValue("textureSampler", 0);
-            
-            // 绘制模型
-            glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, 0);
-            
-            faceEbo.release();
-            vao.release();
-            textureProgram.release();
         } else {
             // 布林冯模式
             blinnPhongProgram.bind();
@@ -685,43 +608,4 @@ void GLWidget::centerView()
     rotationY = 0;
     
     update();
-}
-
-void GLWidget::generateCheckerboardTexture()
-{
-    makeCurrent();
-    
-    // 删除旧纹理
-    if (checkerboardTexture) {
-        delete checkerboardTexture;
-        checkerboardTexture = nullptr;
-    }
-    
-    const int width = 512;
-    const int height = 512;
-    QImage image(width, height, QImage::Format_RGB32);
-    
-    // 创建棋盘格图案
-    for (int y = 0; y < height; ++y) {
-        for (int x = 0; x < width; ++x) {
-            // 将坐标映射到8x8的棋盘格
-            bool isBlack = ((x / 64) % 2) ^ ((y / 64) % 2);
-            QRgb color = isBlack ? qRgb(0, 0, 0) : qRgb(255, 255, 255);
-            image.setPixel(x, y, color);
-        }
-    }
-    
-    // 创建OpenGL纹理
-    checkerboardTexture = new QOpenGLTexture(image);
-    checkerboardTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
-    checkerboardTexture->setMagnificationFilter(QOpenGLTexture::Linear);
-    
-    doneCurrent();
-}
-
-void GLWidget::bindTexture()
-{
-    if (checkerboardTexture) {
-        checkerboardTexture->bind(0);
-    }
 }

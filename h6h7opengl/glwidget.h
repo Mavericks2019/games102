@@ -16,8 +16,6 @@
 #include <queue>
 #include <Eigen/Sparse>
 #include <Eigen/IterativeLinearSolvers>
-#include <QOpenGLTexture> // 新增纹理支持
-#include <QImage> // 用于生成棋格纹理
 
 #define EPSILON 1E-4F 
 
@@ -50,8 +48,7 @@ public:
         MeanCurvature,       // Mean curvature visualization (平均曲率可视化)
         MaxCurvature,        // Maximum curvature visualization (最大曲率可视化)
         LoopSubdivision,     // Loop subdivision surface (Loop细分曲面)
-        MeshSimplification,   // Mesh simplification view (网格简化视图)
-        TextureMapping
+        MeshSimplification   // Mesh simplification view (网格简化视图)
     };
     
     // Iteration methods for minimal surface
@@ -162,10 +159,6 @@ public:
         std::vector<unsigned int> indices;// Face indices (面索引)
     };
 
-    // 新增: 棋格纹理相关函数
-    void generateCheckerboardTexture();
-    void bindTexture();
-
     // ========== PUBLIC MEMBER VARIABLES ========== //
 public:
     // Rendering state
@@ -208,17 +201,12 @@ protected:
     QOpenGLShaderProgram blinnPhongProgram;   // Blinn-Phong shader (Blinn-Phong着色器)
     QOpenGLShaderProgram curvatureProgram;    // Curvature visualization shader (曲率可视化着色器)
     QOpenGLShaderProgram loopSubdivisionProgram; // Loop subdivision shader (Loop细分着色器)
-    QOpenGLShaderProgram textureProgram;
-
+    
     QOpenGLVertexArrayObject vao;         // Vertex array object (顶点数组对象)
     QOpenGLBuffer vbo;                    // Vertex buffer (顶点缓冲区)
     QOpenGLBuffer ebo;                    // Edge index buffer (边索引缓冲区)
     QOpenGLBuffer faceEbo;                // Face index buffer (面索引缓冲区)
 
-    // 新增: 纹理对象
-    QOpenGLTexture *checkerboardTexture;
-    // 新增: 纹理坐标缓冲区
-    QOpenGLBuffer texCoordBuffer;
     // ========== INTERACTION STATE ========== //
 protected:
     bool isDragging;                      // Is mouse dragging (是否正在拖动鼠标)
