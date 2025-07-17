@@ -165,6 +165,17 @@ void GLWidget::mapBoundaryToRectangle() {
 }
 
 // 归一化网格到[-1,1]×[-1,1]范围内，中心在原点
+#include <algorithm>
+#include <cmath>
+#include <map>
+#include "glwidget.h"
+#include <vector>
+#include <queue>
+#include <fstream>
+#include <Eigen/SparseLU>
+
+// ... 其他函数不变 ...
+
 void GLWidget::normalizeMesh() {
     if (!modelLoaded || openMesh.n_vertices() == 0) return;
     
@@ -182,20 +193,34 @@ void GLWidget::normalizeMesh() {
     Mesh::Point center((min[0] + max[0]) / 2, (min[1] + max[1]) / 2, 0);
     float range_x = max[0] - min[0];
     float range_y = max[1] - min[1];
-    float max_range = std::max(range_x, range_y);
     
-    // 避免除以零
-    if (max_range < 1e-6) max_range = 1.0f;
+    // 获取视图尺寸
+    int viewWidth = width();
+    int viewHeight = height();
+    float aspectRatio = static_cast<float>(viewWidth) / viewHeight;
     
-    // 归一化所有顶点到[-1,1]×[-1,1]并设置z=0
+    // 计算缩放因子 - 使用最小边
+    float scaleFactor;
+    if (aspectRatio > 1.0f) {
+        // 宽屏 - 以高度为基准
+        scaleFactor = 2.0f / (range_y > 0 ? range_y : 1.0f);
+    } else {
+        // 竖屏 - 以宽度为基准
+        scaleFactor = 2.0f / (range_x > 0 ? range_x : 1.0f);
+    }
+    
+    // 归一化所有顶点
     for (auto vh : openMesh.vertices()) {
         auto p = openMesh.point(vh);
         p -= center; // 平移到中心
-        p[0] /= max_range / 2.0f; // 缩放到[-1,1]
-        p[1] /= max_range / 2.0f;
+        p[0] *= scaleFactor;
+        p[1] *= scaleFactor;
         p[2] = 0.0f;
         openMesh.set_point(vh, p);
     }
+    
+    // 更新纹理坐标（归一化后）
+    updateTextureCoordinates();
 }
 
 // 求解参数化

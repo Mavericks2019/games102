@@ -563,6 +563,9 @@ namespace UIUtils {
         GLWidget *leftView = new GLWidget;
         GLWidget *rightView = new GLWidget;
         
+        // 设置右侧视图为参数化视图（禁止旋转）
+        rightView->isParameterizationView = false;// 新增
+        
         // 添加视图
         splitter->addWidget(leftView);
         splitter->addWidget(rightView);

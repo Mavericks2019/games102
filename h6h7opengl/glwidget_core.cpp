@@ -124,6 +124,7 @@ void GLWidget::initializeShaders()
     if (wireframeProgram.isLinked()) {
         wireframeProgram.removeAllShaders();
     }
+
     if (blinnPhongProgram.isLinked()) {
         blinnPhongProgram.removeAllShaders();
     }
@@ -308,30 +309,6 @@ void GLWidget::updateBuffersFromOpenMesh()
     } else {
         qWarning() << "Failed to find attribute location for aCurvature in curvature shader";
     }
-    
-    // 设置纹理着色器属性
-    textureProgram.bind();
-    posLoc = textureProgram.attributeLocation("aPos");
-    if (posLoc != -1) {
-        textureProgram.enableAttributeArray(posLoc);
-        textureProgram.setAttributeBuffer(posLoc, GL_FLOAT, 0, 3, 3 * sizeof(float));
-    }
-    
-    normalLoc = textureProgram.attributeLocation("aNormal");
-    if (normalLoc != -1) {
-        textureProgram.enableAttributeArray(normalLoc);
-        textureProgram.setAttributeBuffer(normalLoc, GL_FLOAT, vertexSize, 3, 3 * sizeof(float));
-    }
-    
-    int texCoordLoc = textureProgram.attributeLocation("aTexCoord");
-    if (texCoordLoc != -1) {
-        textureProgram.enableAttributeArray(texCoordLoc);
-        textureProgram.setAttributeBuffer(texCoordLoc, GL_FLOAT, 
-                                         vertexSize + normalSize + curvatureSize, 
-                                         2, 2 * sizeof(float));
-    } else {
-        qWarning() << "Failed to find attribute location for aTexCoord in texture shader";
-    }
 
     ebo.bind();
     ebo.allocate(edges.data(), edges.size() * sizeof(unsigned int));
@@ -345,6 +322,19 @@ void GLWidget::updateBuffersFromOpenMesh()
 void GLWidget::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
+}
+
+void GLWidget::updateTextureCoordinates()
+{
+    texCoords.clear();
+    texCoords.reserve(openMesh.n_vertices() * 2);
+    
+    for (auto vh : openMesh.vertices()) {
+        const auto& p = openMesh.point(vh);
+        // 将顶点坐标映射到[0,1]范围作为纹理坐标
+        texCoords.push_back((p[0] + 1.0f) * 0.5f);
+        texCoords.push_back((p[1] + 1.0f) * 0.5f);
+    }
 }
 
 void GLWidget::paintGL()
