@@ -134,6 +134,7 @@ void GLWidget::initializeShaders()
     if (wireframeProgram.isLinked()) {
         wireframeProgram.removeAllShaders();
     }
+    
     if (blinnPhongProgram.isLinked()) {
         blinnPhongProgram.removeAllShaders();
     }
