@@ -22,6 +22,42 @@
 #include <QSplitter>
 
 namespace UIUtils {
+
+    QGroupBox* createRenderingModeGroupForDualView(GLWidget* leftView, GLWidget* rightView) {
+        QGroupBox *group = new QGroupBox("Rendering Mode");
+        QVBoxLayout *layout = new QVBoxLayout(group);
+        
+        QRadioButton *solidRadio = new QRadioButton("Solid (Blinn-Phong)");
+        QRadioButton *gaussianRadio = new QRadioButton("Gaussian Curvature");
+        QRadioButton *meanRadio = new QRadioButton("Mean Curvature");
+        QRadioButton *maxRadio = new QRadioButton("Max Curvature");
+        QRadioButton *textureRadio = new QRadioButton("Texture Mapping"); // 新增纹理映射选项
+        
+        solidRadio->setChecked(true);
+        
+        layout->addWidget(solidRadio);
+        layout->addWidget(gaussianRadio);
+        layout->addWidget(meanRadio);
+        layout->addWidget(maxRadio);
+        layout->addWidget(textureRadio); // 添加纹理选项
+        
+        // 连接信号：同时设置左右视图
+        auto connectMode = [leftView, rightView](QRadioButton* radio, GLWidget::RenderMode mode) {
+            QObject::connect(radio, &QRadioButton::clicked, [leftView, rightView, mode]() {
+                leftView->setRenderMode(mode);
+                rightView->setRenderMode(mode);
+            });
+        };
+        
+        connectMode(solidRadio, GLWidget::BlinnPhong);
+        connectMode(gaussianRadio, GLWidget::GaussianCurvature);
+        connectMode(meanRadio, GLWidget::MeanCurvature);
+        connectMode(maxRadio, GLWidget::MaxCurvature);
+        connectMode(textureRadio, GLWidget::TextureMapping); // 纹理映射模式
+        
+        return group;
+    }
+
     // 获取当前激活的GLWidget
     GLWidget* getCurrentGLWidget(GLWidget* mainGLWidget, QTabWidget* tabWidget) {
         int currentTab = tabWidget->currentIndex();
@@ -565,6 +601,9 @@ namespace UIUtils {
         GLWidget *leftView = new GLWidget;
         GLWidget *rightView = new GLWidget;
         
+        // 设置右侧视图为参数化视图（禁止旋转）
+        rightView->isParameterizationView = true; // 新增
+        
         // 添加视图
         splitter->addWidget(leftView);
         splitter->addWidget(rightView);
@@ -641,6 +680,7 @@ namespace UIUtils {
         
         solidRadio->setChecked(true);
         
+        layout->addWidget(createRenderingModeGroupForDualView(leftView, rightView));
         renderLayout->addWidget(solidRadio);
         renderLayout->addWidget(gaussianRadio);
         renderLayout->addWidget(meanRadio);
