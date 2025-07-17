@@ -147,6 +147,8 @@ public:
         update();
     }                                                // 新增：为参数化重置视图
     void solveParameterization();                    // Solve parameterization using Eigen (使用Eigen求解参数化)
+    void generateCheckerboardTexture();              // 生成棋格纹理
+    void updateTextureCoordinates();                 // 更新纹理坐标
     // ========== OPENGL RESOURCES ========== //
 public:
     void initializeShaders();                         // Compile/link shaders (编译/链接着色器)
@@ -173,6 +175,10 @@ public:
     QColor bgColor;                       // Background color (背景颜色)
     RenderMode currentRenderMode;         // Current rendering mode (当前渲染模式)
     BoundaryType boundaryType = Rectangle;// Current boundary type (当前边界类型)
+
+    // 纹理相关
+    QOpenGLTexture* checkerboardTexture = nullptr; // 棋格纹理
+    std::vector<float> texCoords;          // 纹理坐标
     
     // Mesh data
     Mesh openMesh;                        // Current mesh (当前网格)

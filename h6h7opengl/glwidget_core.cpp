@@ -16,6 +16,7 @@
 #include <OpenMesh/Core/IO/Options.hh>
 #include <unordered_set>
 #include <Eigen/Dense>
+#include <QImage> // 用于生成棋格纹理
 
 using namespace OpenMesh;
 
@@ -23,6 +24,7 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
     vbo(QOpenGLBuffer::VertexBuffer),
     ebo(QOpenGLBuffer::IndexBuffer),
     faceEbo(QOpenGLBuffer::IndexBuffer),
+    texCoordBuffer(QOpenGLBuffer::VertexBuffer), // 初始化纹理坐标缓冲区
     showWireframeOverlay(false),
     hideFaces(false)  // 初始化新增成员
 {
@@ -69,6 +71,8 @@ GLWidget::~GLWidget()
     vbo.destroy();
     ebo.destroy();
     faceEbo.destroy();
+    texCoordBuffer.destroy(); // 销毁纹理坐标缓冲区
+    if (checkerboardTexture) delete checkerboardTexture; // 删除纹理对象
     doneCurrent();
 }
 
@@ -109,11 +113,15 @@ void GLWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_MULTISAMPLE); // 启用多重采样抗锯齿
 
-    // 创建缓冲区和VAO - 只在这里创建一次
+    // 创建缓冲区和VAO
     vao.create();
     vbo.create();
     ebo.create();
     faceEbo.create();
+    texCoordBuffer.create(); // 创建纹理坐标缓冲区
+
+    // 生成棋格纹理
+    generateCheckerboardTexture();
 
     initializeShaders();
 }
@@ -613,4 +621,26 @@ void GLWidget::centerView()
     rotationY = 0;
     
     update();
+}
+
+void GLWidget::generateCheckerboardTexture()
+{
+    const int size = 512;
+    QImage image(size, size, QImage::Format_RGB32);
+    
+    // 创建棋格图案
+    for (int y = 0; y < size; y++) {
+        for (int x = 0; x < size; x++) {
+            // 每16像素一个格子
+            bool isBlack = ((x / 32) % 2) ^ ((y / 32) % 2);
+            image.setPixel(x, y, isBlack ? qRgb(0, 0, 0) : qRgb(255, 255, 255));
+        }
+    }
+    
+    // 创建OpenGL纹理
+    if (checkerboardTexture) delete checkerboardTexture;
+    checkerboardTexture = new QOpenGLTexture(image.mirrored());
+    checkerboardTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    checkerboardTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+    checkerboardTexture->setWrapMode(QOpenGLTexture::Repeat);
 }
