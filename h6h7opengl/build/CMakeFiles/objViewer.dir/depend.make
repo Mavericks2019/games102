@@ -367,6 +367,7 @@ CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
+CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -390,6 +391,7 @@ CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
+CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
 CMakeFiles/objViewer.dir/glwidget_core.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -711,6 +713,7 @@ CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu
 CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
 CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
 CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
+CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
 CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
 CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
 CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -733,6 +736,7 @@ CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu
 CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
 CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
 CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
+CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
 CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
 CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
 CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -1054,6 +1058,7 @@ CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-li
 CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
 CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
 CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
+CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
 CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
 CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
 CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -1076,6 +1081,7 @@ CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-li
 CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
 CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
 CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
+CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
 CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
 CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
 CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -1399,6 +1405,7 @@ CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-g
 CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
 CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
 CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
+CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
 CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
 CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
 CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -1421,6 +1428,7 @@ CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-g
 CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
 CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
 CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
+CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
 CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
 CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
 CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -1742,6 +1750,7 @@ CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64
 CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
 CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
 CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
+CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
 CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
 CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
 CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -1764,6 +1773,7 @@ CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64
 CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
 CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
 CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
+CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
 CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
 CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
 CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -2085,6 +2095,7 @@ CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-lin
 CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
 CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
 CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
+CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
 CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
 CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
 CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -2107,6 +2118,7 @@ CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-lin
 CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
 CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
 CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
+CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
 CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
 CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
 CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -2428,6 +2440,7 @@ CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linu
 CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
 CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
 CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
+CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
 CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
 CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
 CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -2450,6 +2463,7 @@ CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linu
 CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
 CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
 CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
+CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
 CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
 CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
 CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -2777,6 +2791,7 @@ CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QMa
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
+CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QPalette
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
@@ -2803,6 +2818,7 @@ CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qop
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
+CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
 CMakeFiles/objViewer.dir/main.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h
@@ -3172,6 +3188,7 @@ CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLShaderProgram
+CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLTexture
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVertexArrayObject
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QSurfaceFormat
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D
@@ -3194,6 +3211,7 @@ CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglext.h
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions.h
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglshaderprogram.h
+CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopengltexture.h
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglvertexarrayobject.h
 CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qpaintdevice.h

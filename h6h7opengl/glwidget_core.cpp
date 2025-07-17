@@ -609,3 +609,42 @@ void GLWidget::centerView()
     
     update();
 }
+
+void GLWidget::generateCheckerboardTexture()
+{
+    makeCurrent();
+    
+    // 删除旧纹理
+    if (checkerboardTexture) {
+        delete checkerboardTexture;
+        checkerboardTexture = nullptr;
+    }
+    
+    const int width = 512;
+    const int height = 512;
+    QImage image(width, height, QImage::Format_RGB32);
+    
+    // 创建棋盘格图案
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            // 将坐标映射到8x8的棋盘格
+            bool isBlack = ((x / 64) % 2) ^ ((y / 64) % 2);
+            QRgb color = isBlack ? qRgb(0, 0, 0) : qRgb(255, 255, 255);
+            image.setPixel(x, y, color);
+        }
+    }
+    
+    // 创建OpenGL纹理
+    checkerboardTexture = new QOpenGLTexture(image);
+    checkerboardTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
+    checkerboardTexture->setMagnificationFilter(QOpenGLTexture::Linear);
+    
+    doneCurrent();
+}
+
+void GLWidget::bindTexture()
+{
+    if (checkerboardTexture) {
+        checkerboardTexture->bind(0);
+    }
+}

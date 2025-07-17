@@ -348,7 +348,6 @@ namespace UIUtils {
         QRadioButton *gaussianRadio = new QRadioButton("Gaussian Curvature");
         QRadioButton *meanRadio = new QRadioButton("Mean Curvature");
         QRadioButton *maxRadio = new QRadioButton("Max Curvature");
-        
         solidRadio->setChecked(true);
         
         layout->addWidget(solidRadio);
@@ -370,7 +369,6 @@ namespace UIUtils {
         connectMode(gaussianRadio, GLWidget::GaussianCurvature);
         connectMode(meanRadio, GLWidget::MeanCurvature);
         connectMode(maxRadio, GLWidget::MaxCurvature);
-        
         return group;
     }
 
@@ -638,6 +636,7 @@ namespace UIUtils {
         QRadioButton *gaussianRadio = new QRadioButton("Gaussian Curvature");
         QRadioButton *meanRadio = new QRadioButton("Mean Curvature");
         QRadioButton *maxRadio = new QRadioButton("Max Curvature");
+        QRadioButton *textureRadio = new QRadioButton("Texture Mapping");
         
         solidRadio->setChecked(true);
         
@@ -645,6 +644,7 @@ namespace UIUtils {
         renderLayout->addWidget(gaussianRadio);
         renderLayout->addWidget(meanRadio);
         renderLayout->addWidget(maxRadio);
+        layout->addWidget(textureRadio); // 新增
         
         // 连接信号：同时设置左右视图
         auto connectMode = [leftView, rightView](QRadioButton* radio, GLWidget::RenderMode mode) {
@@ -658,6 +658,7 @@ namespace UIUtils {
         connectMode(gaussianRadio, GLWidget::GaussianCurvature);
         connectMode(meanRadio, GLWidget::MeanCurvature);
         connectMode(maxRadio, GLWidget::MaxCurvature);
+        connectMode(textureRadio, GLWidget::TextureMapping);
         
         layout->addWidget(renderModeGroup);
         
