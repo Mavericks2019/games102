@@ -57,22 +57,6 @@ fstream
 -
 Eigen/SparseLU
 -
-algorithm
--
-cmath
--
-map
--
-glwidget.h
-/opt/games102/h6h7opengl/glwidget.h
-vector
--
-queue
--
-fstream
--
-Eigen/SparseLU
--
 
 /usr/include/eigen3/Eigen/Core
 src/Core/util/DisableStupidWarnings.h

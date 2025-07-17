@@ -164,18 +164,6 @@ void GLWidget::mapBoundaryToRectangle() {
     }
 }
 
-// 归一化网格到[-1,1]×[-1,1]范围内，中心在原点
-#include <algorithm>
-#include <cmath>
-#include <map>
-#include "glwidget.h"
-#include <vector>
-#include <queue>
-#include <fstream>
-#include <Eigen/SparseLU>
-
-// ... 其他函数不变 ...
-
 void GLWidget::normalizeMesh() {
     if (!modelLoaded || openMesh.n_vertices() == 0) return;
     
