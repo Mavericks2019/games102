@@ -213,6 +213,7 @@ protected:
     QOpenGLShaderProgram textureProgram;      // 新增：纹理着色器
 
     QOpenGLVertexArrayObject vao;         // Vertex array object (顶点数组对象)
+    QOpenGLVertexArrayObject vaoTexture;  // 纹理专用顶点数组对象
     QOpenGLBuffer vbo;                    // Vertex buffer (顶点缓冲区)
     QOpenGLBuffer ebo;                    // Edge index buffer (边索引缓冲区)
     QOpenGLBuffer faceEbo;                // Face index buffer (面索引缓冲区)

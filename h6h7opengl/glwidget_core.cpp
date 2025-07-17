@@ -115,6 +115,7 @@ void GLWidget::initializeGL()
 
     // 创建缓冲区和VAO
     vao.create();
+    vaoTexture.create();
     vbo.create();
     ebo.create();
     faceEbo.create();
@@ -224,6 +225,7 @@ void GLWidget::initializeShaders()
 void GLWidget::updateBuffersFromOpenMesh()
 {
     if (openMesh.n_vertices() == 0) return;
+    
     // 准备顶点数据 - 按顶点索引顺序存储
     std::vector<float> vertices(openMesh.n_vertices() * 3);
     std::vector<float> normals(openMesh.n_vertices() * 3);
@@ -243,6 +245,7 @@ void GLWidget::updateBuffersFromOpenMesh()
         curvatures[idx] = openMesh.data(vh).curvature;
     }
     
+    // 绑定主VAO (用于非纹理渲染)
     vao.bind();
     vbo.bind();
     
@@ -301,34 +304,19 @@ void GLWidget::updateBuffersFromOpenMesh()
         qWarning() << "Failed to find attribute location for aCurvature in curvature shader";
     }
     
-    // // 设置纹理着色器属性
-    // textureProgram.bind();
-    // posLoc = textureProgram.attributeLocation("aPos");
-    // if (posLoc != -1) {
-    //     textureProgram.enableAttributeArray(posLoc);
-    //     textureProgram.setAttributeBuffer(posLoc, GL_FLOAT, 0, 3, 3 * sizeof(float));
-    // }
+    // 设置Loop细分着色器属性 (使用主VAO)
+    loopSubdivisionProgram.bind();
+    posLoc = loopSubdivisionProgram.attributeLocation("aPos");
+    if (posLoc != -1) {
+        loopSubdivisionProgram.enableAttributeArray(posLoc);
+        loopSubdivisionProgram.setAttributeBuffer(posLoc, GL_FLOAT, 0, 3, 3 * sizeof(float));
+    }
     
-    // normalLoc = textureProgram.attributeLocation("aNormal");
-    // if (normalLoc != -1) {
-    //     textureProgram.enableAttributeArray(normalLoc);
-    //     textureProgram.setAttributeBuffer(normalLoc, GL_FLOAT, vertexSize, 3, 3 * sizeof(float));
-    // }
-
-    // // 更新纹理坐标缓冲区
-    // updateTextureCoordinates();
-    
-    // // 绑定纹理坐标缓冲区
-    // texCoordBuffer.bind();
-    // texCoordBuffer.allocate(texCoords.data(), texCoords.size() * sizeof(float));
-    
-    // int texCoordLoc = textureProgram.attributeLocation("aTexCoord");
-    // if (texCoordLoc != -1) {
-    //     textureProgram.enableAttributeArray(texCoordLoc);
-    //     textureProgram.setAttributeBuffer(texCoordLoc, GL_FLOAT, 0, 2, 2 * sizeof(float));
-    // } else {
-    //     qWarning() << "Failed to find attribute location for aTexCoord in texture shader";
-    // }
+    normalLoc = loopSubdivisionProgram.attributeLocation("aNormal");
+    if (normalLoc != -1) {
+        loopSubdivisionProgram.enableAttributeArray(normalLoc);
+        loopSubdivisionProgram.setAttributeBuffer(normalLoc, GL_FLOAT, vertexSize, 3, 3 * sizeof(float));
+    }
 
     ebo.bind();
     ebo.allocate(edges.data(), edges.size() * sizeof(unsigned int));
@@ -337,6 +325,45 @@ void GLWidget::updateBuffersFromOpenMesh()
     faceEbo.allocate(faces.data(), faces.size() * sizeof(unsigned int));
     
     vao.release();
+    
+    // ===== 设置纹理专用VAO =====
+    vaoTexture.bind();
+    vbo.bind(); // 共享同一个顶点缓冲区
+    
+    // 设置纹理着色器属性
+    textureProgram.bind();
+    posLoc = textureProgram.attributeLocation("aPos");
+    if (posLoc != -1) {
+        textureProgram.enableAttributeArray(posLoc);
+        textureProgram.setAttributeBuffer(posLoc, GL_FLOAT, 0, 3, 3 * sizeof(float));
+    }
+    
+    normalLoc = textureProgram.attributeLocation("aNormal");
+    if (normalLoc != -1) {
+        textureProgram.enableAttributeArray(normalLoc);
+        textureProgram.setAttributeBuffer(normalLoc, GL_FLOAT, vertexSize, 3, 3 * sizeof(float));
+    }
+
+    // 更新纹理坐标缓冲区
+    updateTextureCoordinates();
+    
+    // 绑定纹理坐标缓冲区
+    texCoordBuffer.bind();
+    texCoordBuffer.allocate(texCoords.data(), texCoords.size() * sizeof(float));
+    
+    int texCoordLoc = textureProgram.attributeLocation("aTexCoord");
+    if (texCoordLoc != -1) {
+        textureProgram.enableAttributeArray(texCoordLoc);
+        textureProgram.setAttributeBuffer(texCoordLoc, GL_FLOAT, 0, 2, 2 * sizeof(float));
+    } else {
+        qWarning() << "Failed to find attribute location for aTexCoord in texture shader";
+    }
+
+    // 绑定面索引缓冲区
+    faceEbo.bind();
+    
+    vaoTexture.release();
+    textureProgram.release();
 }
 
 void GLWidget::resizeGL(int w, int h)
@@ -409,7 +436,7 @@ void GLWidget::paintGL()
         if (currentRenderMode == TextureMapping) {
             // 纹理映射模式
             textureProgram.bind();
-            vao.bind();
+            vaoTexture.bind(); // 使用纹理专用VAO
             faceEbo.bind();
             
             // 设置多边形填充
