@@ -16,7 +16,6 @@
 #include <queue>
 #include <Eigen/Sparse>
 #include <Eigen/IterativeLinearSolvers>
-#include <QOpenGLTexture> // 新增纹理支持
 
 #define EPSILON 1E-4F 
 
@@ -49,8 +48,7 @@ public:
         MeanCurvature,       // Mean curvature visualization (平均曲率可视化)
         MaxCurvature,        // Maximum curvature visualization (最大曲率可视化)
         LoopSubdivision,     // Loop subdivision surface (Loop细分曲面)
-        MeshSimplification,   // Mesh simplification view (网格简化视图)
-        TextureMapping       // 新增：纹理映射
+        MeshSimplification   // Mesh simplification view (网格简化视图)
     };
     
     // Iteration methods for minimal surface
@@ -210,13 +208,11 @@ protected:
     QOpenGLShaderProgram blinnPhongProgram;   // Blinn-Phong shader (Blinn-Phong着色器)
     QOpenGLShaderProgram curvatureProgram;    // Curvature visualization shader (曲率可视化着色器)
     QOpenGLShaderProgram loopSubdivisionProgram; // Loop subdivision shader (Loop细分着色器)
-    QOpenGLShaderProgram textureProgram;      // 新增：纹理着色器
-
+    
     QOpenGLVertexArrayObject vao;         // Vertex array object (顶点数组对象)
     QOpenGLBuffer vbo;                    // Vertex buffer (顶点缓冲区)
     QOpenGLBuffer ebo;                    // Edge index buffer (边索引缓冲区)
     QOpenGLBuffer faceEbo;                // Face index buffer (面索引缓冲区)
-    QOpenGLBuffer texCoordBuffer;         // 新增：纹理坐标缓冲区
 
     // ========== INTERACTION STATE ========== //
 protected:

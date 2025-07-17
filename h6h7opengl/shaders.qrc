@@ -9,7 +9,5 @@
     <file>shaders/curvature.frag</file>
     <file>shaders/loop_subdivision.vert</file>
     <file>shaders/loop_subdivision.frag</file>
-    <file>shaders/texture.vert</file>
-    <file>shaders/texture.frag</file>
 </qresource>
 </RCC>

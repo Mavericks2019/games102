@@ -485,41 +485,6 @@ namespace UIUtils {
         return group;
     }
 
-    QGroupBox* createRenderingModeGroupForDualView(GLWidget* leftView, GLWidget* rightView) {
-        QGroupBox *group = new QGroupBox("Rendering Mode");
-        QVBoxLayout *layout = new QVBoxLayout(group);
-        
-        QRadioButton *solidRadio = new QRadioButton("Solid (Blinn-Phong)");
-        QRadioButton *gaussianRadio = new QRadioButton("Gaussian Curvature");
-        QRadioButton *meanRadio = new QRadioButton("Mean Curvature");
-        QRadioButton *maxRadio = new QRadioButton("Max Curvature");
-        QRadioButton *textureRadio = new QRadioButton("Texture Mapping"); // 新增纹理映射选项
-        
-        solidRadio->setChecked(true);
-        
-        layout->addWidget(solidRadio);
-        layout->addWidget(gaussianRadio);
-        layout->addWidget(meanRadio);
-        layout->addWidget(maxRadio);
-        layout->addWidget(textureRadio); // 添加纹理选项
-        
-        // 连接信号：同时设置左右视图
-        auto connectMode = [leftView, rightView](QRadioButton* radio, GLWidget::RenderMode mode) {
-            QObject::connect(radio, &QRadioButton::clicked, [leftView, rightView, mode]() {
-                leftView->setRenderMode(mode);
-                rightView->setRenderMode(mode);
-            });
-        };
-        
-        connectMode(solidRadio, GLWidget::BlinnPhong);
-        connectMode(gaussianRadio, GLWidget::GaussianCurvature);
-        connectMode(meanRadio, GLWidget::MeanCurvature);
-        connectMode(maxRadio, GLWidget::MaxCurvature);
-        connectMode(textureRadio, GLWidget::TextureMapping); // 纹理映射模式
-        
-        return group;
-    }
-
     // 创建极小曲面控制组
     QGroupBox* createMinimalSurfaceGroup(GLWidget* glWidget, QTabWidget* tabWidget) {
         QGroupBox *group = new QGroupBox("Minimal Surface Iteration");
@@ -718,8 +683,7 @@ namespace UIUtils {
         QObject::connect(circleRadio, &QRadioButton::clicked, [rightView]() {
             rightView->setBoundaryType(GLWidget::Circle);
         });
-        // 添加渲染模式组（使用新的双视图渲染模式组）
-        layout->addWidget(createRenderingModeGroupForDualView(leftView, rightView));
+
         boundaryLayout->addWidget(rectRadio);
         boundaryLayout->addWidget(circleRadio);
         layout->addWidget(boundaryGroup);
