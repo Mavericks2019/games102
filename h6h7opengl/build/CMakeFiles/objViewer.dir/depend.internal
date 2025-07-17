@@ -362,6 +362,7 @@ CMakeFiles/objViewer.dir/glwidget_core.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qversiontagging.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QColor
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QImage
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QKeyEvent
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QMatrix4x4
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QMouseEvent
@@ -710,6 +711,7 @@ CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qversiontagging.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QColor
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QImage
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QMatrix4x4
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
@@ -1055,6 +1057,7 @@ CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qversiontagging.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QColor
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QImage
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QMatrix4x4
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
@@ -1402,6 +1405,7 @@ CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qversiontagging.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QColor
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QImage
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QMatrix4x4
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
@@ -1747,6 +1751,7 @@ CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qversiontagging.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QColor
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QImage
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QMatrix4x4
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
@@ -2092,6 +2097,7 @@ CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qversiontagging.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QColor
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QImage
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QMatrix4x4
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
@@ -2437,6 +2443,7 @@ CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qversiontagging.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QColor
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QImage
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QMatrix4x4
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
@@ -2788,6 +2795,7 @@ CMakeFiles/objViewer.dir/main.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qversiontagging.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QColor
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QImage
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QMatrix4x4
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions
@@ -3185,6 +3193,7 @@ CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qvector.h
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qversiontagging.h
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QColor
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QImage
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QMatrix4x4
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLBuffer
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions

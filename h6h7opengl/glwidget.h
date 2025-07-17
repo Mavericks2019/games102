@@ -17,6 +17,7 @@
 #include <Eigen/Sparse>
 #include <Eigen/IterativeLinearSolvers>
 #include <QOpenGLTexture> // 新增纹理支持
+#include <QImage> // 用于生成棋格纹理
 
 #define EPSILON 1E-4F 
 
@@ -207,7 +208,8 @@ protected:
     QOpenGLShaderProgram blinnPhongProgram;   // Blinn-Phong shader (Blinn-Phong着色器)
     QOpenGLShaderProgram curvatureProgram;    // Curvature visualization shader (曲率可视化着色器)
     QOpenGLShaderProgram loopSubdivisionProgram; // Loop subdivision shader (Loop细分着色器)
-    
+    QOpenGLShaderProgram textureProgram;
+
     QOpenGLVertexArrayObject vao;         // Vertex array object (顶点数组对象)
     QOpenGLBuffer vbo;                    // Vertex buffer (顶点缓冲区)
     QOpenGLBuffer ebo;                    // Edge index buffer (边索引缓冲区)
