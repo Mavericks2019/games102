@@ -373,6 +373,15 @@ void GLWidget::resizeGL(int w, int h)
 
 void GLWidget::updateTextureCoordinates()
 {
+        // 如果已有参数化纹理坐标，则直接使用
+    if (hasParamTexCoords && !paramTexCoords.empty()) {
+        texCoords = paramTexCoords;
+        return;
+    }
+    
+    // 否则使用默认计算方式
+    texCoords.clear();
+    texCoords.reserve(openMesh.n_vertices() * 2);
     texCoords.clear();
     texCoords.reserve(openMesh.n_vertices() * 2);
     
@@ -761,4 +770,17 @@ void GLWidget::generateCheckerboardTexture()
     checkerboardTexture->setMinificationFilter(QOpenGLTexture::LinearMipMapLinear);
     checkerboardTexture->setMagnificationFilter(QOpenGLTexture::Linear);
     checkerboardTexture->setWrapMode(QOpenGLTexture::Repeat);
+}
+
+// glwidget_core.cpp
+void GLWidget::setParameterizationTexCoords(const std::vector<float>& coords) {
+    paramTexCoords = coords;
+    hasParamTexCoords = true;
+    
+    // 更新纹理坐标缓冲区
+    makeCurrent();
+    texCoordBuffer.bind();
+    texCoordBuffer.allocate(paramTexCoords.data(), paramTexCoords.size() * sizeof(float));
+    doneCurrent();
+    update();
 }

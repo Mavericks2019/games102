@@ -334,6 +334,31 @@ void GLWidget::performParameterization() {
     // 归一化网格到中心原点，范围[-1,1]
     normalizeMesh();
     
+    paramTexCoords.clear();
+    paramTexCoords.reserve(openMesh.n_vertices() * 2);
+    
+    // 计算最小最大值用于归一化
+    float minX = 1e9, maxX = -1e9;
+    float minY = 1e9, maxY = -1e9;
+    for (auto vh : openMesh.vertices()) {
+        auto p = openMesh.point(vh);
+        minX = std::min(minX, p[0]);
+        maxX = std::max(maxX, p[0]);
+        minY = std::min(minY, p[1]);
+        maxY = std::max(maxY, p[1]);
+    }
+    
+    // 归一化到[0,1]范围
+    float rangeX = maxX - minX;
+    float rangeY = maxY - minY;
+    for (auto vh : openMesh.vertices()) {
+        auto p = openMesh.point(vh);
+        float u = (p[0] - minX) / rangeX;
+        float v = (p[1] - minY) / rangeY;
+        paramTexCoords.push_back(u);
+        paramTexCoords.push_back(v);
+    }
+    
     // 重新计算曲率
     calculateCurvatures();
     

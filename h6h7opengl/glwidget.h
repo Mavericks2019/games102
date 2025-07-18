@@ -223,6 +223,14 @@ protected:
 protected:
     bool isDragging;                      // Is mouse dragging (是否正在拖动鼠标)
     QPoint lastMousePos;                  // Last mouse position (最后鼠标位置)
+
+// 添加以下成员和方法
+public:
+    void setParameterizationTexCoords(const std::vector<float>& coords);
+    
+public:
+    std::vector<float> paramTexCoords; // 存储参数化生成的纹理坐标
+    bool hasParamTexCoords = false;   // 是否有参数化纹理坐标
 };
 
 #endif // GLWIDGET_H

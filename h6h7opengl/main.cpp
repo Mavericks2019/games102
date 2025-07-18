@@ -740,14 +740,14 @@ namespace UIUtils {
 
         // 连接参数化按钮信号
         QObject::connect(paramButton, &QPushButton::clicked, [glWidget, paramTab]() {
-            // 获取左视图并执行参数化
             GLWidget* leftView = paramTab->property("leftGLWidget").value<GLWidget*>();
-            // leftView->performParameterization();
-            
-            // 在右视图显示参数化结果
             GLWidget* rightView = paramTab->property("rightGLWidget").value<GLWidget*>();
-            //rightView->openMesh = leftView->openMesh; // 复制网格
+            
+            // 在右视图执行参数化
             rightView->performParameterization();
+            
+            // 将右视图的参数化纹理坐标传递给左视图
+            leftView->setParameterizationTexCoords(rightView->paramTexCoords);
         });
         
         layout->addWidget(paramButton);
