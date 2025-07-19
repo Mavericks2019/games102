@@ -27,14 +27,14 @@ find_package(Eigen3 REQUIRED)  # 添加Eigen库查找
 # 添加可执行文件
 add_executable(${PROJECT_NAME}
     main.cpp
-    glwidget_core.cpp
-    glwidget_mesh_loader.cpp
-    glwidget_curvature.cpp
-    glwidget_minimal_surface.cpp
-    glwidget_loop_subdivision.cpp
-    glwidget_mesh_simplification.cpp
-    glwidget_parameteration.cpp
-    glwidget.h
+    glwidget/glwidget_core.cpp
+    glwidget/glwidget_mesh_loader.cpp
+    glwidget/glwidget_curvature.cpp
+    glwidget/glwidget_minimal_surface.cpp
+    glwidget/glwidget_loop_subdivision.cpp
+    glwidget/glwidget_mesh_simplification.cpp
+    glwidget/glwidget_parameteration.cpp
+    glwidget/glwidget.h
     ${RESOURCE_FILES}
 )
 

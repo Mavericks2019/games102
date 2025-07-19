@@ -98,96 +98,96 @@ CMakeFiles/objViewer.dir/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/main.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/h6h7opengl/main.cpp -o CMakeFiles/objViewer.dir/main.cpp.s
 
-CMakeFiles/objViewer.dir/glwidget_core.cpp.o: CMakeFiles/objViewer.dir/flags.make
-CMakeFiles/objViewer.dir/glwidget_core.cpp.o: ../glwidget_core.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/h6h7opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/objViewer.dir/glwidget_core.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget_core.cpp.o -c /opt/games102/h6h7opengl/glwidget_core.cpp
+CMakeFiles/objViewer.dir/glwidget/glwidget_core.cpp.o: CMakeFiles/objViewer.dir/flags.make
+CMakeFiles/objViewer.dir/glwidget/glwidget_core.cpp.o: ../glwidget/glwidget_core.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/h6h7opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/objViewer.dir/glwidget/glwidget_core.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget/glwidget_core.cpp.o -c /opt/games102/h6h7opengl/glwidget/glwidget_core.cpp
 
-CMakeFiles/objViewer.dir/glwidget_core.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/glwidget_core.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/h6h7opengl/glwidget_core.cpp > CMakeFiles/objViewer.dir/glwidget_core.cpp.i
+CMakeFiles/objViewer.dir/glwidget/glwidget_core.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/glwidget/glwidget_core.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/h6h7opengl/glwidget/glwidget_core.cpp > CMakeFiles/objViewer.dir/glwidget/glwidget_core.cpp.i
 
-CMakeFiles/objViewer.dir/glwidget_core.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/glwidget_core.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/h6h7opengl/glwidget_core.cpp -o CMakeFiles/objViewer.dir/glwidget_core.cpp.s
+CMakeFiles/objViewer.dir/glwidget/glwidget_core.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/glwidget/glwidget_core.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/h6h7opengl/glwidget/glwidget_core.cpp -o CMakeFiles/objViewer.dir/glwidget/glwidget_core.cpp.s
 
-CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: CMakeFiles/objViewer.dir/flags.make
-CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o: ../glwidget_mesh_loader.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/h6h7opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o -c /opt/games102/h6h7opengl/glwidget_mesh_loader.cpp
+CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_loader.cpp.o: CMakeFiles/objViewer.dir/flags.make
+CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_loader.cpp.o: ../glwidget/glwidget_mesh_loader.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/h6h7opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_loader.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_loader.cpp.o -c /opt/games102/h6h7opengl/glwidget/glwidget_mesh_loader.cpp
 
-CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/h6h7opengl/glwidget_mesh_loader.cpp > CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.i
+CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_loader.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_loader.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/h6h7opengl/glwidget/glwidget_mesh_loader.cpp > CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_loader.cpp.i
 
-CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/h6h7opengl/glwidget_mesh_loader.cpp -o CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.s
+CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_loader.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_loader.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/h6h7opengl/glwidget/glwidget_mesh_loader.cpp -o CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_loader.cpp.s
 
-CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: CMakeFiles/objViewer.dir/flags.make
-CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o: ../glwidget_curvature.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/h6h7opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o -c /opt/games102/h6h7opengl/glwidget_curvature.cpp
+CMakeFiles/objViewer.dir/glwidget/glwidget_curvature.cpp.o: CMakeFiles/objViewer.dir/flags.make
+CMakeFiles/objViewer.dir/glwidget/glwidget_curvature.cpp.o: ../glwidget/glwidget_curvature.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/h6h7opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/objViewer.dir/glwidget/glwidget_curvature.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget/glwidget_curvature.cpp.o -c /opt/games102/h6h7opengl/glwidget/glwidget_curvature.cpp
 
-CMakeFiles/objViewer.dir/glwidget_curvature.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/glwidget_curvature.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/h6h7opengl/glwidget_curvature.cpp > CMakeFiles/objViewer.dir/glwidget_curvature.cpp.i
+CMakeFiles/objViewer.dir/glwidget/glwidget_curvature.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/glwidget/glwidget_curvature.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/h6h7opengl/glwidget/glwidget_curvature.cpp > CMakeFiles/objViewer.dir/glwidget/glwidget_curvature.cpp.i
 
-CMakeFiles/objViewer.dir/glwidget_curvature.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/glwidget_curvature.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/h6h7opengl/glwidget_curvature.cpp -o CMakeFiles/objViewer.dir/glwidget_curvature.cpp.s
+CMakeFiles/objViewer.dir/glwidget/glwidget_curvature.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/glwidget/glwidget_curvature.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/h6h7opengl/glwidget/glwidget_curvature.cpp -o CMakeFiles/objViewer.dir/glwidget/glwidget_curvature.cpp.s
 
-CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: CMakeFiles/objViewer.dir/flags.make
-CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o: ../glwidget_minimal_surface.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/h6h7opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o -c /opt/games102/h6h7opengl/glwidget_minimal_surface.cpp
+CMakeFiles/objViewer.dir/glwidget/glwidget_minimal_surface.cpp.o: CMakeFiles/objViewer.dir/flags.make
+CMakeFiles/objViewer.dir/glwidget/glwidget_minimal_surface.cpp.o: ../glwidget/glwidget_minimal_surface.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/h6h7opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/objViewer.dir/glwidget/glwidget_minimal_surface.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget/glwidget_minimal_surface.cpp.o -c /opt/games102/h6h7opengl/glwidget/glwidget_minimal_surface.cpp
 
-CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/h6h7opengl/glwidget_minimal_surface.cpp > CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.i
+CMakeFiles/objViewer.dir/glwidget/glwidget_minimal_surface.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/glwidget/glwidget_minimal_surface.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/h6h7opengl/glwidget/glwidget_minimal_surface.cpp > CMakeFiles/objViewer.dir/glwidget/glwidget_minimal_surface.cpp.i
 
-CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/h6h7opengl/glwidget_minimal_surface.cpp -o CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.s
+CMakeFiles/objViewer.dir/glwidget/glwidget_minimal_surface.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/glwidget/glwidget_minimal_surface.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/h6h7opengl/glwidget/glwidget_minimal_surface.cpp -o CMakeFiles/objViewer.dir/glwidget/glwidget_minimal_surface.cpp.s
 
-CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: CMakeFiles/objViewer.dir/flags.make
-CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o: ../glwidget_loop_subdivision.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/h6h7opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o -c /opt/games102/h6h7opengl/glwidget_loop_subdivision.cpp
+CMakeFiles/objViewer.dir/glwidget/glwidget_loop_subdivision.cpp.o: CMakeFiles/objViewer.dir/flags.make
+CMakeFiles/objViewer.dir/glwidget/glwidget_loop_subdivision.cpp.o: ../glwidget/glwidget_loop_subdivision.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/h6h7opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/objViewer.dir/glwidget/glwidget_loop_subdivision.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget/glwidget_loop_subdivision.cpp.o -c /opt/games102/h6h7opengl/glwidget/glwidget_loop_subdivision.cpp
 
-CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/h6h7opengl/glwidget_loop_subdivision.cpp > CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.i
+CMakeFiles/objViewer.dir/glwidget/glwidget_loop_subdivision.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/glwidget/glwidget_loop_subdivision.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/h6h7opengl/glwidget/glwidget_loop_subdivision.cpp > CMakeFiles/objViewer.dir/glwidget/glwidget_loop_subdivision.cpp.i
 
-CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/h6h7opengl/glwidget_loop_subdivision.cpp -o CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.s
+CMakeFiles/objViewer.dir/glwidget/glwidget_loop_subdivision.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/glwidget/glwidget_loop_subdivision.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/h6h7opengl/glwidget/glwidget_loop_subdivision.cpp -o CMakeFiles/objViewer.dir/glwidget/glwidget_loop_subdivision.cpp.s
 
-CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: CMakeFiles/objViewer.dir/flags.make
-CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o: ../glwidget_mesh_simplification.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/h6h7opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o -c /opt/games102/h6h7opengl/glwidget_mesh_simplification.cpp
+CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_simplification.cpp.o: CMakeFiles/objViewer.dir/flags.make
+CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_simplification.cpp.o: ../glwidget/glwidget_mesh_simplification.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/h6h7opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_simplification.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_simplification.cpp.o -c /opt/games102/h6h7opengl/glwidget/glwidget_mesh_simplification.cpp
 
-CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/h6h7opengl/glwidget_mesh_simplification.cpp > CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.i
+CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_simplification.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_simplification.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/h6h7opengl/glwidget/glwidget_mesh_simplification.cpp > CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_simplification.cpp.i
 
-CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/h6h7opengl/glwidget_mesh_simplification.cpp -o CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.s
+CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_simplification.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_simplification.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/h6h7opengl/glwidget/glwidget_mesh_simplification.cpp -o CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_simplification.cpp.s
 
-CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: CMakeFiles/objViewer.dir/flags.make
-CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o: ../glwidget_parameteration.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/h6h7opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o -c /opt/games102/h6h7opengl/glwidget_parameteration.cpp
+CMakeFiles/objViewer.dir/glwidget/glwidget_parameteration.cpp.o: CMakeFiles/objViewer.dir/flags.make
+CMakeFiles/objViewer.dir/glwidget/glwidget_parameteration.cpp.o: ../glwidget/glwidget_parameteration.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/opt/games102/h6h7opengl/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/objViewer.dir/glwidget/glwidget_parameteration.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/objViewer.dir/glwidget/glwidget_parameteration.cpp.o -c /opt/games102/h6h7opengl/glwidget/glwidget_parameteration.cpp
 
-CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/h6h7opengl/glwidget_parameteration.cpp > CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.i
+CMakeFiles/objViewer.dir/glwidget/glwidget_parameteration.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/objViewer.dir/glwidget/glwidget_parameteration.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /opt/games102/h6h7opengl/glwidget/glwidget_parameteration.cpp > CMakeFiles/objViewer.dir/glwidget/glwidget_parameteration.cpp.i
 
-CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/h6h7opengl/glwidget_parameteration.cpp -o CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.s
+CMakeFiles/objViewer.dir/glwidget/glwidget_parameteration.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/objViewer.dir/glwidget/glwidget_parameteration.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /opt/games102/h6h7opengl/glwidget/glwidget_parameteration.cpp -o CMakeFiles/objViewer.dir/glwidget/glwidget_parameteration.cpp.s
 
 CMakeFiles/objViewer.dir/qrc_shaders.cpp.o: CMakeFiles/objViewer.dir/flags.make
 CMakeFiles/objViewer.dir/qrc_shaders.cpp.o: qrc_shaders.cpp
@@ -206,13 +206,13 @@ CMakeFiles/objViewer.dir/qrc_shaders.cpp.s: cmake_force
 objViewer_OBJECTS = \
 "CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o" \
 "CMakeFiles/objViewer.dir/main.cpp.o" \
-"CMakeFiles/objViewer.dir/glwidget_core.cpp.o" \
-"CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o" \
-"CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o" \
-"CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o" \
-"CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o" \
-"CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o" \
-"CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o" \
+"CMakeFiles/objViewer.dir/glwidget/glwidget_core.cpp.o" \
+"CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_loader.cpp.o" \
+"CMakeFiles/objViewer.dir/glwidget/glwidget_curvature.cpp.o" \
+"CMakeFiles/objViewer.dir/glwidget/glwidget_minimal_surface.cpp.o" \
+"CMakeFiles/objViewer.dir/glwidget/glwidget_loop_subdivision.cpp.o" \
+"CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_simplification.cpp.o" \
+"CMakeFiles/objViewer.dir/glwidget/glwidget_parameteration.cpp.o" \
 "CMakeFiles/objViewer.dir/qrc_shaders.cpp.o"
 
 # External object files for target objViewer
@@ -220,13 +220,13 @@ objViewer_EXTERNAL_OBJECTS =
 
 objViewer: CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o
 objViewer: CMakeFiles/objViewer.dir/main.cpp.o
-objViewer: CMakeFiles/objViewer.dir/glwidget_core.cpp.o
-objViewer: CMakeFiles/objViewer.dir/glwidget_mesh_loader.cpp.o
-objViewer: CMakeFiles/objViewer.dir/glwidget_curvature.cpp.o
-objViewer: CMakeFiles/objViewer.dir/glwidget_minimal_surface.cpp.o
-objViewer: CMakeFiles/objViewer.dir/glwidget_loop_subdivision.cpp.o
-objViewer: CMakeFiles/objViewer.dir/glwidget_mesh_simplification.cpp.o
-objViewer: CMakeFiles/objViewer.dir/glwidget_parameteration.cpp.o
+objViewer: CMakeFiles/objViewer.dir/glwidget/glwidget_core.cpp.o
+objViewer: CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_loader.cpp.o
+objViewer: CMakeFiles/objViewer.dir/glwidget/glwidget_curvature.cpp.o
+objViewer: CMakeFiles/objViewer.dir/glwidget/glwidget_minimal_surface.cpp.o
+objViewer: CMakeFiles/objViewer.dir/glwidget/glwidget_loop_subdivision.cpp.o
+objViewer: CMakeFiles/objViewer.dir/glwidget/glwidget_mesh_simplification.cpp.o
+objViewer: CMakeFiles/objViewer.dir/glwidget/glwidget_parameteration.cpp.o
 objViewer: CMakeFiles/objViewer.dir/qrc_shaders.cpp.o
 objViewer: CMakeFiles/objViewer.dir/build.make
 objViewer: /usr/lib/x86_64-linux-gnu/libQt5OpenGL.so.5.12.8

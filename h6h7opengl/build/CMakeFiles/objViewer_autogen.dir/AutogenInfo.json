@@ -8,9 +8,9 @@
 	"HEADERS" : 
 	[
 		[
-			"/opt/games102/h6h7opengl/glwidget.h",
+			"/opt/games102/h6h7opengl/glwidget/glwidget.h",
 			"MU",
-			"EWIEGA46WW/moc_glwidget.cpp"
+			"KTNQVRIVIS/moc_glwidget.cpp"
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
@@ -71,13 +71,22 @@
 	"SETTINGS_FILE" : "/opt/games102/h6h7opengl/build/CMakeFiles/objViewer_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
-		[ "/opt/games102/h6h7opengl/glwidget_core.cpp", "MU" ],
-		[ "/opt/games102/h6h7opengl/glwidget_curvature.cpp", "MU" ],
-		[ "/opt/games102/h6h7opengl/glwidget_loop_subdivision.cpp", "MU" ],
-		[ "/opt/games102/h6h7opengl/glwidget_mesh_loader.cpp", "MU" ],
-		[ "/opt/games102/h6h7opengl/glwidget_mesh_simplification.cpp", "MU" ],
-		[ "/opt/games102/h6h7opengl/glwidget_minimal_surface.cpp", "MU" ],
-		[ "/opt/games102/h6h7opengl/glwidget_parameteration.cpp", "MU" ],
+		[ "/opt/games102/h6h7opengl/glwidget/glwidget_core.cpp", "MU" ],
+		[ "/opt/games102/h6h7opengl/glwidget/glwidget_curvature.cpp", "MU" ],
+		[
+			"/opt/games102/h6h7opengl/glwidget/glwidget_loop_subdivision.cpp",
+			"MU"
+		],
+		[ "/opt/games102/h6h7opengl/glwidget/glwidget_mesh_loader.cpp", "MU" ],
+		[
+			"/opt/games102/h6h7opengl/glwidget/glwidget_mesh_simplification.cpp",
+			"MU"
+		],
+		[
+			"/opt/games102/h6h7opengl/glwidget/glwidget_minimal_surface.cpp",
+			"MU"
+		],
+		[ "/opt/games102/h6h7opengl/glwidget/glwidget_parameteration.cpp", "MU" ],
 		[ "/opt/games102/h6h7opengl/main.cpp", "MU" ]
 	],
 	"UIC_OPTIONS" : [],

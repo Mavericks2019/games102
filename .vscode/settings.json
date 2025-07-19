@@ -70,6 +70,7 @@
         "typeindex": "cpp",
         "queue": "cpp",
         "qopenglwidget": "cpp",
-        "sparselu": "cpp"
+        "sparselu": "cpp",
+        "dense": "cpp"
     }
 }

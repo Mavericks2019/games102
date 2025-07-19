@@ -1,4 +1,4 @@
-#include "glwidget.h"
+#include "glwidget/glwidget.h"
 #include <QApplication>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -348,6 +348,7 @@ namespace UIUtils {
         QRadioButton *gaussianRadio = new QRadioButton("Gaussian Curvature");
         QRadioButton *meanRadio = new QRadioButton("Mean Curvature");
         QRadioButton *maxRadio = new QRadioButton("Max Curvature");
+        QRadioButton *textureRadio = new QRadioButton("Texture Mapping");
         
         solidRadio->setChecked(true);
         
@@ -355,6 +356,7 @@ namespace UIUtils {
         layout->addWidget(gaussianRadio);
         layout->addWidget(meanRadio);
         layout->addWidget(maxRadio);
+        layout->addWidget(textureRadio);
         
         // 连接渲染模式信号
         auto connectMode = [glWidget, tabWidget](QRadioButton* radio, GLWidget::RenderMode mode) {
@@ -370,6 +372,7 @@ namespace UIUtils {
         connectMode(gaussianRadio, GLWidget::GaussianCurvature);
         connectMode(meanRadio, GLWidget::MeanCurvature);
         connectMode(maxRadio, GLWidget::MaxCurvature);
+        connectMode(textureRadio, GLWidget::TextureMapping);
         
         return group;
     }
@@ -402,7 +405,7 @@ namespace UIUtils {
         return group;
     }
 
-    // 创建显示选项组（双视图）- 新增函数
+    // 创建显示选项组（双视图）
     QGroupBox* createDisplayOptionsGroupForDualView(GLWidget* leftView, GLWidget* rightView) {
         QGroupBox *group = new QGroupBox("Display Options");
         QVBoxLayout *layout = new QVBoxLayout(group);
@@ -493,7 +496,7 @@ namespace UIUtils {
         QRadioButton *gaussianRadio = new QRadioButton("Gaussian Curvature");
         QRadioButton *meanRadio = new QRadioButton("Mean Curvature");
         QRadioButton *maxRadio = new QRadioButton("Max Curvature");
-        QRadioButton *textureRadio = new QRadioButton("Texture Mapping"); // 新增纹理映射选项
+        QRadioButton *textureRadio = new QRadioButton("Texture Mapping");
         
         solidRadio->setChecked(true);
         
@@ -501,7 +504,7 @@ namespace UIUtils {
         layout->addWidget(gaussianRadio);
         layout->addWidget(meanRadio);
         layout->addWidget(maxRadio);
-        layout->addWidget(textureRadio); // 添加纹理选项
+        layout->addWidget(textureRadio);
         
         // 连接信号：同时设置左右视图
         auto connectMode = [leftView, rightView](QRadioButton* radio, GLWidget::RenderMode mode) {
@@ -515,7 +518,7 @@ namespace UIUtils {
         connectMode(gaussianRadio, GLWidget::GaussianCurvature);
         connectMode(meanRadio, GLWidget::MeanCurvature);
         connectMode(maxRadio, GLWidget::MaxCurvature);
-        connectMode(textureRadio, GLWidget::TextureMapping); // 纹理映射模式
+        connectMode(textureRadio, GLWidget::TextureMapping);
         
         return group;
     }
@@ -601,7 +604,7 @@ namespace UIUtils {
         GLWidget *rightView = new GLWidget;
         
         // 设置右侧视图为参数化视图（禁止旋转）
-        rightView->isParameterizationView = false;// 新增
+        rightView->isParameterizationView = false;
         
         // 添加视图
         splitter->addWidget(leftView);
@@ -617,7 +620,7 @@ namespace UIUtils {
         return tab;
     }
 
-    // 创建OBJ模型控制面板
+    // 创建OBJ模型控制面板（包含网格操作和Loop细分控件）
     QWidget* createModelControlPanel(GLWidget* glWidget, QLabel* infoLabel, QWidget* mainWindow, QTabWidget* tabWidget) {
         QWidget *panel = new QWidget;
         QVBoxLayout *layout = new QVBoxLayout(panel);
@@ -631,12 +634,16 @@ namespace UIUtils {
         layout->addWidget(createIterationMethodGroup(glWidget, tabWidget));
         layout->addWidget(createMinimalSurfaceGroup(glWidget, tabWidget));
         
+        // 添加网格操作和Loop细分组（只在模型标签页显示）
+        layout->addWidget(createMeshOperationsGroup(glWidget, tabWidget));
+        layout->addWidget(createLoopSubdivisionGroup(glWidget, tabWidget));
+        
         layout->addStretch();
         return panel;
     }
 
-    // 创建参数化控制面板
-    QWidget* createParameterizationControlPanel(GLWidget* glWidget, QWidget* paramTab, QTabWidget* tabWidget) {
+    // 创建参数化控制面板（已移除网格操作和Loop细分控件）
+    QWidget* createParameterizationControlPanel(GLWidget* glWidget, QWidget* paramTab) {
         QWidget *panel = new QWidget;
         QVBoxLayout *layout = new QVBoxLayout(panel);
         
@@ -668,38 +675,10 @@ namespace UIUtils {
         });
         layout->addWidget(loadButton);
         
-        // 添加渲染模式组
-        QGroupBox *renderModeGroup = new QGroupBox("Rendering Mode");
-        QVBoxLayout *renderLayout = new QVBoxLayout(renderModeGroup);
+        // 添加渲染模式组（双视图）
+        layout->addWidget(createRenderingModeGroupForDualView(leftView, rightView));
         
-        QRadioButton *solidRadio = new QRadioButton("Solid (Blinn-Phong)");
-        QRadioButton *gaussianRadio = new QRadioButton("Gaussian Curvature");
-        QRadioButton *meanRadio = new QRadioButton("Mean Curvature");
-        QRadioButton *maxRadio = new QRadioButton("Max Curvature");
-        
-        solidRadio->setChecked(true);
-        
-        renderLayout->addWidget(solidRadio);
-        renderLayout->addWidget(gaussianRadio);
-        renderLayout->addWidget(meanRadio);
-        renderLayout->addWidget(maxRadio);
-        
-        // 连接信号：同时设置左右视图
-        auto connectMode = [leftView, rightView](QRadioButton* radio, GLWidget::RenderMode mode) {
-            QObject::connect(radio, &QRadioButton::clicked, [leftView, rightView, mode]() {
-                leftView->setRenderMode(mode);
-                rightView->setRenderMode(mode);
-            });
-        };
-        
-        connectMode(solidRadio, GLWidget::BlinnPhong);
-        connectMode(gaussianRadio, GLWidget::GaussianCurvature);
-        connectMode(meanRadio, GLWidget::MeanCurvature);
-        connectMode(maxRadio, GLWidget::MaxCurvature);
-        
-        layout->addWidget(renderModeGroup);
-        
-        // 添加显示选项组（双视图）- 新增
+        // 添加显示选项组（双视图）
         layout->addWidget(createDisplayOptionsGroupForDualView(leftView, rightView));
         
         // 添加边界选项
@@ -718,8 +697,7 @@ namespace UIUtils {
         QObject::connect(circleRadio, &QRadioButton::clicked, [rightView]() {
             rightView->setBoundaryType(GLWidget::Circle);
         });
-        // 添加渲染模式组（使用新的双视图渲染模式组）
-        layout->addWidget(createRenderingModeGroupForDualView(leftView, rightView));
+        
         boundaryLayout->addWidget(rectRadio);
         boundaryLayout->addWidget(circleRadio);
         layout->addWidget(boundaryGroup);
@@ -853,19 +831,15 @@ int main(int argc, char *argv[])
     QStackedLayout *stackedLayout = new QStackedLayout;
     controlLayout->addLayout(stackedLayout);
     
-    // 创建模型控制面板
+    // 创建模型控制面板（包含网格操作和Loop细分）
     stackedLayout->addWidget(UIUtils::createModelControlPanel(
         glWidget, modelInfoLabel, &mainWindow, tabWidget
     ));
     
-    // 创建参数化控制面板
+    // 创建参数化控制面板（移除网格操作和Loop细分）
     stackedLayout->addWidget(UIUtils::createParameterizationControlPanel(
-        glWidget, paramTab, tabWidget
+        glWidget, paramTab
     ));
-    
-    // ==== 网格操作组 ====
-    controlLayout->addWidget(UIUtils::createMeshOperationsGroup(glWidget, tabWidget));
-    controlLayout->addWidget(UIUtils::createLoopSubdivisionGroup(glWidget, tabWidget));
     
     // 连接标签切换信号
     QObject::connect(tabWidget, &QTabWidget::currentChanged, [stackedLayout](int index) {
