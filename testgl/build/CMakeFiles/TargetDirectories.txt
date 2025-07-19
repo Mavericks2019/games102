@@ -1,3 +1,5 @@
-/opt/games102/testgl/build/CMakeFiles/PathTracingRenderer.dir
+/opt/games102/testgl/build/CMakeFiles/PathTracer.dir
 /opt/games102/testgl/build/CMakeFiles/edit_cache.dir
 /opt/games102/testgl/build/CMakeFiles/rebuild_cache.dir
+/opt/games102/testgl/build/CMakeFiles/PathTracer_autogen_timestamp_deps.dir
+/opt/games102/testgl/build/CMakeFiles/PathTracer_autogen.dir

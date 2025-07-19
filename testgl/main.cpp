@@ -1,14 +1,14 @@
 #include <QApplication>
 #include <QOpenGLWindow>
-#include <QOpenGLFunctions_4_2_Core>
+#include <QOpenGLFunctions_4_3_Core>
 #include <QOpenGLShaderProgram>
 #include <QOpenGLTexture>
 #include <QTime>
 #include <random>
 
-// 计算着色器代码
+// 计算着色器代码 (移动到全局作用域)
 const char* computeShaderSource = R"(
-#version 420 core
+#version 430 core
 layout(local_size_x = 16, local_size_y = 16) in;
 layout(rgba32f, binding = 0) uniform image2D outputImage;
 layout(rgba32f, binding = 1) uniform image2D accumImage;
@@ -195,9 +195,9 @@ void main() {
 }
 )";
 
-// 顶点着色器 (全屏四边形)
+// 顶点着色器 (全屏四边形) (移动到全局作用域)
 const char* vertexShaderSource = R"(
-#version 420 core
+#version 430 core
 layout(location = 0) in vec2 position;
 out vec2 uv;
 void main() {
@@ -206,9 +206,9 @@ void main() {
 }
 )";
 
-// 片段着色器
+// 片段着色器 (移动到全局作用域)
 const char* fragmentShaderSource = R"(
-#version 420 core
+#version 430 core
 in vec2 uv;
 out vec4 fragColor;
 uniform sampler2D tex;
@@ -220,11 +220,17 @@ void main() {
 }
 )";
 
-class PathTracingWindow : public QOpenGLWindow, protected QOpenGLFunctions_4_2_Core {
+class PathTracingWindow : public QOpenGLWindow, protected QOpenGLFunctions_4_3_Core {
 public:
     PathTracingWindow() : frameCount(0) {
         setTitle("Path Tracer - Cornell Box");
         resize(800, 600);
+        
+        // 设置OpenGL 4.3核心上下文
+        QSurfaceFormat format;
+        format.setVersion(4, 3);
+        format.setProfile(QSurfaceFormat::CoreProfile);
+        setFormat(format);
     }
     
 protected:
@@ -265,7 +271,7 @@ protected:
     void createTextures() {
         QSize size = this->size() * devicePixelRatio();
         
-        // 输出纹理 (用于显示)
+        // 输出纹理
         glGenTextures(1, &outputTex);
         glBindTexture(GL_TEXTURE_2D, outputTex);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, size.width(), size.height(), 
@@ -289,7 +295,7 @@ protected:
     
     void resizeGL(int w, int h) override {
         createTextures();
-        frameCount = 0; // 重置帧计数
+        frameCount = 0;
     }
     
     void paintGL() override {
@@ -322,14 +328,16 @@ protected:
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         
-        // 每帧更新
         update();
     }
     
 private:
-    QOpenGLShaderProgram *computeProgram, *renderProgram;
-    GLuint vao, vbo;
-    GLuint outputTex, accumTex;
+    QOpenGLShaderProgram *computeProgram = nullptr;
+    QOpenGLShaderProgram *renderProgram = nullptr;
+    GLuint vao = 0;
+    GLuint vbo = 0;
+    GLuint outputTex = 0;
+    GLuint accumTex = 0;
     int frameCount;
 };
 

@@ -5,4 +5,5 @@
 /opt/games102/h6h7opengl/build/CMakeFiles/install.dir
 /opt/games102/h6h7opengl/build/CMakeFiles/install/local.dir
 /opt/games102/h6h7opengl/build/CMakeFiles/install/strip.dir
+/opt/games102/h6h7opengl/build/CMakeFiles/objViewer_autogen_timestamp_deps.dir
 /opt/games102/h6h7opengl/build/CMakeFiles/objViewer_autogen.dir

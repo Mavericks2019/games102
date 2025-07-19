@@ -24,6 +24,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/objViewer.dir/qrc_shaders.cpp.o.d"
   "objViewer"
   "objViewer.pdb"
+  "objViewer_autogen/mocs_compilation.cpp"
+  "objViewer_autogen/timestamp"
   "qrc_shaders.cpp"
 )
 

@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "" "objViewer_autogen/timestamp" "custom" "objViewer_autogen/deps"
   "/opt/games102/h6h7opengl/glwidget/glwidget_core.cpp" "CMakeFiles/objViewer.dir/glwidget/glwidget_core.cpp.o" "gcc" "CMakeFiles/objViewer.dir/glwidget/glwidget_core.cpp.o.d"
   "/opt/games102/h6h7opengl/glwidget/glwidget_curvature.cpp" "CMakeFiles/objViewer.dir/glwidget/glwidget_curvature.cpp.o" "gcc" "CMakeFiles/objViewer.dir/glwidget/glwidget_curvature.cpp.o.d"
   "/opt/games102/h6h7opengl/glwidget/glwidget_loop_subdivision.cpp" "CMakeFiles/objViewer.dir/glwidget/glwidget_loop_subdivision.cpp.o" "gcc" "CMakeFiles/objViewer.dir/glwidget/glwidget_loop_subdivision.cpp.o.d"
@@ -20,8 +21,12 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/opt/games102/h6h7opengl/build/qrc_shaders.cpp" "CMakeFiles/objViewer.dir/qrc_shaders.cpp.o" "gcc" "CMakeFiles/objViewer.dir/qrc_shaders.cpp.o.d"
   )
 
-# Targets to which this target links.
-set(CMAKE_TARGET_LINKED_INFO_FILES
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
+  )
+
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_FORWARD_LINKED_INFO_FILES
   )
 
 # Fortran module output directory.
