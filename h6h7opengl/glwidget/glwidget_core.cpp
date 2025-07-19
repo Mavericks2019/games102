@@ -17,6 +17,9 @@
 #include <unordered_set>
 #include <Eigen/Dense>
 #include <QImage> // 用于生成棋格纹理
+// 在文件顶部添加这两个头文件
+#include <QPainter>
+#include <QFont>
 
 using namespace OpenMesh;
 
@@ -753,16 +756,52 @@ void GLWidget::centerView()
 void GLWidget::generateCheckerboardTexture()
 {
     const int size = 512;
+    const int tileSize = 32;  // 每个格子的大小
     QImage image(size, size, QImage::Format_RGB32);
     
-    // 创建棋格图案
-    for (int y = 0; y < size; y++) {
-        for (int x = 0; x < size; x++) {
-            // 每16像素一个格子
-            bool isBlack = ((x / 32) % 2) ^ ((y / 32) % 2);
-            image.setPixel(x, y, isBlack ? qRgb(0, 0, 0) : qRgb(255, 255, 255));
+    // 设置棕色和白色
+    const QColor brownColor(139, 69, 19);  // RGB for saddle brown
+    const QColor whiteColor(255, 255, 255);
+    
+    // 创建QPainter绘制文本
+    QPainter painter(&image);
+    QFont font;
+    font.setFamily("Arial");
+    font.setPixelSize(tileSize / 2);  // 字体大小为格子的一半
+    font.setBold(true);
+    painter.setFont(font);
+    
+    // 字母序列 (A-Z)
+    const QString letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    
+    // 创建棋格图案并添加字母
+    for (int y = 0; y < size; y += tileSize) {
+        for (int x = 0; x < size; x += tileSize) {
+            // 确定当前格子颜色
+            bool isBrown = ((x / tileSize) % 2) ^ ((y / tileSize) % 2);
+            QColor tileColor = isBrown ? brownColor : whiteColor;
+            
+            // 填充整个格子
+            for (int dy = 0; dy < tileSize && y + dy < size; dy++) {
+                for (int dx = 0; dx < tileSize && x + dx < size; dx++) {
+                    image.setPixel(x + dx, y + dy, tileColor.rgb());
+                }
+            }
+            
+            // 计算当前格子索引
+            int tileIndex = (y / tileSize) * (size / tileSize) + (x / tileSize);
+            char currentChar = letters.at(tileIndex % letters.length()).toLatin1();
+            
+            // 设置文本颜色（对比色）
+            painter.setPen(isBrown ? whiteColor : brownColor);
+            
+            // 在格子中心绘制字母
+            QRect tileRect(x, y, tileSize, tileSize);
+            painter.drawText(tileRect, Qt::AlignCenter, QString(currentChar));
         }
     }
+    
+    painter.end();  // 结束绘制
     
     // 创建OpenGL纹理
     if (checkerboardTexture) delete checkerboardTexture;

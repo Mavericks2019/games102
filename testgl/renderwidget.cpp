@@ -1,7 +1,7 @@
 #include "renderwidget.h"
 #include <QFile>
 #include <QDebug>
-#include <GL/glew.h>
+#include <QOpenGLExtraFunctions> // Replace QOpenGLFunctions with this
 
 RenderWidget::RenderWidget(QWidget *parent)
     : QOpenGLWidget(parent) {
