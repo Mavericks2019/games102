@@ -1,5 +1,7 @@
-#version 120
-uniform vec4 lineColor; // 添加颜色uniform变量
+#version 420 core
+out vec4 FragColor;
+uniform vec4 lineColor;
+
 void main() {
-   gl_FragColor = lineColor; // 使用uniform变量设置颜色
+   FragColor = lineColor;
 }

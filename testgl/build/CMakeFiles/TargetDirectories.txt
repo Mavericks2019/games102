@@ -1,8 +1,3 @@
-/opt/games102/testgl/build/CMakeFiles/install/local.dir
-/opt/games102/testgl/build/CMakeFiles/install.dir
-/opt/games102/testgl/build/CMakeFiles/list_install_components.dir
 /opt/games102/testgl/build/CMakeFiles/rebuild_cache.dir
 /opt/games102/testgl/build/CMakeFiles/edit_cache.dir
-/opt/games102/testgl/build/CMakeFiles/install/strip.dir
-/opt/games102/testgl/build/CMakeFiles/ObjViewer.dir
-/opt/games102/testgl/build/CMakeFiles/ObjViewer_autogen.dir
+/opt/games102/testgl/build/CMakeFiles/PathTracingRenderer.dir

@@ -66,6 +66,9 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/share/cmake-3.16/Modules/Compiler/GNU-C.cmake"
   "/usr/share/cmake-3.16/Modules/Compiler/GNU-CXX.cmake"
   "/usr/share/cmake-3.16/Modules/Compiler/GNU.cmake"
+  "/usr/share/cmake-3.16/Modules/FindOpenGL.cmake"
+  "/usr/share/cmake-3.16/Modules/FindPackageHandleStandardArgs.cmake"
+  "/usr/share/cmake-3.16/Modules/FindPackageMessage.cmake"
   "/usr/share/cmake-3.16/Modules/Internal/CMakeCheckCompilerFlag.cmake"
   "/usr/share/cmake-3.16/Modules/Platform/Linux-GNU-C.cmake"
   "/usr/share/cmake-3.16/Modules/Platform/Linux-GNU-CXX.cmake"
@@ -82,12 +85,10 @@ set(CMAKE_MAKEFILE_OUTPUTS
 
 # Byproducts of CMake generate step:
 set(CMAKE_MAKEFILE_PRODUCTS
-  "CMakeFiles/ObjViewer_autogen.dir/AutogenInfo.json"
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   )
 
 # Dependency information for all targets:
 set(CMAKE_DEPEND_INFO_FILES
-  "CMakeFiles/ObjViewer.dir/DependInfo.cmake"
-  "CMakeFiles/ObjViewer_autogen.dir/DependInfo.cmake"
+  "CMakeFiles/PathTracingRenderer.dir/DependInfo.cmake"
   )

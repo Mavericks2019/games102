@@ -56,40 +56,6 @@ CMAKE_BINARY_DIR = /opt/games102/testgl/build
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target install/local
-install/local: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local
-
-# Special rule for the target install/local
-install/local/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing only the local directory..."
-	/usr/bin/cmake -DCMAKE_INSTALL_LOCAL_ONLY=1 -P cmake_install.cmake
-.PHONY : install/local/fast
-
-# Special rule for the target install
-install: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
-.PHONY : install
-
-# Special rule for the target install
-install/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Install the project..."
-	/usr/bin/cmake -P cmake_install.cmake
-.PHONY : install/fast
-
-# Special rule for the target list_install_components
-list_install_components:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Available install components are: \"Unspecified\""
-.PHONY : list_install_components
-
-# Special rule for the target list_install_components
-list_install_components/fast: list_install_components
-
-.PHONY : list_install_components/fast
-
 # Special rule for the target rebuild_cache
 rebuild_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
@@ -111,18 +77,6 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
-
-# Special rule for the target install/strip
-install/strip: preinstall
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip
-
-# Special rule for the target install/strip
-install/strip/fast: preinstall/fast
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Installing the project stripped..."
-	/usr/bin/cmake -DCMAKE_INSTALL_DO_STRIP=1 -P cmake_install.cmake
-.PHONY : install/strip/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -157,57 +111,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named ObjViewer
+# Target rules for targets named PathTracingRenderer
 
 # Build rule for target.
-ObjViewer: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ObjViewer
-.PHONY : ObjViewer
+PathTracingRenderer: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 PathTracingRenderer
+.PHONY : PathTracingRenderer
 
 # fast build rule for target.
-ObjViewer/fast:
-	$(MAKE) -f CMakeFiles/ObjViewer.dir/build.make CMakeFiles/ObjViewer.dir/build
-.PHONY : ObjViewer/fast
-
-#=============================================================================
-# Target rules for targets named ObjViewer_autogen
-
-# Build rule for target.
-ObjViewer_autogen: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 ObjViewer_autogen
-.PHONY : ObjViewer_autogen
-
-# fast build rule for target.
-ObjViewer_autogen/fast:
-	$(MAKE) -f CMakeFiles/ObjViewer_autogen.dir/build.make CMakeFiles/ObjViewer_autogen.dir/build
-.PHONY : ObjViewer_autogen/fast
-
-ObjViewer_autogen/mocs_compilation.o: ObjViewer_autogen/mocs_compilation.cpp.o
-
-.PHONY : ObjViewer_autogen/mocs_compilation.o
-
-# target to build an object file
-ObjViewer_autogen/mocs_compilation.cpp.o:
-	$(MAKE) -f CMakeFiles/ObjViewer.dir/build.make CMakeFiles/ObjViewer.dir/ObjViewer_autogen/mocs_compilation.cpp.o
-.PHONY : ObjViewer_autogen/mocs_compilation.cpp.o
-
-ObjViewer_autogen/mocs_compilation.i: ObjViewer_autogen/mocs_compilation.cpp.i
-
-.PHONY : ObjViewer_autogen/mocs_compilation.i
-
-# target to preprocess a source file
-ObjViewer_autogen/mocs_compilation.cpp.i:
-	$(MAKE) -f CMakeFiles/ObjViewer.dir/build.make CMakeFiles/ObjViewer.dir/ObjViewer_autogen/mocs_compilation.cpp.i
-.PHONY : ObjViewer_autogen/mocs_compilation.cpp.i
-
-ObjViewer_autogen/mocs_compilation.s: ObjViewer_autogen/mocs_compilation.cpp.s
-
-.PHONY : ObjViewer_autogen/mocs_compilation.s
-
-# target to generate assembly for a file
-ObjViewer_autogen/mocs_compilation.cpp.s:
-	$(MAKE) -f CMakeFiles/ObjViewer.dir/build.make CMakeFiles/ObjViewer.dir/ObjViewer_autogen/mocs_compilation.cpp.s
-.PHONY : ObjViewer_autogen/mocs_compilation.cpp.s
+PathTracingRenderer/fast:
+	$(MAKE) -f CMakeFiles/PathTracingRenderer.dir/build.make CMakeFiles/PathTracingRenderer.dir/build
+.PHONY : PathTracingRenderer/fast
 
 main.o: main.cpp.o
 
@@ -215,7 +129,7 @@ main.o: main.cpp.o
 
 # target to build an object file
 main.cpp.o:
-	$(MAKE) -f CMakeFiles/ObjViewer.dir/build.make CMakeFiles/ObjViewer.dir/main.cpp.o
+	$(MAKE) -f CMakeFiles/PathTracingRenderer.dir/build.make CMakeFiles/PathTracingRenderer.dir/main.cpp.o
 .PHONY : main.cpp.o
 
 main.i: main.cpp.i
@@ -224,7 +138,7 @@ main.i: main.cpp.i
 
 # target to preprocess a source file
 main.cpp.i:
-	$(MAKE) -f CMakeFiles/ObjViewer.dir/build.make CMakeFiles/ObjViewer.dir/main.cpp.i
+	$(MAKE) -f CMakeFiles/PathTracingRenderer.dir/build.make CMakeFiles/PathTracingRenderer.dir/main.cpp.i
 .PHONY : main.cpp.i
 
 main.s: main.cpp.s
@@ -233,8 +147,35 @@ main.s: main.cpp.s
 
 # target to generate assembly for a file
 main.cpp.s:
-	$(MAKE) -f CMakeFiles/ObjViewer.dir/build.make CMakeFiles/ObjViewer.dir/main.cpp.s
+	$(MAKE) -f CMakeFiles/PathTracingRenderer.dir/build.make CMakeFiles/PathTracingRenderer.dir/main.cpp.s
 .PHONY : main.cpp.s
+
+renderwidget.o: renderwidget.cpp.o
+
+.PHONY : renderwidget.o
+
+# target to build an object file
+renderwidget.cpp.o:
+	$(MAKE) -f CMakeFiles/PathTracingRenderer.dir/build.make CMakeFiles/PathTracingRenderer.dir/renderwidget.cpp.o
+.PHONY : renderwidget.cpp.o
+
+renderwidget.i: renderwidget.cpp.i
+
+.PHONY : renderwidget.i
+
+# target to preprocess a source file
+renderwidget.cpp.i:
+	$(MAKE) -f CMakeFiles/PathTracingRenderer.dir/build.make CMakeFiles/PathTracingRenderer.dir/renderwidget.cpp.i
+.PHONY : renderwidget.cpp.i
+
+renderwidget.s: renderwidget.cpp.s
+
+.PHONY : renderwidget.s
+
+# target to generate assembly for a file
+renderwidget.cpp.s:
+	$(MAKE) -f CMakeFiles/PathTracingRenderer.dir/build.make CMakeFiles/PathTracingRenderer.dir/renderwidget.cpp.s
+.PHONY : renderwidget.cpp.s
 
 # Help Target
 help:
@@ -242,20 +183,15 @@ help:
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... install/local"
-	@echo "... install"
-	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... install/strip"
-	@echo "... ObjViewer"
-	@echo "... ObjViewer_autogen"
-	@echo "... ObjViewer_autogen/mocs_compilation.o"
-	@echo "... ObjViewer_autogen/mocs_compilation.i"
-	@echo "... ObjViewer_autogen/mocs_compilation.s"
+	@echo "... PathTracingRenderer"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... renderwidget.o"
+	@echo "... renderwidget.i"
+	@echo "... renderwidget.s"
 .PHONY : help
 
 

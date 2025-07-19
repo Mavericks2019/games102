@@ -1,18 +1,18 @@
-#version 120
-attribute vec3 aPos;
-attribute vec3 aNormal;
-attribute float aCurvature;  // 添加曲率属性
+#version 420 core
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec3 aNormal;
+layout(location = 2) in float aCurvature;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 uniform mat3 normalMatrix;
-varying vec3 FragPos;
-varying vec3 Normal;
-varying float Curvature;  // 传递曲率到片段着色器
+out vec3 FragPos;
+out vec3 Normal;
+out float Curvature;
 
 void main() {
    FragPos = vec3(model * vec4(aPos, 1.0));
    Normal = normalMatrix * aNormal;
-   Curvature = aCurvature;  // 传递曲率值
+   Curvature = aCurvature;
    gl_Position = projection * view * vec4(FragPos, 1.0);
 }
