@@ -231,6 +231,18 @@ public:
 public:
     std::vector<float> paramTexCoords; // 存储参数化生成的纹理坐标
     bool hasParamTexCoords = false;   // 是否有参数化纹理坐标
+
+// ========== CVT ITERATION ========== //
+public:
+    void performCVTIteration();   // 执行CVT迭代
+    void calculateCVT();          // 计算CVT迭代
+    void updateVoronoiDiagram();   // 更新Voronoi图
+    void clipVoronoiToBoundary(std::vector<QVector2D>& cell, const QVector2D& site);  // 裁剪Voronoi多边形到边界
+
+    // 添加CVT控件相关变量
+    int cvtIterations = 10;       // CVT迭代次数
+    int currentCVTLevel = 0;       // 当前CVT迭代级别
+    bool isCVTActive = false;      // CVT是否激活
 };
 
 #endif // GLWIDGET_H

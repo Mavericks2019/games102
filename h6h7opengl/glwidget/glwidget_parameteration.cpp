@@ -6,6 +6,231 @@
 #include <queue>
 #include <fstream>
 #include <Eigen/SparseLU>
+#include <QVector2D>
+#include <QPolygonF>
+#include <QLineF>
+#include <limits>
+
+// 计算两点之间的距离
+float distance(const QVector2D& a, const QVector2D& b) {
+    return (a - b).length();
+}
+
+// 计算两点之间的中点
+QVector2D midpoint(const QVector2D& a, const QVector2D& b) {
+    return (a + b) * 0.5f;
+}
+
+// 计算垂直平分线
+QLineF perpendicularBisector(const QVector2D& a, const QVector2D& b) {
+    QVector2D mid = midpoint(a, b);
+    QVector2D dir = (b - a).normalized();
+    QVector2D normal(-dir.y(), dir.x()); // 垂直方向
+    
+    return QLineF(mid.toPointF(), (mid + normal).toPointF());
+}
+
+// 计算直线与矩形边界的交点
+QVector2D intersectLineWithBoundary(const QLineF& line) {
+    // 边界矩形 [0,0] 到 [1,1]
+    QRectF boundary(0, 0, 1, 1);
+    
+    // 检查与四条边的交点
+    QPointF intersection;
+    if (line.intersects(QLineF(boundary.topLeft(), boundary.topRight()), &intersection)) {
+        return QVector2D(intersection);
+    } else if (line.intersects(QLineF(boundary.topRight(), boundary.bottomRight()), &intersection)) {
+        return QVector2D(intersection);
+    } else if (line.intersects(QLineF(boundary.bottomRight(), boundary.bottomLeft()), &intersection)) {
+        return QVector2D(intersection);
+    } else if (line.intersects(QLineF(boundary.bottomLeft(), boundary.topLeft()), &intersection)) {
+        return QVector2D(intersection);
+    }
+    
+    // 如果没有交点，返回一个无效点
+    return QVector2D(-1, -1);
+}
+
+// 裁剪Voronoi多边形到边界
+void GLWidget::clipVoronoiToBoundary(std::vector<QVector2D>& cell, const QVector2D& site) {
+    // 边界矩形 [0,0] 到 [1,1]
+    QRectF boundary(0, 0, 1, 1);
+    
+    // 检查每个点是否在边界内
+    for (int i = 0; i < cell.size(); ) {
+        if (!boundary.contains(cell[i].toPointF())) {
+            // 移除边界外的点
+            cell.erase(cell.begin() + i);
+        } else {
+            i++;
+        }
+    }
+    
+    // 添加边界交点
+    for (int i = 0; i < cell.size(); i++) {
+        int next = (i + 1) % cell.size();
+        QLineF edge(cell[i].toPointF(), cell[next].toPointF());
+        
+        if (!boundary.contains(edge.p1()) || !boundary.contains(edge.p2())) {
+            QVector2D intersection = intersectLineWithBoundary(edge);
+            if (intersection.x() >= 0 && intersection.y() >= 0) {
+                // 在交点处分割边
+                cell.insert(cell.begin() + i + 1, intersection);
+                i++; // 跳过新添加的点
+            }
+        }
+    }
+}
+
+// 计算多边形的重心
+QVector2D computeCentroid(const std::vector<QVector2D>& polygon) {
+    if (polygon.empty()) return QVector2D(0.5f, 0.5f);
+    
+    float area = 0.0f;
+    QVector2D centroid(0, 0);
+    
+    for (int i = 0; i < polygon.size(); i++) {
+        int j = (i + 1) % polygon.size();
+        float cross = polygon[i].x() * polygon[j].y() - polygon[j].x() * polygon[i].y();
+        area += cross;
+        centroid += (polygon[i] + polygon[j]) * cross;
+    }
+    
+    area *= 0.5f;
+    centroid /= (6.0f * area);
+    
+    return centroid;
+}
+
+// 更新Voronoi图
+void GLWidget::updateVoronoiDiagram() {
+    if (!isCVTActive || openMesh.n_vertices() == 0) return;
+    
+    // 收集采样点（内部点）
+    std::vector<QVector2D> sites;
+    std::vector<Mesh::VertexHandle> siteHandles;
+    
+    for (auto vh : openMesh.vertices()) {
+        auto p = openMesh.point(vh);
+        if (!openMesh.is_boundary(vh)) {
+            sites.push_back(QVector2D(p[0], p[1]));
+            siteHandles.push_back(vh);
+        }
+    }
+    
+    // 打印迭代前内部顶点位置
+    std::cout << "\n=== 更新Voronoi图前 ===" << std::endl;
+    for (size_t i = 0; i < sites.size(); ++i) {
+        std::cout << "顶点 " << siteHandles[i].idx() << ": (" 
+                  << sites[i].x() << ", " << sites[i].y() << ")" << std::endl;
+    }
+    
+    // 对每个采样点计算Voronoi单元
+    for (int i = 0; i < sites.size(); i++) {
+        std::vector<QVector2D> cell;
+        
+        // 初始单元为整个参数化空间 [0,1]x[0,1]
+        cell.push_back(QVector2D(0, 0));
+        cell.push_back(QVector2D(1, 0));
+        cell.push_back(QVector2D(1, 1));
+        cell.push_back(QVector2D(0, 1));
+        
+        // 用每个其他点裁剪单元
+        for (int j = 0; j < sites.size(); j++) {
+            if (i == j) continue;
+            
+            // 计算垂直平分线
+            QLineF bisector = perpendicularBisector(sites[i], sites[j]);
+            QVector2D normal(bisector.dx(), bisector.dy());
+            normal.normalize();
+            
+            std::vector<QVector2D> newCell;
+            
+            // 用垂直平分线裁剪单元
+            for (int k = 0; k < cell.size(); k++) {
+                int prev = (k - 1 + cell.size()) % cell.size();
+                int next = (k + 1) % cell.size();
+                
+                QVector2D p = cell[k];
+                QVector2D prevP = cell[prev];
+                QVector2D nextP = cell[next];
+                
+                // 检查点是否在边界内侧
+                QVector2D toSite = sites[i] - sites[j];
+                float side = QVector2D::dotProduct(p - sites[i], toSite);
+                
+                if (side > 0) {
+                    newCell.push_back(p);
+                }
+            }
+            
+            if (!newCell.empty()) {
+                cell = newCell;
+            }
+        }
+        
+        // 裁剪到边界
+        clipVoronoiToBoundary(cell, sites[i]);
+        
+        // 计算重心并更新采样点位置
+        if (!cell.empty()) {
+            QVector2D centroid = computeCentroid(cell);
+            
+            // 打印单元重心信息
+            std::cout << "顶点 " << siteHandles[i].idx() << " 的新重心: ("
+                      << centroid.x() << ", " << centroid.y() << ")" 
+                      << " (原位置: " << sites[i].x() << ", " << sites[i].y() << ")" << std::endl;
+            
+            Mesh::Point newPos(centroid.x(), centroid.y(), 0.0f);
+            openMesh.set_point(siteHandles[i], newPos);
+        }
+    }
+    
+    // 打印迭代后内部顶点位置
+    std::cout << "\n=== 更新Voronoi图后 ===" << std::endl;
+    for (size_t i = 0; i < sites.size(); ++i) {
+        auto p = openMesh.point(siteHandles[i]);
+        std::cout << "顶点 " << siteHandles[i].idx() << ": (" 
+                  << p[0] << ", " << p[1] << ")" << std::endl;
+    }
+}
+
+void GLWidget::performCVTIteration() {
+    if (!isCVTActive) return;
+    
+    // 打印当前迭代信息
+    std::cout << "\n*** 开始CVT迭代 (当前级别: " << currentCVTLevel 
+              << ", 总迭代: " << cvtIterations << ") ***" << std::endl;
+    
+    for (int i = 0; i < cvtIterations; i++) {
+        std::cout << "\n--- 执行CVT迭代 #" << i+1 << " ---" << std::endl;
+        updateVoronoiDiagram();
+        currentCVTLevel++;
+    }
+    
+    // 重新计算纹理坐标
+    paramTexCoords.clear();
+    paramTexCoords.reserve(openMesh.n_vertices() * 2);
+    
+    for (auto vh : openMesh.vertices()) {
+        auto p = openMesh.point(vh);
+        paramTexCoords.push_back(p[0]);
+        paramTexCoords.push_back(p[1]);
+    }
+    
+    // 更新OpenGL缓冲区
+    makeCurrent();
+    updateBuffersFromOpenMesh();
+    doneCurrent();
+    update();
+}
+
+// 计算CVT迭代
+void GLWidget::calculateCVT() {
+    isCVTActive = true;
+    currentCVTLevel = 0;
+    performCVTIteration();
+}
 
 // 边界映射到圆形
 void GLWidget::mapBoundaryToCircle() {

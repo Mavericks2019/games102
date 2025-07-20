@@ -650,4 +650,10 @@ CMakeFiles/objViewer.dir/glwidget/glwidget_parameteration.cpp.o: \
  /usr/include/c++/13/fstream \
  /usr/include/x86_64-linux-gnu/c++/13/bits/basic_file.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++io.h \
- /usr/include/c++/13/bits/fstream.tcc /usr/include/eigen3/Eigen/SparseLU
+ /usr/include/c++/13/bits/fstream.tcc /usr/include/eigen3/Eigen/SparseLU \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector2D \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qvector2d.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QPolygonF \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qpolygon.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/QLineF \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qline.h
