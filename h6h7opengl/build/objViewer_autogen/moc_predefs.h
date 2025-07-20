@@ -377,6 +377,7 @@
 #define __FLT64X_IS_IEC_60559__ 1
 #define __LDBL_MAX_10_EXP__ 4932
 #define __ATOMIC_RELAXED 0
+#define CGAL_USE_CORE 1
 #define __DBL_EPSILON__ double(2.22044604925031308084726333618164062e-16L)
 #define __INT_LEAST32_TYPE__ int
 #define _LP64 1
@@ -460,6 +461,7 @@
 #define __FLT32_HAS_QUIET_NAN__ 1
 #define __FLT_DECIMAL_DIG__ 9
 #define __UINT_FAST16_MAX__ 0xffffffffffffffffUL
+#define CGAL_USE_GMPXX 1
 #define __LDBL_NORM_MAX__ 1.18973149535723176502126385303097021e+4932L
 #define __GCC_ATOMIC_SHORT_LOCK_FREE 2
 #define __SIZE_MAX__ 0xffffffffffffffffUL

@@ -22,7 +22,18 @@ qt5_add_resources(RESOURCE_FILES ${SHADER_RESOURCES})
 find_package(OpenMesh REQUIRED)
 
 # 添加Eigen库支持
-find_package(Eigen3 REQUIRED)  # 添加Eigen库查找
+find_package(Eigen3 REQUIRED)
+
+# +++ 添加CGAL依赖 +++
+# 首先查找GMP和MPFR（CGAL所需）
+# find_package(GMP REQUIRED)
+# find_package(MPFR REQUIRED)
+
+# 查找CGAL库
+find_package(CGAL REQUIRED COMPONENTS Core)
+
+# 启用CGAL自动链接
+include(${CGAL_USE_FILE})
 
 # 添加可执行文件
 add_executable(${PROJECT_NAME}
@@ -45,7 +56,11 @@ target_link_libraries(${PROJECT_NAME}
     GL
     OpenMeshCore
     OpenMeshTools
-    Eigen3::Eigen  # 链接Eigen库
+    Eigen3::Eigen
+    # +++ 添加CGAL相关库 +++
+    CGAL::CGAL
+    ${GMP_LIBRARIES}
+    ${MPFR_LIBRARIES}
 )
 
 # 设置安装路径
