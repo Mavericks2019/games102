@@ -1,0 +1,1 @@
+/usr/bin/c++ "CMakeFiles/cgal-demo.dir/src/main.cpp.o" "CMakeFiles/cgal-demo.dir/src/cgal_test.cpp.o" -o cgal-demo  /usr/lib/x86_64-linux-gnu/libgmpxx.so /usr/lib/x86_64-linux-gnu/libmpfr.so /usr/lib/x86_64-linux-gnu/libgmp.so 

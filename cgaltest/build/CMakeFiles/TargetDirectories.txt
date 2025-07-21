@@ -1,0 +1,7 @@
+/opt/games102/cgaltest/build/CMakeFiles/cgal-demo.dir
+/opt/games102/cgaltest/build/CMakeFiles/edit_cache.dir
+/opt/games102/cgaltest/build/CMakeFiles/rebuild_cache.dir
+/opt/games102/cgaltest/build/CMakeFiles/list_install_components.dir
+/opt/games102/cgaltest/build/CMakeFiles/install.dir
+/opt/games102/cgaltest/build/CMakeFiles/install/local.dir
+/opt/games102/cgaltest/build/CMakeFiles/install/strip.dir

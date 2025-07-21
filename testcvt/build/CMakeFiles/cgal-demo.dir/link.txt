@@ -1,0 +1,1 @@
+/usr/bin/c++ "CMakeFiles/cgal-demo.dir/main.cpp.o" -o cgal-demo  -lQt5::Widgets -lQt5::OpenGL -lGL /usr/lib/x86_64-linux-gnu/libgmpxx.so /usr/lib/x86_64-linux-gnu/libmpfr.so /usr/lib/x86_64-linux-gnu/libgmp.so 

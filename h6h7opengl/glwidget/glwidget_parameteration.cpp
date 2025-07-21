@@ -67,7 +67,7 @@ QVector2D intersectLineWithBoundary(const QLineF& line) {
 // 裁剪Voronoi多边形到边界
 void GLWidget::clipVoronoiToBoundary(std::vector<QVector2D>& cell, const QVector2D& site) {
     // 边界矩形 [0,0] 到 [1,1]
-    QRectF boundary(0, 0, 1, 1);
+    QRectF boundary(-1, -1, 2, 2);
     
     // 检查每个点是否在边界内
     for (int i = 0; i < cell.size(); ) {
@@ -119,43 +119,48 @@ QVector2D computeCentroid(const std::vector<QVector2D>& polygon) {
 void GLWidget::updateVoronoiDiagram() {
     if (!isCVTActive || openMesh.n_vertices() == 0) return;
 
-    // 收集所有点（包括边界点）
-    std::vector<CDT::Point> all_points;
-    std::vector<Mesh::VertexHandle> all_handles;
+    // 收集内部点（非边界点）
+    std::vector<CDT::Point> internal_points;
+    std::vector<Mesh::VertexHandle> internal_handles;
     
     for (auto vh : openMesh.vertices()) {
-        auto p = openMesh.point(vh);
-        all_points.push_back(CDT::Point(p[0], p[1]));
-        all_handles.push_back(vh);
+        if (!openMesh.is_boundary(vh)) {
+            auto p = openMesh.point(vh);
+            internal_points.push_back(CDT::Point(p[0], p[1]));
+            internal_handles.push_back(vh);
+        }
     }
 
     // 创建约束Delaunay三角剖分
     CDT cdt;
 
-    // 添加边界约束 [0,0] 到 [1,1]
-    Vertex_handle v0 = cdt.insert(CDT::Point(0, 0));
-    Vertex_handle v1 = cdt.insert(CDT::Point(0, 1));
+    // 添加边界约束 [-1,-1] 到 [1,1]
+    Vertex_handle v0 = cdt.insert(CDT::Point(-1, -1));
+    Vertex_handle v1 = cdt.insert(CDT::Point(-1, 1));
     Vertex_handle v2 = cdt.insert(CDT::Point(1, 1));
-    Vertex_handle v3 = cdt.insert(CDT::Point(1, 0));
+    Vertex_handle v3 = cdt.insert(CDT::Point(1, -1));
     
     cdt.insert_constraint(v0, v1);
     cdt.insert_constraint(v1, v2);
     cdt.insert_constraint(v2, v3);
     cdt.insert_constraint(v3, v0);
 
-    // 添加所有点
-    std::vector<Vertex_handle> all_vertices;
-    for (const auto& pt : all_points) {
-        all_vertices.push_back(cdt.insert(pt));
+    // 添加内部点
+    std::vector<Vertex_handle> internal_vertices;
+    for (const auto& pt : internal_points) {
+        internal_vertices.push_back(cdt.insert(pt));
     }
 
-    // 执行一次Lloyd优化
-    CGAL::lloyd_optimize_mesh_2(cdt, CGAL::parameters::max_iteration_number = 1);
+    // 执行一次Lloyd优化 - 使用标准调用方式
+    CGAL::lloyd_optimize_mesh_2(cdt, 
+        CGAL::parameters::max_iteration_number = 1,
+        CGAL::parameters::convergence = 0.0,
+        CGAL::parameters::freeze_bound = true);  // 保持边界固定
 
-    // 更新点位置（跳过前4个边界点）
-    for (size_t i = 4; i < all_vertices.size(); ++i) {
-        CDT::Point p = all_vertices[i]->point();
-        openMesh.set_point(all_handles[i], Mesh::Point(p.x(), p.y(), 0.0f));
+    // 更新OpenMesh中的点位置
+    for (size_t i = 0; i < internal_vertices.size(); ++i) {
+        CDT::Point p = internal_vertices[i]->point();
+        openMesh.set_point(internal_handles[i], Mesh::Point(p.x(), p.y(), 0.0f));
     }
 
     // 更新纹理坐标

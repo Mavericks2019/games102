@@ -256,6 +256,12 @@ public:
     int cvtIterations = 10;       // CVT迭代次数
     int currentCVTLevel = 0;       // 当前CVT迭代级别
     bool isCVTActive = false;      // CVT是否激活
+public:
+    // CVT 相关方法
+    void generateRandomPoints();
+    void computeDelaunayTriangulation();
+    void computeVoronoiDiagram();
+    void performLloydRelaxation();
 };
 
 #endif // GLWIDGET_H
