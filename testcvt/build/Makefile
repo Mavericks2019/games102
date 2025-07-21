@@ -117,74 +117,74 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named VoronoiIterationVisualizer
+# Target rules for targets named OpenGLSquare
 
 # Build rule for target.
-VoronoiIterationVisualizer: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 VoronoiIterationVisualizer
-.PHONY : VoronoiIterationVisualizer
+OpenGLSquare: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 OpenGLSquare
+.PHONY : OpenGLSquare
 
 # fast build rule for target.
-VoronoiIterationVisualizer/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoronoiIterationVisualizer.dir/build.make CMakeFiles/VoronoiIterationVisualizer.dir/build
-.PHONY : VoronoiIterationVisualizer/fast
+OpenGLSquare/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OpenGLSquare.dir/build.make CMakeFiles/OpenGLSquare.dir/build
+.PHONY : OpenGLSquare/fast
 
 #=============================================================================
-# Target rules for targets named VoronoiIterationVisualizer_autogen_timestamp_deps
+# Target rules for targets named OpenGLSquare_autogen_timestamp_deps
 
 # Build rule for target.
-VoronoiIterationVisualizer_autogen_timestamp_deps: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 VoronoiIterationVisualizer_autogen_timestamp_deps
-.PHONY : VoronoiIterationVisualizer_autogen_timestamp_deps
+OpenGLSquare_autogen_timestamp_deps: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 OpenGLSquare_autogen_timestamp_deps
+.PHONY : OpenGLSquare_autogen_timestamp_deps
 
 # fast build rule for target.
-VoronoiIterationVisualizer_autogen_timestamp_deps/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoronoiIterationVisualizer_autogen_timestamp_deps.dir/build.make CMakeFiles/VoronoiIterationVisualizer_autogen_timestamp_deps.dir/build
-.PHONY : VoronoiIterationVisualizer_autogen_timestamp_deps/fast
+OpenGLSquare_autogen_timestamp_deps/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OpenGLSquare_autogen_timestamp_deps.dir/build.make CMakeFiles/OpenGLSquare_autogen_timestamp_deps.dir/build
+.PHONY : OpenGLSquare_autogen_timestamp_deps/fast
 
 #=============================================================================
-# Target rules for targets named VoronoiIterationVisualizer_autogen
+# Target rules for targets named OpenGLSquare_autogen
 
 # Build rule for target.
-VoronoiIterationVisualizer_autogen: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 VoronoiIterationVisualizer_autogen
-.PHONY : VoronoiIterationVisualizer_autogen
+OpenGLSquare_autogen: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 OpenGLSquare_autogen
+.PHONY : OpenGLSquare_autogen
 
 # fast build rule for target.
-VoronoiIterationVisualizer_autogen/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoronoiIterationVisualizer_autogen.dir/build.make CMakeFiles/VoronoiIterationVisualizer_autogen.dir/build
-.PHONY : VoronoiIterationVisualizer_autogen/fast
+OpenGLSquare_autogen/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OpenGLSquare_autogen.dir/build.make CMakeFiles/OpenGLSquare_autogen.dir/build
+.PHONY : OpenGLSquare_autogen/fast
 
-VoronoiIterationVisualizer_autogen/mocs_compilation.o: VoronoiIterationVisualizer_autogen/mocs_compilation.cpp.o
-.PHONY : VoronoiIterationVisualizer_autogen/mocs_compilation.o
+OpenGLSquare_autogen/mocs_compilation.o: OpenGLSquare_autogen/mocs_compilation.cpp.o
+.PHONY : OpenGLSquare_autogen/mocs_compilation.o
 
 # target to build an object file
-VoronoiIterationVisualizer_autogen/mocs_compilation.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoronoiIterationVisualizer.dir/build.make CMakeFiles/VoronoiIterationVisualizer.dir/VoronoiIterationVisualizer_autogen/mocs_compilation.cpp.o
-.PHONY : VoronoiIterationVisualizer_autogen/mocs_compilation.cpp.o
+OpenGLSquare_autogen/mocs_compilation.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OpenGLSquare.dir/build.make CMakeFiles/OpenGLSquare.dir/OpenGLSquare_autogen/mocs_compilation.cpp.o
+.PHONY : OpenGLSquare_autogen/mocs_compilation.cpp.o
 
-VoronoiIterationVisualizer_autogen/mocs_compilation.i: VoronoiIterationVisualizer_autogen/mocs_compilation.cpp.i
-.PHONY : VoronoiIterationVisualizer_autogen/mocs_compilation.i
+OpenGLSquare_autogen/mocs_compilation.i: OpenGLSquare_autogen/mocs_compilation.cpp.i
+.PHONY : OpenGLSquare_autogen/mocs_compilation.i
 
 # target to preprocess a source file
-VoronoiIterationVisualizer_autogen/mocs_compilation.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoronoiIterationVisualizer.dir/build.make CMakeFiles/VoronoiIterationVisualizer.dir/VoronoiIterationVisualizer_autogen/mocs_compilation.cpp.i
-.PHONY : VoronoiIterationVisualizer_autogen/mocs_compilation.cpp.i
+OpenGLSquare_autogen/mocs_compilation.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OpenGLSquare.dir/build.make CMakeFiles/OpenGLSquare.dir/OpenGLSquare_autogen/mocs_compilation.cpp.i
+.PHONY : OpenGLSquare_autogen/mocs_compilation.cpp.i
 
-VoronoiIterationVisualizer_autogen/mocs_compilation.s: VoronoiIterationVisualizer_autogen/mocs_compilation.cpp.s
-.PHONY : VoronoiIterationVisualizer_autogen/mocs_compilation.s
+OpenGLSquare_autogen/mocs_compilation.s: OpenGLSquare_autogen/mocs_compilation.cpp.s
+.PHONY : OpenGLSquare_autogen/mocs_compilation.s
 
 # target to generate assembly for a file
-VoronoiIterationVisualizer_autogen/mocs_compilation.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoronoiIterationVisualizer.dir/build.make CMakeFiles/VoronoiIterationVisualizer.dir/VoronoiIterationVisualizer_autogen/mocs_compilation.cpp.s
-.PHONY : VoronoiIterationVisualizer_autogen/mocs_compilation.cpp.s
+OpenGLSquare_autogen/mocs_compilation.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OpenGLSquare.dir/build.make CMakeFiles/OpenGLSquare.dir/OpenGLSquare_autogen/mocs_compilation.cpp.s
+.PHONY : OpenGLSquare_autogen/mocs_compilation.cpp.s
 
 main.o: main.cpp.o
 .PHONY : main.o
 
 # target to build an object file
 main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoronoiIterationVisualizer.dir/build.make CMakeFiles/VoronoiIterationVisualizer.dir/main.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OpenGLSquare.dir/build.make CMakeFiles/OpenGLSquare.dir/main.cpp.o
 .PHONY : main.cpp.o
 
 main.i: main.cpp.i
@@ -192,7 +192,7 @@ main.i: main.cpp.i
 
 # target to preprocess a source file
 main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoronoiIterationVisualizer.dir/build.make CMakeFiles/VoronoiIterationVisualizer.dir/main.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OpenGLSquare.dir/build.make CMakeFiles/OpenGLSquare.dir/main.cpp.i
 .PHONY : main.cpp.i
 
 main.s: main.cpp.s
@@ -200,7 +200,7 @@ main.s: main.cpp.s
 
 # target to generate assembly for a file
 main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/VoronoiIterationVisualizer.dir/build.make CMakeFiles/VoronoiIterationVisualizer.dir/main.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/OpenGLSquare.dir/build.make CMakeFiles/OpenGLSquare.dir/main.cpp.s
 .PHONY : main.cpp.s
 
 # Help Target
@@ -211,12 +211,12 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... VoronoiIterationVisualizer_autogen"
-	@echo "... VoronoiIterationVisualizer_autogen_timestamp_deps"
-	@echo "... VoronoiIterationVisualizer"
-	@echo "... VoronoiIterationVisualizer_autogen/mocs_compilation.o"
-	@echo "... VoronoiIterationVisualizer_autogen/mocs_compilation.i"
-	@echo "... VoronoiIterationVisualizer_autogen/mocs_compilation.s"
+	@echo "... OpenGLSquare_autogen"
+	@echo "... OpenGLSquare_autogen_timestamp_deps"
+	@echo "... OpenGLSquare"
+	@echo "... OpenGLSquare_autogen/mocs_compilation.o"
+	@echo "... OpenGLSquare_autogen/mocs_compilation.i"
+	@echo "... OpenGLSquare_autogen/mocs_compilation.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

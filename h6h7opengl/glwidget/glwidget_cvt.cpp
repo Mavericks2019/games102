@@ -18,18 +18,25 @@ void GLWidget::performLloydRelaxation() {
 
 void GLWidget::drawCVTBackground()
 {
-    // 设置正交投影
-    QMatrix4x4 projection;
-    projection.ortho(-1.0f, 1.0f, -1.0f, 1.0f, -1.0f, 1.0f);
-    
-    // 计算正方形大小（基于屏幕较短边）
+    // 获取窗口尺寸
     float screenWidth = width();
     float screenHeight = height();
-    float squareSize = qMin(screenWidth, screenHeight) / qMax(screenWidth, screenHeight);
     
-    // 创建模型矩阵
+    // 计算窗口宽高比
+    float aspect = screenWidth / screenHeight;
+    
+    // 设置正交投影，根据宽高比调整
+    QMatrix4x4 projection;
+    if (aspect > 1.0f) {
+        // 宽大于高
+        projection.ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+    } else {
+        // 高大于宽
+        projection.ortho(-1.0f, 1.0f, -1.0f/aspect, 1.0f/aspect, -1.0f, 1.0f);
+    }
+    
+    // 创建模型矩阵 - 不需要缩放
     QMatrix4x4 model;
-    model.scale(squareSize, squareSize, 1.0f); // 保持正方形
     
     // 使用简单的着色器
     QOpenGLShaderProgram program;
@@ -54,7 +61,7 @@ void GLWidget::drawCVTBackground()
         return;
     }
     
-    // 正方形顶点数据
+    // 正方形顶点数据（从-1到1的正方形）
     float vertices[] = {
         -1.0f, -1.0f, 0.0f,
          1.0f, -1.0f, 0.0f,

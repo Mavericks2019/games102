@@ -194,7 +194,7 @@ CMAKE_PROJECT_DESCRIPTION:STATIC=
 CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=VoronoiIterationVisualizer
+CMAKE_PROJECT_NAME:STATIC=OpenGLSquare
 
 //Value Computed by CMake
 CMAKE_PROJECT_VERSION:STATIC=1.0
@@ -337,6 +337,15 @@ OPENGL_opengl_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libOpenGL.so
 
 //Path to a file.
 OPENGL_xmesa_INCLUDE_DIR:PATH=OPENGL_xmesa_INCLUDE_DIR-NOTFOUND
+
+//Value Computed by CMake
+OpenGLSquare_BINARY_DIR:STATIC=/opt/games102/testcvt/build
+
+//Value Computed by CMake
+OpenGLSquare_IS_TOP_LEVEL:STATIC=ON
+
+//Value Computed by CMake
+OpenGLSquare_SOURCE_DIR:STATIC=/opt/games102/testcvt
 
 //The directory containing a CMake configuration file for Qt5Core.
 Qt5Core_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/Qt5Core

@@ -265,8 +265,6 @@ public:
     bool isCVTView; // 是否在CVT界面
     void drawCVTBackground();
     void setCVTView(bool enabled);
-
-
 private:
     void drawWireframe(const QMatrix4x4& model, const QMatrix4x4& view, const QMatrix4x4& projection);
     void drawTextureMapping(const QMatrix4x4& model, const QMatrix4x4& view, const QMatrix4x4& projection, const QMatrix3x3& normalMatrix);

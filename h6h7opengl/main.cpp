@@ -217,6 +217,7 @@ int main(int argc, char *argv[])
     // 创建CVT标签页
     QWidget *cvtTab = createCVTTab(glWidget);
     tabWidget->addTab(cvtTab, "CVT");
+
     
     // 添加标签页到主布局
     mainLayout->addWidget(tabWidget, 8); // 8:2比例
@@ -256,6 +257,32 @@ int main(int argc, char *argv[])
     // 连接标签切换信号
     QObject::connect(tabWidget, &QTabWidget::currentChanged, [stackedLayout](int index) {
         stackedLayout->setCurrentIndex(index);
+    });
+
+    // 连接标签切换信号 - CVT视图处理
+    QObject::connect(tabWidget, &QTabWidget::currentChanged, [=](int index) {
+        // 重置所有视图的CVT状态
+        glWidget->setCVTView(false);
+        
+        // 获取参数化视图
+        QWidget* paramTab = tabWidget->widget(1);
+        GLWidget* paramView = paramTab->property("leftGLWidget").value<GLWidget*>();
+        if (paramView) paramView->setCVTView(false);
+        
+        // 获取CVT视图
+        GLWidget* cvtView = cvtTab->property("cvtGLWidget").value<GLWidget*>();
+        
+        if (cvtView) {
+            // 如果切换到CVT标签页
+            if (index == 2) {
+                cvtView->setCVTView(true);
+                cvtView->resetViewForParameterization();
+                cvtView->update();
+            } else {
+                // 离开CVT标签页时重置状态
+                cvtView->setCVTView(false);
+            }
+        }
     });
     
     // 添加控制面板到主布局

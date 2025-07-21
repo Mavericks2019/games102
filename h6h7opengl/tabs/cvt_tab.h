@@ -15,6 +15,13 @@ QWidget* createCVTTab(GLWidget* glWidget) {
     // 保存视图指针
     tab->setProperty("cvtGLWidget", QVariant::fromValue(cvtView));
     
+    // 连接标签切换信号
+    QObject::connect(tab, &QWidget::show, [cvtView]() {
+        cvtView->setCVTView(true);
+        cvtView->resetViewForParameterization(); // 重置视图
+        cvtView->update();
+    });
+    
     return tab;
 }
 
