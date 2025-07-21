@@ -262,6 +262,10 @@ public:
     void computeDelaunayTriangulation();
     void computeVoronoiDiagram();
     void performLloydRelaxation();
+    bool isCVTView; // 是否在CVT界面
+    void drawCVTBackground();
+    void setCVTView(bool enabled);
+
 
 private:
     void drawWireframe(const QMatrix4x4& model, const QMatrix4x4& view, const QMatrix4x4& projection);

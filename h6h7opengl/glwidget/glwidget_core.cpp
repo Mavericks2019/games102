@@ -29,7 +29,8 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
     faceEbo(QOpenGLBuffer::IndexBuffer),
     texCoordBuffer(QOpenGLBuffer::VertexBuffer), // 初始化纹理坐标缓冲区
     showWireframeOverlay(false),
-    hideFaces(false)  // 初始化新增成员
+    hideFaces(false),  // 初始化新增成员
+    isCVTView(false)   // 新增：CVT视图标志初始化
 {
     // 设置多重采样格式
     QSurfaceFormat format;
@@ -47,6 +48,12 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
     meshOperationValue = 50;  // 默认居中
     subdivisionLevel = 0; // 确保初始化为0
 
+}
+
+void GLWidget::setCVTView(bool enabled)
+{
+    isCVTView = enabled;
+    update();
 }
 
 void GLWidget::setHideFaces(bool hide)
@@ -400,6 +407,12 @@ void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // 如果是CVT视图，绘制白色正方形
+    if (isCVTView) {
+        drawCVTBackground();
+        return; // 提前返回，不绘制其他内容
+    }
+
     if (!modelLoaded || openMesh.n_vertices() == 0) {
         return;
     }
@@ -453,6 +466,8 @@ void GLWidget::paintGL()
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
+    if (isCVTView || isParameterizationView) return;
+
     switch (event->key()) {
     case Qt::Key_Left:
         rotationY -= 5;
@@ -484,7 +499,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     // 如果是参数化视图，只允许缩放，不允许旋转
-    if (isParameterizationView) return;
+    if (isCVTView || isParameterizationView) return;
     if (event->button() == Qt::LeftButton) {
         isDragging = true;
         lastMousePos = event->pos();
@@ -504,7 +519,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     // 如果是参数化视图，只允许缩放，不允许旋转
-    if (isParameterizationView) return;
+    if (isCVTView || isParameterizationView) return;
     if (isDragging) {
         QPoint currentPos = event->pos();
         QPoint delta = currentPos - lastMousePos;
