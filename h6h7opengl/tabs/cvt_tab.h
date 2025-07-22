@@ -102,12 +102,21 @@ QWidget* createCVTControlPanel(GLWidget* glWidget, QWidget* cvtTab) {
         cvtView->setShowVoronoiDiagram(state == Qt::Checked);
     });
     
+    // 新增：Delaunay三角网格显示控制
+    QCheckBox *showDelaunayCheckbox = new QCheckBox("Show Delaunay Triangles");
+    showDelaunayCheckbox->setStyleSheet("color: white;");
+    showDelaunayCheckbox->setChecked(false); // 默认不显示
+    QObject::connect(showDelaunayCheckbox, &QCheckBox::stateChanged, [cvtView](int state) {
+        cvtView->setShowDelaunay(state == Qt::Checked);
+    });
+    
     voronoiLayout->addWidget(showVoronoiCheckbox);
+    voronoiLayout->addWidget(showDelaunayCheckbox);
     layout->addWidget(voronoiGroup);
     
     // 添加其他按钮
-    QPushButton *delaunayButton = new QPushButton("Delaunay");
-    QPushButton *voronoiButton = new QPushButton("Voronoi");
+    QPushButton *delaunayButton = new QPushButton("Compute Delaunay");
+    QPushButton *voronoiButton = new QPushButton("Compute Voronoi");
     QPushButton *lloydButton = new QPushButton("Do Lloyd");
     
     delaunayButton->setStyleSheet(buttonStyle);

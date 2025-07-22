@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <cmath>
 #include <ctime> // 包含ctime用于srand
-
 // CGAL 类型定义
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef CGAL::Delaunay_triangulation_2<K> DelaunayTriangulation;
@@ -18,6 +17,7 @@ typedef K::Point_2 Point_2;
 typedef VoronoiDiagram::Locate_result Locate_result;
 typedef VoronoiDiagram::Face_handle Face_handle;
 typedef VoronoiDiagram::Ccb_halfedge_circulator Ccb_halfedge_circulator;
+
 
 void GLWidget::generateRandomPoints(int count)
 {
@@ -192,29 +192,59 @@ void GLWidget::drawVoronoiDiagram()
 
 void GLWidget::computeVoronoiDiagram()
 {
-    voronoiCells.clear(); // 清空之前的Voronoi单元
+    voronoiCells.clear();
+    delaunayVertices.clear();
+    delaunayIndices.clear();
 
     if (randomPoints.empty()) return;
 
     // 添加矩形的四个角点
+    boundaryPoints = {
+        QVector2D(-1.0f, -1.0f),
+        QVector2D(1.0f, -1.0f),
+        QVector2D(1.0f, 1.0f),
+        QVector2D(-1.0f, 1.0f)
+    };
+    
     std::vector<Point_2> points;
-    points.reserve(randomPoints.size() + 4);
+    points.reserve(randomPoints.size() + boundaryPoints.size());
+    
+    // 创建点坐标到索引的映射
+    pointIndexMap.clear();
     
     // 添加随机点
-    for (const auto& p : randomPoints) {
-        points.push_back(Point_2(p.x(), p.y()));
+    for (int i = 0; i < randomPoints.size(); i++) {
+        const auto& p = randomPoints[i];
+        Point_2 cgalPoint(p.x(), p.y()); // 修复：显式创建Point_2对象
+        points.push_back(cgalPoint);
+        pointIndexMap[cgalPoint] = i;
     }
     
-    // 添加矩形边界点（按顺序：左下、右下、右上、左上）
-    points.push_back(Point_2(-1.0, -1.0)); // 左下
-    points.push_back(Point_2(1.0, -1.0));  // 右下
-    points.push_back(Point_2(1.0, 1.0));   // 右上
-    points.push_back(Point_2(-1.0, 1.0));  // 左上
+    // 添加边界点
+    for (int i = 0; i < boundaryPoints.size(); i++) {
+        const auto& p = boundaryPoints[i];
+        Point_2 cgalPoint(p.x(), p.y()); // 修复：显式创建Point_2对象
+        points.push_back(cgalPoint);
+        pointIndexMap[cgalPoint] = randomPoints.size() + i;
+    }
 
     // 创建Delaunay三角剖分
     DelaunayTriangulation dt;
     dt.insert(points.begin(), points.end());
 
+    // 存储Delaunay三角形
+    for (auto fit = dt.finite_faces_begin(); fit != dt.finite_faces_end(); ++fit) {
+        for (int i = 0; i < 3; i++) {
+            auto vh = fit->vertex(i);
+            if (vh == nullptr || dt.is_infinite(vh)) continue;
+            
+            Point_2 p = vh->point();
+            auto it = pointIndexMap.find(p);
+            if (it != pointIndexMap.end()) {
+                delaunayIndices.push_back(it->second);
+            }
+        }
+    }
     // 创建Voronoi图
     VoronoiDiagram vd(dt);
 
@@ -240,6 +270,90 @@ void GLWidget::computeVoronoiDiagram()
     }
 
     update();
+}
+
+void GLWidget::drawDelaunayTriangles()
+{
+    if (delaunayIndices.empty() || !showDelaunay) return;
+
+    // 获取窗口尺寸和宽高比
+    float screenWidth = width();
+    float screenHeight = height();
+    float aspect = screenWidth / screenHeight;
+
+    // 设置投影矩阵（与背景相同）
+    QMatrix4x4 projection;
+    if (aspect > 1.0f) {
+        projection.ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+    } else {
+        projection.ortho(-1.0f, 1.0f, -1.0f/aspect, 1.0f/aspect, -1.0f, 1.0f);
+    }
+
+    // 合并所有点（随机点 + 边界点）
+    std::vector<QVector2D> allPoints = randomPoints;
+    allPoints.insert(allPoints.end(), boundaryPoints.begin(), boundaryPoints.end());
+    
+    // 创建顶点数据
+    std::vector<float> vertices;
+    for (const auto& p : allPoints) {
+        vertices.push_back(p.x());
+        vertices.push_back(p.y());
+    }
+
+    // 设置着色器
+    QOpenGLShaderProgram program;
+    program.addShaderFromSourceCode(QOpenGLShader::Vertex,
+        "#version 330 core\n"
+        "layout(location = 0) in vec2 aPos;\n"
+        "uniform mat4 projection;\n"
+        "void main() {\n"
+        "    gl_Position = projection * vec4(aPos, 0.0, 1.0);\n"
+        "}");
+    
+    program.addShaderFromSourceCode(QOpenGLShader::Fragment,
+        "#version 330 core\n"
+        "out vec4 FragColor;\n"
+        "void main() {\n"
+        "    FragColor = vec4(1.0, 0.5, 0.0, 1.0); // 橙色线条\n"
+        "}");
+    
+    if (!program.link()) {
+        qWarning() << "Delaunay shader link error:" << program.log();
+        return;
+    }
+
+    program.bind();
+    program.setUniformValue("projection", projection);
+
+    // 创建临时VAO和VBO
+    QOpenGLVertexArrayObject vao;
+    QOpenGLBuffer vbo(QOpenGLBuffer::VertexBuffer);
+    QOpenGLBuffer ebo(QOpenGLBuffer::IndexBuffer);
+    
+    vao.create();
+    vao.bind();
+    
+    vbo.create();
+    vbo.bind();
+    vbo.allocate(vertices.data(), static_cast<int>(vertices.size() * sizeof(float)));
+    
+    ebo.create();
+    ebo.bind();
+    ebo.allocate(delaunayIndices.data(), static_cast<int>(delaunayIndices.size() * sizeof(unsigned int)));
+    
+    // 设置顶点属性
+    int posLoc = program.attributeLocation("aPos");
+    if (posLoc != -1) {
+        program.enableAttributeArray(posLoc);
+        program.setAttributeBuffer(posLoc, GL_FLOAT, 0, 2, 2 * sizeof(float));
+    }
+    
+    // 绘制三角形线框
+    glLineWidth(1.5f);
+    glDrawElements(GL_LINES, delaunayIndices.size(), GL_UNSIGNED_INT, 0);
+    
+    vao.release();
+    program.release();
 }
 
 void GLWidget::performLloydRelaxation() {
@@ -342,6 +456,8 @@ void GLWidget::drawCVTBackground()
     if (!randomPoints.empty()) {
         // 绘制Voronoi图
         drawVoronoiDiagram();
+        // 绘制Delaunay三角网格
+        drawDelaunayTriangles();
         drawRandomPoints();    
     }
     
