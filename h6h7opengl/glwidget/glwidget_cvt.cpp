@@ -21,23 +21,22 @@ typedef VoronoiDiagram::Ccb_halfedge_circulator Ccb_halfedge_circulator;
 
 void GLWidget::generateRandomPoints(int count)
 {
-    randomPoints.clear();
-    randomPoints.reserve(count);
+    canvasData.points.clear(); // 使用CanvasData存储点
+    canvasData.points.reserve(count);
     
-    // 在 [-0.9, 0.9] 范围内生成随机点
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
     for (int i = 0; i < count; i++) {
         float x = (static_cast<float>(std::rand()) / RAND_MAX) * 2.0f - 1.0f;
         float y = (static_cast<float>(std::rand()) / RAND_MAX) * 2.0f - 1.0f;
-        randomPoints.push_back(QVector2D(x, y));
+        canvasData.points.push_back(Point(x, y)); // 存入CanvasData
     }
-    
+    canvasData.dt = Delaunay(canvasData.points.begin(), canvasData.points.end());
     currentPointCount = count;
     
     // 准备点数据
     std::vector<float> points;
-    points.reserve(randomPoints.size() * 2);
-    for (const auto& point : randomPoints) {
+    points.reserve(canvasData.points.size() * 2);
+    for (const auto& point : canvasData.points) {
         points.push_back(point.x());
         points.push_back(point.y());
     }
@@ -70,7 +69,7 @@ void GLWidget::generateRandomPoints(int count)
 
 void GLWidget::drawRandomPoints()
 {
-    if (randomPoints.empty()) return;
+    if (canvasData.points.empty()) return;
     
     // 禁用深度测试，确保点在最上层
     glDisable(GL_DEPTH_TEST);
@@ -196,25 +195,25 @@ void GLWidget::computeVoronoiDiagram()
     delaunayVertices.clear();
     delaunayIndices.clear();
 
-    if (randomPoints.empty()) return;
+    if (canvasData.points.empty()) return;
 
     // 添加矩形的四个角点
     boundaryPoints = {
-        QVector2D(-1.0f, -1.0f),
-        QVector2D(1.0f, -1.0f),
-        QVector2D(1.0f, 1.0f),
-        QVector2D(-1.0f, 1.0f)
+        Point(-1.0f, -1.0f),
+        Point(1.0f, -1.0f),
+        Point(1.0f, 1.0f),
+        Point(-1.0f, 1.0f)
     };
     
     std::vector<Point_2> points;
-    points.reserve(randomPoints.size() + boundaryPoints.size());
+    points.reserve(canvasData.points.size() + boundaryPoints.size());
     
     // 创建点坐标到索引的映射
     pointIndexMap.clear();
     
     // 添加随机点
-    for (int i = 0; i < randomPoints.size(); i++) {
-        const auto& p = randomPoints[i];
+    for (int i = 0; i < canvasData.points.size(); i++) {
+        const auto& p = canvasData.points[i];
         Point_2 cgalPoint(p.x(), p.y()); // 修复：显式创建Point_2对象
         points.push_back(cgalPoint);
         pointIndexMap[cgalPoint] = i;
@@ -225,7 +224,7 @@ void GLWidget::computeVoronoiDiagram()
         const auto& p = boundaryPoints[i];
         Point_2 cgalPoint(p.x(), p.y()); // 修复：显式创建Point_2对象
         points.push_back(cgalPoint);
-        pointIndexMap[cgalPoint] = randomPoints.size() + i;
+        pointIndexMap[cgalPoint] = canvasData.points.size() + i;
     }
 
     // 创建Delaunay三角剖分
@@ -290,7 +289,7 @@ void GLWidget::drawDelaunayTriangles()
     }
 
     // 合并所有点（随机点 + 边界点）
-    std::vector<QVector2D> allPoints = randomPoints;
+    std::vector<Point> allPoints = canvasData.points;
     allPoints.insert(allPoints.end(), boundaryPoints.begin(), boundaryPoints.end());
     
     // 创建顶点数据
@@ -453,7 +452,7 @@ void GLWidget::drawCVTBackground()
     glDisable(GL_DEPTH_TEST);
     
     // 在背景上绘制随机点
-    if (!randomPoints.empty()) {
+    if (!canvasData.points.empty()) {
         // 绘制Voronoi图
         drawVoronoiDiagram();
         // 绘制Delaunay三角网格
