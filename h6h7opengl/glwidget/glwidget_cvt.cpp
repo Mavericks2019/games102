@@ -22,8 +22,13 @@ typedef VoronoiDiagram::Ccb_halfedge_circulator Ccb_halfedge_circulator;
 void GLWidget::generateRandomPoints(int count)
 {
     canvasData.points.clear(); // 使用CanvasData存储点
-    canvasData.points.reserve(count);
-    
+    canvasData.points.reserve(count + 4);
+
+    canvasData.points.push_back(Point(-1.0f, -1.0f));
+    canvasData.points.push_back(Point(1.0f, -1.0f));
+    canvasData.points.push_back(Point(-1.0f, 1.0f));
+    canvasData.points.push_back(Point(1.0f, 1.0f));
+
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
     for (int i = 0; i < count; i++) {
         float x = (static_cast<float>(std::rand()) / RAND_MAX) * 2.0f - 1.0f;
@@ -275,7 +280,6 @@ void GLWidget::drawDelaunayTriangles()
 {
     if (canvasData.dt.number_of_faces() == 0 || !showDelaunay) 
         return;
-
     // 获取窗口尺寸和宽高比
     float screenWidth = width();
     float screenHeight = height();
@@ -296,23 +300,35 @@ void GLWidget::drawDelaunayTriangles()
         vertices.push_back(p.y());
     }
 
-    // 准备索引数据 (直接遍历dt的三角形)
+    // 准备索引数据 - 使用GL_LINES模式绘制边线
     std::vector<unsigned int> indices;
+    std::unordered_map<Point, unsigned int> pointToIndex;
+    
+    // 创建点坐标到索引的映射
+    for (unsigned int i = 0; i < canvasData.points.size(); i++) {
+        pointToIndex[canvasData.points[i]] = i;
+    }
+    
+    // 遍历所有有限面（三角形）
     for (auto fit = canvasData.dt.finite_faces_begin(); 
          fit != canvasData.dt.finite_faces_end(); ++fit) 
     {
-        // 获取三角形的三个顶点索引
+        // 获取三角形的三个顶点
         for (int i = 0; i < 3; i++) {
             auto vh = fit->vertex(i);
-            // 计算顶点在points中的索引
-            auto it = std::find_if(canvasData.points.begin(), canvasData.points.end(),
-                [&](const Point& p) {
-                    return p.x() == vh->point().x() && p.y() == vh->point().y();
-                });
-            if (it != canvasData.points.end()) {
-                unsigned int idx = std::distance(canvasData.points.begin(), it);
+            Point p(vh->point().x(), vh->point().y());
+            
+            if (pointToIndex.find(p) != pointToIndex.end()) {
+                unsigned int idx = pointToIndex[p];
                 indices.push_back(idx);
             }
+        }
+        
+        // 添加闭合三角形的额外索引（连接最后一个顶点和第一个顶点）
+        auto vh0 = fit->vertex(0);
+        Point p0(vh0->point().x(), vh0->point().y());
+        if (pointToIndex.find(p0) != pointToIndex.end()) {
+            indices.push_back(pointToIndex[p0]);
         }
     }
 
@@ -364,9 +380,9 @@ void GLWidget::drawDelaunayTriangles()
         program.setAttributeBuffer(posLoc, GL_FLOAT, 0, 2, 2 * sizeof(float));
     }
     
-    // 正确绘制三角形线框 (使用三角形模式)
+    // 绘制三角形边线
     glLineWidth(1.5f);
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_LINES, indices.size(), GL_UNSIGNED_INT, 0);
     
     vao.release();
     program.release();
