@@ -109,6 +109,19 @@ void GLWidget::drawVoronoiDiagram()
 {
     if (voronoiCells.empty()) return;
 
+    // 获取窗口尺寸和宽高比
+    float screenWidth = width();
+    float screenHeight = height();
+    float aspect = screenWidth / screenHeight;
+
+    // 设置投影矩阵（与背景相同）
+    QMatrix4x4 projection;
+    if (aspect > 1.0f) {
+        projection.ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+    } else {
+        projection.ortho(-1.0f, 1.0f, -1.0f/aspect, 1.0f/aspect, -1.0f, 1.0f);
+    }
+
     // 设置简单的着色器
     QOpenGLShaderProgram program;
     program.addShaderFromSourceCode(QOpenGLShader::Vertex,
@@ -129,19 +142,6 @@ void GLWidget::drawVoronoiDiagram()
     if (!program.link()) {
         qWarning() << "Voronoi shader link error:" << program.log();
         return;
-    }
-
-    // 获取窗口尺寸和宽高比
-    float screenWidth = width();
-    float screenHeight = height();
-    float aspect = screenWidth / screenHeight;
-    
-    // 设置投影矩阵
-    QMatrix4x4 projection;
-    if (aspect > 1.0f) {
-        projection.ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
-    } else {
-        projection.ortho(-1.0f, 1.0f, -1.0f/aspect, 1.0f/aspect, -1.0f, 1.0f);
     }
 
     program.bind();
@@ -176,7 +176,7 @@ void GLWidget::drawVoronoiDiagram()
         }
         
         // 绘制多边形边界
-        glLineWidth(1.5f);
+        glLineWidth(2.5f); // 增加线宽使其更明显
         glDrawArrays(GL_LINE_LOOP, 0, static_cast<GLsizei>(cell.size()));
         
         vao.release();
@@ -331,12 +331,13 @@ void GLWidget::drawCVTBackground()
     // 清理
     vao.release();
     program.release();
-
+    glDisable(GL_DEPTH_TEST);
     // 在背景上绘制随机点
     if (!randomPoints.empty()) {
         // 绘制Voronoi图
-        drawRandomPoints();    
         drawVoronoiDiagram();
-
+        drawRandomPoints();    
     }
+    glEnable(GL_DEPTH_TEST);
+
 }
