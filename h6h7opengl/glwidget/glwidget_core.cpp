@@ -9,12 +9,10 @@
 #include <QtMath>
 #include <QResource>
 #include <algorithm>
-#include <iostream>
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
 #include <OpenMesh/Tools/Smoother/JacobiLaplaceSmootherT.hh>
 #include <OpenMesh/Core/IO/MeshIO.hh> // 添加OpenMesh IO头文件
 #include <OpenMesh/Core/IO/Options.hh>
-#include <unordered_set>
 #include <Eigen/Dense>
 #include <QImage> // 用于生成棋格纹理
 // 在文件顶部添加这两个头文件
@@ -151,14 +149,27 @@ void GLWidget::initializeGL()
         "uniform mat4 projection;\n"
         "void main() {\n"
         "    gl_Position = projection * vec4(aPos, 0.0, 1.0);\n"
-        "    gl_PointSize = 8.0;\n"  // 点的大小
+        "    gl_PointSize = 12.0;\n"  // 增大点的大小
         "}");
-    
+        
+    // 修改点绘制着色器
     pointProgram.addShaderFromSourceCode(QOpenGLShader::Fragment,
         "#version 330 core\n"
         "out vec4 FragColor;\n"
         "void main() {\n"
-        "    FragColor = vec4(0.0, 0.0, 0.0, 1.0); // 黑色点\n"
+        "    // 计算当前片元到点中心的距离\n"
+        "    vec2 coord = gl_PointCoord - vec2(0.5);\n"
+        "    float dist = length(coord) * 2.0; // 归一化到[0,1]\n"
+        "    \n"
+        "    // 如果距离大于1，则丢弃（形成圆形）\n"
+        "    if (dist > 1.0) discard;\n"
+        "    \n"
+        "    // 内部区域（80%以内）为红色，轮廓（80%到100%）为绿色\n"
+        "    if (dist < 0.8) {\n"
+        "        FragColor = vec4(1.0, 0.0, 0.0, 1.0); // 红色\n"
+        "    } else {\n"
+        "        FragColor = vec4(0.0, 1.0, 0.0, 1.0); // 绿色\n"
+        "    }\n"
         "}");
     
     if (!pointProgram.link()) {

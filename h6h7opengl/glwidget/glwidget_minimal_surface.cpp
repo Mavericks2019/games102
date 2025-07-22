@@ -1,7 +1,5 @@
 #include "glwidget.h"
 #include <vector>
-#include <queue>
-#include <fstream> // 用于输出到文件
 
 
 void GLWidget::performCotangentWeightsIteration(int iterations, float lambda) {

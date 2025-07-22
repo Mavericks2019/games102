@@ -1,15 +1,9 @@
-#include <algorithm>
 #include <cmath>
-#include <map>
 #include "glwidget.h"
-#include <vector>
-#include <queue>
-#include <fstream>
 #include <Eigen/SparseLU>
 #include <QVector2D>
 #include <QPolygonF>
 #include <QLineF>
-#include <limits>
 
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Delaunay_mesh_vertex_base_2.h>

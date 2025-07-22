@@ -264,11 +264,13 @@ public:
 public:
     // CVT 相关方法
     void generateRandomPoints(int count);
+    void drawVoronoiDiagram();
     void drawRandomPoints();             // 绘制随机点
     void computeDelaunayTriangulation();
     void computeVoronoiDiagram();
     void performLloydRelaxation();
     bool isCVTView; // 是否在CVT界面
+    std::vector<std::vector<QVector2D>> voronoiCells; // 存储Voronoi单元
     void drawCVTBackground();
     void setCVTView(bool enabled);
 private:

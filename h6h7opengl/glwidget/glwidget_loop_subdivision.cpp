@@ -1,8 +1,4 @@
 #include "glwidget.h"
-#include <queue>
-#include <map>
-#include <vector>
-#include <unordered_map>
 #include <OpenMesh/Core/Geometry/VectorT.hh>
 #include <OpenMesh/Tools/Subdivider/Uniform/LoopT.hh>
 
