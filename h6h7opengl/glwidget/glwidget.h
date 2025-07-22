@@ -256,9 +256,15 @@ public:
     int cvtIterations = 10;       // CVT迭代次数
     int currentCVTLevel = 0;       // 当前CVT迭代级别
     bool isCVTActive = false;      // CVT是否激活
+    std::vector<QVector2D> randomPoints; // 存储随机点
+    int currentPointCount = 0;           // 当前点数
+    QOpenGLShaderProgram pointProgram;    // 点绘制着色器
+    QOpenGLVertexArrayObject pointVao;    // 点绘制VAO
+    QOpenGLBuffer pointVbo;               // 点绘制VBO
 public:
     // CVT 相关方法
-    void generateRandomPoints();
+    void generateRandomPoints(int count);
+    void drawRandomPoints();             // 绘制随机点
     void computeDelaunayTriangulation();
     void computeVoronoiDiagram();
     void performLloydRelaxation();

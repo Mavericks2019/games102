@@ -2,6 +2,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QGroupBox>
+#include <QLineEdit>
 
 // 创建CVT选项卡
 QWidget* createCVTTab(GLWidget* glWidget) {
@@ -33,11 +34,32 @@ QWidget* createCVTControlPanel(GLWidget* glWidget, QWidget* cvtTab) {
     // 获取视图
     GLWidget *cvtView = cvtTab->property("cvtGLWidget").value<GLWidget*>();
     
+    // 创建点数设置控件
+    QGroupBox *pointGroup = new QGroupBox("Point Settings");
+    QVBoxLayout *pointLayout = new QVBoxLayout(pointGroup);
+    
+    // 点数输入框
+    QHBoxLayout *countLayout = new QHBoxLayout();
+    QLabel *countLabel = new QLabel("Points Count:");
+    countLabel->setStyleSheet("color: white;");
+    QLineEdit *countInput = new QLineEdit();
+    countInput->setText("100");
+    countInput->setStyleSheet(
+        "QLineEdit {"
+        "   background-color: #3A3A3A;"
+        "   color: white;"
+        "   border: 1px solid #555;"
+        "   border-radius: 4px;"
+        "   padding: 4px;"
+        "}"
+    );
+    countLayout->addWidget(countLabel);
+    countLayout->addWidget(countInput);
+    
+    pointLayout->addLayout(countLayout);
+    
     // 创建按钮
     QPushButton *randomButton = new QPushButton("Random generation");
-    QPushButton *delaunayButton = new QPushButton("Delaunay");
-    QPushButton *voronoiButton = new QPushButton("Voronoi");
-    QPushButton *lloydButton = new QPushButton("Do Lloyd");
     
     // 设置按钮样式
     QString buttonStyle = 
@@ -53,14 +75,29 @@ QWidget* createCVTControlPanel(GLWidget* glWidget, QWidget* cvtTab) {
         "QPushButton:hover { background-color: #606060; }";
     
     randomButton->setStyleSheet(buttonStyle);
+    
+    // 连接按钮信号
+    QObject::connect(randomButton, &QPushButton::clicked, [cvtView, countInput]() {
+        bool ok;
+        int count = countInput->text().toInt(&ok);
+        if (ok && count > 0) {
+            cvtView->generateRandomPoints(count);
+        }
+    });
+    
+    pointLayout->addWidget(randomButton);
+    
+    // 添加按钮到布局
+    layout->addWidget(pointGroup);
+    
+    // 添加其他按钮
+    QPushButton *delaunayButton = new QPushButton("Delaunay");
+    QPushButton *voronoiButton = new QPushButton("Voronoi");
+    QPushButton *lloydButton = new QPushButton("Do Lloyd");
+    
     delaunayButton->setStyleSheet(buttonStyle);
     voronoiButton->setStyleSheet(buttonStyle);
     lloydButton->setStyleSheet(buttonStyle);
-    
-    // 连接按钮信号
-    QObject::connect(randomButton, &QPushButton::clicked, [cvtView]() {
-        cvtView->generateRandomPoints();
-    });
     
     QObject::connect(delaunayButton, &QPushButton::clicked, [cvtView]() {
         cvtView->computeDelaunayTriangulation();
@@ -74,8 +111,6 @@ QWidget* createCVTControlPanel(GLWidget* glWidget, QWidget* cvtTab) {
         cvtView->performLloydRelaxation();
     });
     
-    // 添加按钮到布局
-    layout->addWidget(randomButton);
     layout->addWidget(delaunayButton);
     layout->addWidget(voronoiButton);
     layout->addWidget(lloydButton);

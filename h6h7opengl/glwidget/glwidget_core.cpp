@@ -28,6 +28,7 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
     ebo(QOpenGLBuffer::IndexBuffer),
     faceEbo(QOpenGLBuffer::IndexBuffer),
     texCoordBuffer(QOpenGLBuffer::VertexBuffer), // 初始化纹理坐标缓冲区
+    pointVbo(QOpenGLBuffer::VertexBuffer), // 初始化点VBO
     showWireframeOverlay(false),
     hideFaces(false),  // 初始化新增成员
     isCVTView(false)   // 新增：CVT视图标志初始化
@@ -83,6 +84,11 @@ GLWidget::~GLWidget()
     faceEbo.destroy();
     texCoordBuffer.destroy(); // 销毁纹理坐标缓冲区
     if (checkerboardTexture) delete checkerboardTexture; // 删除纹理对象
+    
+    // 销毁点绘制资源
+    pointVao.destroy();
+    pointVbo.destroy();
+    
     doneCurrent();
 }
 
@@ -133,6 +139,31 @@ void GLWidget::initializeGL()
 
     // 生成棋格纹理
     generateCheckerboardTexture();
+
+    // 创建点绘制资源
+    pointVao.create();
+    pointVbo.create();
+    
+    // 初始化点绘制着色器
+    pointProgram.addShaderFromSourceCode(QOpenGLShader::Vertex,
+        "#version 330 core\n"
+        "layout(location = 0) in vec2 aPos;\n"
+        "uniform mat4 projection;\n"
+        "void main() {\n"
+        "    gl_Position = projection * vec4(aPos, 0.0, 1.0);\n"
+        "    gl_PointSize = 8.0;\n"  // 点的大小
+        "}");
+    
+    pointProgram.addShaderFromSourceCode(QOpenGLShader::Fragment,
+        "#version 330 core\n"
+        "out vec4 FragColor;\n"
+        "void main() {\n"
+        "    FragColor = vec4(0.0, 0.0, 0.0, 1.0); // 黑色点\n"
+        "}");
+    
+    if (!pointProgram.link()) {
+        qWarning() << "Point shader link error:" << pointProgram.log();
+    }
 
     initializeShaders();
 }

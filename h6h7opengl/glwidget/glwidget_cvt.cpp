@@ -1,7 +1,86 @@
 #include "glwidget.h"
-// CVT 实现
-void GLWidget::generateRandomPoints() {
 
+void GLWidget::generateRandomPoints(int count)
+{
+    randomPoints.clear();
+    randomPoints.reserve(count);
+    
+    // 在 [-0.9, 0.9] 范围内生成随机点
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    for (int i = 0; i < count; i++) {
+        float x = (static_cast<float>(std::rand()) / RAND_MAX) * 2.0f - 1.0f;
+        float y = (static_cast<float>(std::rand()) / RAND_MAX) * 2.0f - 1.0f;
+        randomPoints.push_back(QVector2D(x, y));
+    }
+    
+    currentPointCount = count;
+    
+    // 准备点数据
+    std::vector<float> points;
+    points.reserve(randomPoints.size() * 2);
+    for (const auto& point : randomPoints) {
+        points.push_back(point.x());
+        points.push_back(point.y());
+    }
+    
+    // 更新点缓冲区
+    makeCurrent();
+    
+    pointVao.bind();
+    pointVbo.bind();
+    pointVbo.allocate(points.data(), static_cast<int>(points.size() * sizeof(float)));
+    
+    // 设置顶点属性
+    pointProgram.bind();
+    int posLoc = pointProgram.attributeLocation("aPos");
+    if (posLoc != -1) {
+        pointProgram.enableAttributeArray(posLoc);
+        pointProgram.setAttributeBuffer(posLoc, GL_FLOAT, 0, 2, 2 * sizeof(float));
+    }
+    
+    pointVao.release();
+    pointVbo.release();
+    pointProgram.release();
+    
+    doneCurrent();
+    
+    update();
+}
+
+void GLWidget::drawRandomPoints()
+{
+    if (randomPoints.empty()) return;
+    
+    // 禁用深度测试，确保点在最上层
+    glDisable(GL_DEPTH_TEST);
+    
+    // 使用持久化的点绘制资源
+    pointVao.bind();
+    pointProgram.bind();
+    
+    // 设置投影矩阵（与背景相同）
+    float screenWidth = width();
+    float screenHeight = height();
+    float aspect = screenWidth / screenHeight;
+    QMatrix4x4 projection;
+    if (aspect > 1.0f) {
+        projection.ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+    } else {
+        projection.ortho(-1.0f, 1.0f, -1.0f/aspect, 1.0f/aspect, -1.0f, 1.0f);
+    }
+    pointProgram.setUniformValue("projection", projection);
+    
+    // 绘制点
+    glEnable(GL_PROGRAM_POINT_SIZE);
+    glDrawArrays(GL_POINTS, 0, currentPointCount);
+    glDisable(GL_PROGRAM_POINT_SIZE);
+    
+    // 清理
+    pointProgram.release();
+    pointVao.release();
+    
+    // 重新启用深度测试
+    glEnable(GL_DEPTH_TEST);
 }
 
 void GLWidget::computeDelaunayTriangulation() {
@@ -24,7 +103,9 @@ void GLWidget::drawCVTBackground()
     
     // 计算窗口宽高比
     float aspect = screenWidth / screenHeight;
-    
+
+    // 禁用深度测试
+    //glDisable(GL_DEPTH_TEST);
     // 设置正交投影，根据宽高比调整
     QMatrix4x4 projection;
     if (aspect > 1.0f) {
@@ -109,4 +190,12 @@ void GLWidget::drawCVTBackground()
     // 清理
     vao.release();
     program.release();
+
+    // 在背景上绘制随机点
+    if (!randomPoints.empty()) {
+        drawRandomPoints();
+    }
+    
+    // 重新启用深度测试
+    glEnable(GL_DEPTH_TEST);
 }

@@ -201,9 +201,32 @@ int main(int argc, char *argv[])
     // 创建标签页控件
     QTabWidget *tabWidget = new QTabWidget;
     tabWidget->setStyleSheet(
-        "QTabWidget::pane { border: 1px solid #444; }"
-        "QTabBar::tab { background: #505050; color: white; padding: 8px; }"
-        "QTabBar::tab:selected { background: #606060; }"
+        "QTabWidget::pane {"
+        "    border: 1px solid #444;"
+        "    border-radius: 8px;"
+        "    margin-top: 4px;"
+        "}"
+        "QTabBar::tab {"
+        "    background: #505050;"
+        "    color: white;"
+        "    padding: 8px 16px;"
+        "    border-top-left-radius: 8px;"
+        "    border-top-right-radius: 8px;"
+        "    border: 1px solid #666;"
+        "    border-bottom: none;"
+        "    margin-right: 2px;"
+        "}"
+        "QTabBar::tab:selected {"
+        "    background: #606060;"
+        "    border-color: #888;"
+        "}"
+        "QTabBar::tab:!selected {"
+        "    background: #404040;"
+        "    border-color: #555;"
+        "}"
+        "QTabBar::tab:first {"
+        "    margin-left: 4px;"
+        "}"
     );
     
     // 创建OBJ模型标签页
