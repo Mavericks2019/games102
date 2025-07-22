@@ -6,6 +6,7 @@
 #include <CGAL/Delaunay_triangulation_adaptation_policies_2.h>
 #include <algorithm>
 #include <cmath>
+#include <ctime> // 包含ctime用于srand
 
 // CGAL 类型定义
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
@@ -60,8 +61,10 @@ void GLWidget::generateRandomPoints(int count)
     pointVbo.release();
     pointProgram.release();
     
-    doneCurrent();
+    // 生成Voronoi图数据
+    computeVoronoiDiagram();
     
+    doneCurrent();
     update();
 }
 
@@ -102,12 +105,13 @@ void GLWidget::drawRandomPoints()
 }
 
 void GLWidget::computeDelaunayTriangulation() {
-
+    // 实现Delaunay三角剖分
+    // 这里可以添加具体实现
 }
 
 void GLWidget::drawVoronoiDiagram()
 {
-    if (voronoiCells.empty()) return;
+    if (voronoiCells.empty() || !showVoronoiDiagram) return; // 新增：检查是否显示Voronoi图
 
     // 获取窗口尺寸和宽高比
     float screenWidth = width();
@@ -176,7 +180,7 @@ void GLWidget::drawVoronoiDiagram()
         }
         
         // 绘制多边形边界
-        glLineWidth(2.5f); // 增加线宽使其更明显
+        glLineWidth(1.5f); // 增加线宽使其更明显
         glDrawArrays(GL_LINE_LOOP, 0, static_cast<GLsizei>(cell.size()));
         
         vao.release();
@@ -239,7 +243,8 @@ void GLWidget::computeVoronoiDiagram()
 }
 
 void GLWidget::performLloydRelaxation() {
-
+    // 实现Lloyd松弛算法
+    // 这里可以添加具体实现
 }
 
 void GLWidget::drawCVTBackground()
@@ -332,12 +337,13 @@ void GLWidget::drawCVTBackground()
     vao.release();
     program.release();
     glDisable(GL_DEPTH_TEST);
+    
     // 在背景上绘制随机点
     if (!randomPoints.empty()) {
         // 绘制Voronoi图
         drawVoronoiDiagram();
         drawRandomPoints();    
     }
+    
     glEnable(GL_DEPTH_TEST);
-
 }

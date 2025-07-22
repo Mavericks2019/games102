@@ -3,6 +3,7 @@
 #include <QPushButton>
 #include <QGroupBox>
 #include <QLineEdit>
+#include <QCheckBox> // 新增：包含复选框头文件
 
 // 创建CVT选项卡
 QWidget* createCVTTab(GLWidget* glWidget) {
@@ -89,6 +90,20 @@ QWidget* createCVTControlPanel(GLWidget* glWidget, QWidget* cvtTab) {
     
     // 添加按钮到布局
     layout->addWidget(pointGroup);
+    
+    // 新增：Voronoi图显示控制
+    QGroupBox *voronoiGroup = new QGroupBox("Voronoi Settings");
+    QVBoxLayout *voronoiLayout = new QVBoxLayout(voronoiGroup);
+    
+    QCheckBox *showVoronoiCheckbox = new QCheckBox("Show Voronoi Diagram");
+    showVoronoiCheckbox->setStyleSheet("color: white;");
+    showVoronoiCheckbox->setChecked(false); // 默认不显示
+    QObject::connect(showVoronoiCheckbox, &QCheckBox::stateChanged, [cvtView](int state) {
+        cvtView->setShowVoronoiDiagram(state == Qt::Checked);
+    });
+    
+    voronoiLayout->addWidget(showVoronoiCheckbox);
+    layout->addWidget(voronoiGroup);
     
     // 添加其他按钮
     QPushButton *delaunayButton = new QPushButton("Delaunay");

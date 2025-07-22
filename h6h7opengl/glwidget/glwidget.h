@@ -245,19 +245,19 @@ public:
     std::vector<float> paramTexCoords; // 存储参数化生成的纹理坐标
     bool hasParamTexCoords = false;   // 是否有参数化纹理坐标
 
-// ========== CVT ITERATION ========== //
+    // ========== CVT ITERATION ========== //
 public:
     void performCVTIteration();   // 执行CVT迭代
     void calculateCVT();          // 计算CVT迭代
     void updateVoronoiDiagram();   // 更新Voronoi图
     void clipVoronoiToBoundary(std::vector<QVector2D>& cell, const QVector2D& site);  // 裁剪Voronoi多边形到边界
-
     // 添加CVT控件相关变量
     int cvtIterations = 10;       // CVT迭代次数
     int currentCVTLevel = 0;       // 当前CVT迭代级别
     bool isCVTActive = false;      // CVT是否激活
     std::vector<QVector2D> randomPoints; // 存储随机点
     int currentPointCount = 0;           // 当前点数
+    bool showVoronoiDiagram = false;     // 是否显示Voronoi图 // 新增：控制Voronoi图显示
     QOpenGLShaderProgram pointProgram;    // 点绘制着色器
     QOpenGLVertexArrayObject pointVao;    // 点绘制VAO
     QOpenGLBuffer pointVbo;               // 点绘制VBO
@@ -269,11 +269,12 @@ public:
     void computeDelaunayTriangulation();
     void computeVoronoiDiagram();
     void performLloydRelaxation();
+    void setShowVoronoiDiagram(bool show) { showVoronoiDiagram = show; update(); } // 新增：设置Voronoi图显示状态
     bool isCVTView; // 是否在CVT界面
     std::vector<std::vector<QVector2D>> voronoiCells; // 存储Voronoi单元
     void drawCVTBackground();
     void setCVTView(bool enabled);
-private:
+public:
     void drawWireframe(const QMatrix4x4& model, const QMatrix4x4& view, const QMatrix4x4& projection);
     void drawTextureMapping(const QMatrix4x4& model, const QMatrix4x4& view, const QMatrix4x4& projection, const QMatrix3x3& normalMatrix);
     void drawLoopSubdivision(const QMatrix4x4& model, const QMatrix4x4& view, const QMatrix4x4& projection, const QMatrix3x3& normalMatrix);
