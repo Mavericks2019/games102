@@ -273,14 +273,15 @@ void GLWidget::computeVoronoiDiagram()
 
 void GLWidget::drawDelaunayTriangles()
 {
-    if (delaunayIndices.empty() || !showDelaunay) return;
+    if (canvasData.dt.number_of_faces() == 0 || !showDelaunay) 
+        return;
 
     // 获取窗口尺寸和宽高比
     float screenWidth = width();
     float screenHeight = height();
     float aspect = screenWidth / screenHeight;
 
-    // 设置投影矩阵（与背景相同）
+    // 设置投影矩阵
     QMatrix4x4 projection;
     if (aspect > 1.0f) {
         projection.ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
@@ -288,15 +289,31 @@ void GLWidget::drawDelaunayTriangles()
         projection.ortho(-1.0f, 1.0f, -1.0f/aspect, 1.0f/aspect, -1.0f, 1.0f);
     }
 
-    // 合并所有点（随机点 + 边界点）
-    std::vector<Point> allPoints = canvasData.points;
-    allPoints.insert(allPoints.end(), boundaryPoints.begin(), boundaryPoints.end());
-    
-    // 创建顶点数据
+    // 准备顶点数据 (仅使用原始点集)
     std::vector<float> vertices;
-    for (const auto& p : allPoints) {
+    for (const auto& p : canvasData.points) {
         vertices.push_back(p.x());
         vertices.push_back(p.y());
+    }
+
+    // 准备索引数据 (直接遍历dt的三角形)
+    std::vector<unsigned int> indices;
+    for (auto fit = canvasData.dt.finite_faces_begin(); 
+         fit != canvasData.dt.finite_faces_end(); ++fit) 
+    {
+        // 获取三角形的三个顶点索引
+        for (int i = 0; i < 3; i++) {
+            auto vh = fit->vertex(i);
+            // 计算顶点在points中的索引
+            auto it = std::find_if(canvasData.points.begin(), canvasData.points.end(),
+                [&](const Point& p) {
+                    return p.x() == vh->point().x() && p.y() == vh->point().y();
+                });
+            if (it != canvasData.points.end()) {
+                unsigned int idx = std::distance(canvasData.points.begin(), it);
+                indices.push_back(idx);
+            }
+        }
     }
 
     // 设置着色器
@@ -338,7 +355,7 @@ void GLWidget::drawDelaunayTriangles()
     
     ebo.create();
     ebo.bind();
-    ebo.allocate(delaunayIndices.data(), static_cast<int>(delaunayIndices.size() * sizeof(unsigned int)));
+    ebo.allocate(indices.data(), static_cast<int>(indices.size() * sizeof(unsigned int)));
     
     // 设置顶点属性
     int posLoc = program.attributeLocation("aPos");
@@ -347,9 +364,9 @@ void GLWidget::drawDelaunayTriangles()
         program.setAttributeBuffer(posLoc, GL_FLOAT, 0, 2, 2 * sizeof(float));
     }
     
-    // 绘制三角形线框
+    // 正确绘制三角形线框 (使用三角形模式)
     glLineWidth(1.5f);
-    glDrawElements(GL_LINES, delaunayIndices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
     
     vao.release();
     program.release();
