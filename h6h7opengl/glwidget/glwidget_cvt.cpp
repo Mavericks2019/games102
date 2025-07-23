@@ -22,7 +22,6 @@ typedef VoronoiDiagram::Ccb_halfedge_circulator Ccb_halfedge_circulator;
 void GLWidget::generateRandomPoints(int count)
 {
     canvasData.points.clear(); // 使用CanvasData存储点
-    canvasData.points.reserve(count + 4);
 
     canvasData.points.push_back(Point(-1.0f, -1.0f));
     canvasData.points.push_back(Point(1.0f, -1.0f));
@@ -36,7 +35,7 @@ void GLWidget::generateRandomPoints(int count)
         canvasData.points.push_back(Point(x, y)); // 存入CanvasData
     }
     canvasData.dt = Delaunay(canvasData.points.begin(), canvasData.points.end());
-    currentPointCount = count;
+    currentPointCount = count + 4;
     
     // 准备点数据
     std::vector<float> points;
@@ -194,12 +193,104 @@ void GLWidget::drawVoronoiDiagram()
     program.release();
 }
 
+std::vector<QVector2D> GLWidget::clipVoronoiCellToRectangle(const std::vector<QVector2D>& cell, 
+                                                           float left, float right, 
+                                                           float bottom, float top)
+{
+    std::vector<QVector2D> clippedCell;
+    
+    // 检查单元是否需要裁剪
+    bool needsClipping = false;
+    for (const auto& pt : cell) {
+        if (pt.x() < left || pt.x() > right || pt.y() < bottom || pt.y() > top) {
+            needsClipping = true;
+            break;
+        }
+    }
+    
+    if (!needsClipping) {
+        return cell; // 如果单元完全在矩形内，直接返回
+    }
+    
+    // 检查每条边是否与边界相交
+    for (size_t i = 0; i < cell.size(); i++) {
+        const QVector2D& start = cell[i];
+        const QVector2D& end = cell[(i + 1) % cell.size()];
+        
+        // 起点在矩形内
+        if (start.x() >= left && start.x() <= right && 
+            start.y() >= bottom && start.y() <= top) {
+            clippedCell.push_back(start);
+        }
+        
+        // 检查边是否与边界相交
+        std::vector<QVector2D> intersections;
+        
+        // 检查与左边界的交点
+        if ((start.x() < left && end.x() > left) || 
+            (start.x() > left && end.x() < left)) {
+            float t = (left - start.x()) / (end.x() - start.x());
+            float y = start.y() + t * (end.y() - start.y());
+            if (y >= bottom && y <= top) {
+                intersections.push_back(QVector2D(left, y));
+            }
+        }
+        
+        // 检查与右边界的交点
+        if ((start.x() < right && end.x() > right) || 
+            (start.x() > right && end.x() < right)) {
+            float t = (right - start.x()) / (end.x() - start.x());
+            float y = start.y() + t * (end.y() - start.y());
+            if (y >= bottom && y <= top) {
+                intersections.push_back(QVector2D(right, y));
+            }
+        }
+        
+        // 检查与下边界的交点
+        if ((start.y() < bottom && end.y() > bottom) || 
+            (start.y() > bottom && end.y() < bottom)) {
+            float t = (bottom - start.y()) / (end.y() - start.y());
+            float x = start.x() + t * (end.x() - start.x());
+            if (x >= left && x <= right) {
+                intersections.push_back(QVector2D(x, bottom));
+            }
+        }
+        
+        // 检查与上边界的交点
+        if ((start.y() < top && end.y() > top) || 
+            (start.y() > top && end.y() < top)) {
+            float t = (top - start.y()) / (end.y() - start.y());
+            float x = start.x() + t * (end.x() - start.x());
+            if (x >= left && x <= right) {
+                intersections.push_back(QVector2D(x, top));
+            }
+        }
+        
+        // 添加交点（按距离起点的远近排序）
+        if (!intersections.empty()) {
+            std::sort(intersections.begin(), intersections.end(), 
+                [&](const QVector2D& a, const QVector2D& b) {
+                    return (a - start).lengthSquared() < 
+                           (b - start).lengthSquared();
+                });
+            
+            for (const auto& pt : intersections) {
+                clippedCell.push_back(pt);
+            }
+        }
+    }
+    
+    // 确保裁剪后的多边形是闭合的
+    if (!clippedCell.empty() && clippedCell.front() != clippedCell.back()) {
+        clippedCell.push_back(clippedCell.front());
+    }
+    
+    return clippedCell;
+}
+
 void GLWidget::computeVoronoiDiagram()
 {
     voronoiCells.clear();
-    // 以下两行可以移除，因为未在后续代码中使用
-    // delaunayVertices.clear();
-    // delaunayIndices.clear();
 
     if (canvasData.points.empty()) return;
 
@@ -208,6 +299,12 @@ void GLWidget::computeVoronoiDiagram()
 
     // 创建Voronoi图
     VoronoiDiagram vd(dt);
+
+    // 定义矩形边界
+    const float left = -1.0f;
+    const float right = 1.0f;
+    const float bottom = -1.0f;
+    const float top = 1.0f;
 
     // 遍历所有面（每个面对应一个采样点）
     for (auto fit = vd.faces_begin(); fit != vd.faces_end(); ++fit) {
@@ -227,7 +324,9 @@ void GLWidget::computeVoronoiDiagram()
             }
         } while (++ec != ec_start);
         
-        voronoiCells.push_back(cell);
+        // 裁剪单元到矩形边界
+        std::vector<QVector2D> clippedCell = clipVoronoiCellToRectangle(cell, left, right, bottom, top);
+        voronoiCells.push_back(clippedCell);
     }
 
     update();
@@ -266,26 +365,25 @@ void GLWidget::drawDelaunayTriangles()
         pointToIndex[canvasData.points[i]] = i;
     }
     
-    // 遍历所有有限面（三角形）
-    for (auto fit = canvasData.dt.finite_faces_begin(); 
-         fit != canvasData.dt.finite_faces_end(); ++fit) 
+    // 改为遍历所有有限边
+    for (auto eit = canvasData.dt.finite_edges_begin(); 
+         eit != canvasData.dt.finite_edges_end(); ++eit) 
     {
-        // 获取三角形的三个顶点
-        for (int i = 0; i < 3; i++) {
-            auto vh = fit->vertex(i);
-            Point p(vh->point().x(), vh->point().y());
-            
-            if (pointToIndex.find(p) != pointToIndex.end()) {
-                unsigned int idx = pointToIndex[p];
-                indices.push_back(idx);
-            }
-        }
+        // 获取边的两个端点
+        auto face = eit->first;
+        int edgeIndex = eit->second;
+        auto vh1 = face->vertex(face->cw(edgeIndex));
+        auto vh2 = face->vertex(face->ccw(edgeIndex));
         
-        // 添加闭合三角形的额外索引（连接最后一个顶点和第一个顶点）
-        auto vh0 = fit->vertex(0);
-        Point p0(vh0->point().x(), vh0->point().y());
-        if (pointToIndex.find(p0) != pointToIndex.end()) {
-            indices.push_back(pointToIndex[p0]);
+        Point p1(vh1->point().x(), vh1->point().y());
+        Point p2(vh2->point().x(), vh2->point().y());
+        
+        // 添加边的两个端点索引
+        if (pointToIndex.find(p1) != pointToIndex.end() && 
+            pointToIndex.find(p2) != pointToIndex.end()) 
+        {
+            indices.push_back(pointToIndex[p1]);
+            indices.push_back(pointToIndex[p2]);
         }
     }
 
@@ -346,8 +444,72 @@ void GLWidget::drawDelaunayTriangles()
 }
 
 void GLWidget::performLloydRelaxation() {
-    // 实现Lloyd松弛算法
-    // 这里可以添加具体实现
+    if (voronoiCells.empty()) {
+        computeVoronoiDiagram();
+    }
+    
+    // 存储新点位置
+    std::vector<Point> newPoints = canvasData.points;
+    
+    // 前4个点是矩形角点，不移动
+    for (size_t i = 4; i < canvasData.points.size(); i++) {
+        // 获取当前点的Voronoi单元
+        const std::vector<QVector2D>& cell = voronoiCells[i-4];
+        
+        // 计算单元重心
+        float centroidX = 0.0f;
+        float centroidY = 0.0f;
+        float area = 0.0f;
+        
+        // 使用鞋带公式计算重心
+        int n = cell.size();
+        for (int j = 0; j < n; j++) {
+            const QVector2D& p1 = cell[j];
+            const QVector2D& p2 = cell[(j+1) % n];
+            
+            float cross = p1.x() * p2.y() - p2.x() * p1.y();
+            area += cross;
+            centroidX += (p1.x() + p2.x()) * cross;
+            centroidY += (p1.y() + p2.y()) * cross;
+        }
+        
+        if (fabs(area) > 1e-7) {
+            area *= 0.5f;
+            centroidX /= (6.0f * area);
+            centroidY /= (6.0f * area);
+            
+            // 更新点位置
+            newPoints[i] = Point(centroidX, centroidY);
+        }
+    }
+    
+    // 更新点集
+    canvasData.points = newPoints;
+    
+    // 重新计算Delaunay三角剖分
+    canvasData.dt = Delaunay(canvasData.points.begin(), canvasData.points.end());
+    
+    // 准备点数据
+    std::vector<float> points;
+    points.reserve(canvasData.points.size() * 2);
+    for (const auto& point : canvasData.points) {
+        points.push_back(point.x());
+        points.push_back(point.y());
+    }
+    
+    // 更新点缓冲区
+    makeCurrent();
+    pointVao.bind();
+    pointVbo.bind();
+    pointVbo.allocate(points.data(), static_cast<int>(points.size() * sizeof(float)));
+    pointVao.release();
+    pointVbo.release();
+    doneCurrent();
+    
+    // 重新计算Voronoi图
+    computeVoronoiDiagram();
+    
+    update();
 }
 
 void GLWidget::drawCVTBackground()

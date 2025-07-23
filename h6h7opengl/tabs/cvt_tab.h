@@ -114,30 +114,44 @@ QWidget* createCVTControlPanel(GLWidget* glWidget, QWidget* cvtTab) {
     voronoiLayout->addWidget(showDelaunayCheckbox);
     layout->addWidget(voronoiGroup);
     
-    // 添加其他按钮
-    QPushButton *delaunayButton = new QPushButton("Compute Delaunay");
-    QPushButton *voronoiButton = new QPushButton("Compute Voronoi");
+    // 新增：Lloyd迭代控制
+    QGroupBox *lloydGroup = new QGroupBox("Lloyd Relaxation");
+    QVBoxLayout *lloydLayout = new QVBoxLayout(lloydGroup);
+    
+    QHBoxLayout *iterLayout = new QHBoxLayout();
+    QLabel *iterLabel = new QLabel("Iterations:");
+    iterLabel->setStyleSheet("color: white;");
+    QLineEdit *iterInput = new QLineEdit();
+    iterInput->setText("1"); // 默认1次
+    iterInput->setStyleSheet(
+        "QLineEdit {"
+        "   background-color: #3A3A3A;"
+        "   color: white;"
+        "   border: 1px solid #555;"
+        "   border-radius: 4px;"
+        "   padding: 4px;"
+        "}"
+    );
+    iterLayout->addWidget(iterLabel);
+    iterLayout->addWidget(iterInput);
+    
+    lloydLayout->addLayout(iterLayout);
+    
     QPushButton *lloydButton = new QPushButton("Do Lloyd");
-    
-    delaunayButton->setStyleSheet(buttonStyle);
-    voronoiButton->setStyleSheet(buttonStyle);
     lloydButton->setStyleSheet(buttonStyle);
-    
-    QObject::connect(delaunayButton, &QPushButton::clicked, [cvtView]() {
-        cvtView->computeDelaunayTriangulation();
+    QObject::connect(lloydButton, &QPushButton::clicked, [cvtView, iterInput]() {
+        bool ok;
+        int iterations = iterInput->text().toInt(&ok);
+        if (ok && iterations > 0) {
+            for (int i = 0; i < iterations; i++) {
+                cvtView->performLloydRelaxation();
+            }
+        }
     });
     
-    QObject::connect(voronoiButton, &QPushButton::clicked, [cvtView]() {
-        cvtView->computeVoronoiDiagram();
-    });
+    lloydLayout->addWidget(lloydButton);
     
-    QObject::connect(lloydButton, &QPushButton::clicked, [cvtView]() {
-        cvtView->performLloydRelaxation();
-    });
-    
-    layout->addWidget(delaunayButton);
-    layout->addWidget(voronoiButton);
-    layout->addWidget(lloydButton);
+    layout->addWidget(lloydGroup);
     
     layout->addStretch();
     return panel;
