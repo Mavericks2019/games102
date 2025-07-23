@@ -302,6 +302,9 @@ public:
     std::vector<std::vector<QVector2D>> voronoiCells; // 存储Voronoi单元
     void drawCVTBackground();
     void setCVTView(bool enabled);
+    std::vector<QVector2D> clipVoronoiCellToRectangle(const std::vector<QVector2D>& cell, 
+                                                           float left, float right, 
+                                                           float bottom, float top);
     
     // 新增：存储边界点
     std::vector<Point> boundaryPoints;

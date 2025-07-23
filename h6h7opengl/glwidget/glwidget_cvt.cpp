@@ -197,58 +197,15 @@ void GLWidget::drawVoronoiDiagram()
 void GLWidget::computeVoronoiDiagram()
 {
     voronoiCells.clear();
-    delaunayVertices.clear();
-    delaunayIndices.clear();
+    // 以下两行可以移除，因为未在后续代码中使用
+    // delaunayVertices.clear();
+    // delaunayIndices.clear();
 
     if (canvasData.points.empty()) return;
 
-    // 添加矩形的四个角点
-    boundaryPoints = {
-        Point(-1.0f, -1.0f),
-        Point(1.0f, -1.0f),
-        Point(1.0f, 1.0f),
-        Point(-1.0f, 1.0f)
-    };
-    
-    std::vector<Point_2> points;
-    points.reserve(canvasData.points.size() + boundaryPoints.size());
-    
-    // 创建点坐标到索引的映射
-    pointIndexMap.clear();
-    
-    // 添加随机点
-    for (int i = 0; i < canvasData.points.size(); i++) {
-        const auto& p = canvasData.points[i];
-        Point_2 cgalPoint(p.x(), p.y()); // 修复：显式创建Point_2对象
-        points.push_back(cgalPoint);
-        pointIndexMap[cgalPoint] = i;
-    }
-    
-    // 添加边界点
-    for (int i = 0; i < boundaryPoints.size(); i++) {
-        const auto& p = boundaryPoints[i];
-        Point_2 cgalPoint(p.x(), p.y()); // 修复：显式创建Point_2对象
-        points.push_back(cgalPoint);
-        pointIndexMap[cgalPoint] = canvasData.points.size() + i;
-    }
+    // 直接使用已有的Delaunay三角剖分
+    const DelaunayTriangulation& dt = canvasData.dt;
 
-    // 创建Delaunay三角剖分
-    DelaunayTriangulation dt;
-    dt.insert(points.begin(), points.end());
-
-    // 存储Delaunay三角形
-    for (auto fit = dt.finite_faces_begin(); fit != dt.finite_faces_end(); ++fit) {
-        for (int i = 0; i < 3; i++) {
-            auto vh = fit->vertex(i);
-            if (vh == nullptr || dt.is_infinite(vh)) continue;
-            
-            Point_2 p = vh->point();
-            auto it = pointIndexMap.find(p);
-            if (it != pointIndexMap.end()) {
-                delaunayIndices.push_back(it->second);
-            }
-        }
-    }
     // 创建Voronoi图
     VoronoiDiagram vd(dt);
 
