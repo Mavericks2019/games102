@@ -109,7 +109,17 @@ QWidget* createCVTControlPanel(GLWidget* glWidget, QWidget* cvtTab) {
     QObject::connect(showDelaunayCheckbox, &QCheckBox::stateChanged, [cvtView](int state) {
         cvtView->setShowDelaunay(state == Qt::Checked);
     });
+
+    // 在点设置组中添加显示点的复选框
+    QCheckBox *showPointsCheckbox = new QCheckBox("Show Points");
+    showPointsCheckbox->setStyleSheet("color: white;");
+    showPointsCheckbox->setChecked(true); // 默认显示点
+    QObject::connect(showPointsCheckbox, &QCheckBox::stateChanged, [cvtView](int state) {
+        cvtView->setShowPoints(state == Qt::Checked);
+    });
     
+    // 添加到点设置组的布局中
+    voronoiLayout->addWidget(showPointsCheckbox);
     voronoiLayout->addWidget(showVoronoiCheckbox);
     voronoiLayout->addWidget(showDelaunayCheckbox);
     layout->addWidget(voronoiGroup);

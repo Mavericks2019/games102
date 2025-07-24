@@ -289,6 +289,8 @@ public:
     
 public:
     // CVT 相关方法
+    bool showPoints = true; // 新增：控制是否显示点
+    void setShowPoints(bool show) { showPoints = show; update(); } // 新增：设置点显示状态
     void generateRandomPoints(int count);
     void drawVoronoiDiagram();
     void drawRandomPoints();             // 绘制随机点

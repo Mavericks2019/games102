@@ -365,6 +365,12 @@ void GLWidget::drawDelaunayTriangles()
         pointToIndex[canvasData.points[i]] = i;
     }
     
+    // 定义四个角点
+    Point corner1(-1.0f, -1.0f);
+    Point corner2(1.0f, -1.0f);
+    Point corner3(-1.0f, 1.0f);
+    Point corner4(1.0f, 1.0f);
+    
     // 改为遍历所有有限边
     for (auto eit = canvasData.dt.finite_edges_begin(); 
          eit != canvasData.dt.finite_edges_end(); ++eit) 
@@ -378,8 +384,14 @@ void GLWidget::drawDelaunayTriangles()
         Point p1(vh1->point().x(), vh1->point().y());
         Point p2(vh2->point().x(), vh2->point().y());
         
-        // 添加边的两个端点索引
-        if (pointToIndex.find(p1) != pointToIndex.end() && 
+        // 检查是否与角点相连
+        bool isCornerEdge = 
+            (p1 == corner1 || p1 == corner2 || p1 == corner3 || p1 == corner4) ||
+            (p2 == corner1 || p2 == corner2 || p2 == corner3 || p2 == corner4);
+        
+        // 添加边的两个端点索引（排除与角点相连的边）
+        if (!isCornerEdge && 
+            pointToIndex.find(p1) != pointToIndex.end() && 
             pointToIndex.find(p2) != pointToIndex.end()) 
         {
             indices.push_back(pointToIndex[p1]);
@@ -604,12 +616,16 @@ void GLWidget::drawCVTBackground()
     glDisable(GL_DEPTH_TEST);
     
     // 在背景上绘制随机点
-    if (!canvasData.points.empty()) {
-        // 绘制Voronoi图
-        drawVoronoiDiagram();
-        // 绘制Delaunay三角网格
-        drawDelaunayTriangles();
+    if (!canvasData.points.empty() && showPoints) { // 修改：添加showPoints判断
         drawRandomPoints();    
+    }
+
+    if(showVoronoiDiagram) {
+        drawVoronoiDiagram();
+    }
+
+    if(showDelaunay) {
+        drawDelaunayTriangles();
     }
     
     glEnable(GL_DEPTH_TEST);
