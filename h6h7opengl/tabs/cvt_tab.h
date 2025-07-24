@@ -1,4 +1,5 @@
 #include "../glwidget/glwidget.h"
+#include "../cvtwidget/cvtglwidget.h"
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QGroupBox>
@@ -6,12 +7,12 @@
 #include <QCheckBox> // 新增：包含复选框头文件
 
 // 创建CVT选项卡
-QWidget* createCVTTab(GLWidget* glWidget) {
+QWidget* createCVTTab(CVTGLWidget* glWidget) {
     QWidget *tab = new QWidget;
     QHBoxLayout *layout = new QHBoxLayout(tab);
     
     // 创建专用视图
-    GLWidget *cvtView = new GLWidget;
+    CVTGLWidget *cvtView = new CVTGLWidget;
     layout->addWidget(cvtView);
     
     // 保存视图指针
@@ -20,7 +21,6 @@ QWidget* createCVTTab(GLWidget* glWidget) {
     // 连接标签切换信号
     QObject::connect(tab, &QWidget::show, [cvtView]() {
         cvtView->setCVTView(true);
-        cvtView->resetViewForParameterization(); // 重置视图
         cvtView->update();
     });
     
@@ -28,12 +28,12 @@ QWidget* createCVTTab(GLWidget* glWidget) {
 }
 
 // 创建CVT控制面板
-QWidget* createCVTControlPanel(GLWidget* glWidget, QWidget* cvtTab) {
+QWidget* createCVTControlPanel(CVTGLWidget* glWidget, QWidget* cvtTab) {
     QWidget *panel = new QWidget;
     QVBoxLayout *layout = new QVBoxLayout(panel);
     
     // 获取视图
-    GLWidget *cvtView = cvtTab->property("cvtGLWidget").value<GLWidget*>();
+    CVTGLWidget *cvtView = cvtTab->property("cvtGLWidget").value<CVTGLWidget*>();
     
     // 创建点数设置控件
     QGroupBox *pointGroup = new QGroupBox("Point Settings");

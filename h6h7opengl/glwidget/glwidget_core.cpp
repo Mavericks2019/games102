@@ -26,10 +26,8 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
     ebo(QOpenGLBuffer::IndexBuffer),
     faceEbo(QOpenGLBuffer::IndexBuffer),
     texCoordBuffer(QOpenGLBuffer::VertexBuffer), // 初始化纹理坐标缓冲区
-    pointVbo(QOpenGLBuffer::VertexBuffer), // 初始化点VBO
     showWireframeOverlay(false),
-    hideFaces(false),  // 初始化新增成员
-    isCVTView(false)   // 新增：CVT视图标志初始化
+    hideFaces(false)  // 初始化新增成员
 {
     // 设置多重采样格式
     QSurfaceFormat format;
@@ -47,12 +45,6 @@ GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent),
     meshOperationValue = 50;  // 默认居中
     subdivisionLevel = 0; // 确保初始化为0
 
-}
-
-void GLWidget::setCVTView(bool enabled)
-{
-    isCVTView = enabled;
-    update();
 }
 
 void GLWidget::setHideFaces(bool hide)
@@ -83,9 +75,7 @@ GLWidget::~GLWidget()
     texCoordBuffer.destroy(); // 销毁纹理坐标缓冲区
     if (checkerboardTexture) delete checkerboardTexture; // 删除纹理对象
     
-    // 销毁点绘制资源
-    pointVao.destroy();
-    pointVbo.destroy();
+
     
     doneCurrent();
 }
@@ -137,44 +127,6 @@ void GLWidget::initializeGL()
 
     // 生成棋格纹理
     generateCheckerboardTexture();
-
-    // 创建点绘制资源
-    pointVao.create();
-    pointVbo.create();
-    
-    // 初始化点绘制着色器
-    pointProgram.addShaderFromSourceCode(QOpenGLShader::Vertex,
-        "#version 330 core\n"
-        "layout(location = 0) in vec2 aPos;\n"
-        "uniform mat4 projection;\n"
-        "void main() {\n"
-        "    gl_Position = projection * vec4(aPos, 0.0, 1.0);\n"
-        "    gl_PointSize = 12.0;\n"  // 增大点的大小
-        "}");
-        
-    // 修改点绘制着色器
-    pointProgram.addShaderFromSourceCode(QOpenGLShader::Fragment,
-        "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main() {\n"
-        "    // 计算当前片元到点中心的距离\n"
-        "    vec2 coord = gl_PointCoord - vec2(0.5);\n"
-        "    float dist = length(coord) * 2.0; // 归一化到[0,1]\n"
-        "    \n"
-        "    // 如果距离大于1，则丢弃（形成圆形）\n"
-        "    if (dist > 1.0) discard;\n"
-        "    \n"
-        "    // 内部区域（80%以内）为红色，轮廓（80%到100%）为绿色\n"
-        "    if (dist < 0.8) {\n"
-        "        FragColor = vec4(1.0, 0.0, 0.0, 1.0); // 红色\n"
-        "    } else {\n"
-        "        FragColor = vec4(0.0, 1.0, 0.0, 1.0); // 绿色\n"
-        "    }\n"
-        "}");
-    
-    if (!pointProgram.link()) {
-        qWarning() << "Point shader link error:" << pointProgram.log();
-    }
 
     initializeShaders();
 }
@@ -449,12 +401,6 @@ void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // 如果是CVT视图，绘制白色正方形
-    if (isCVTView) {
-        drawCVTBackground();
-        return; // 提前返回，不绘制其他内容
-    }
-
     if (!modelLoaded || openMesh.n_vertices() == 0) {
         return;
     }
@@ -508,7 +454,7 @@ void GLWidget::paintGL()
 
 void GLWidget::keyPressEvent(QKeyEvent *event)
 {
-    if (isCVTView || isParameterizationView) return;
+    if (isParameterizationView) return;
 
     switch (event->key()) {
     case Qt::Key_Left:
@@ -541,7 +487,7 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
 void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     // 如果是参数化视图，只允许缩放，不允许旋转
-    if (isCVTView || isParameterizationView) return;
+    if (isParameterizationView) return;
     if (event->button() == Qt::LeftButton) {
         isDragging = true;
         lastMousePos = event->pos();
@@ -561,7 +507,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
 void GLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     // 如果是参数化视图，只允许缩放，不允许旋转
-    if (isCVTView || isParameterizationView) return;
+    if (isParameterizationView) return;
     if (isDragging) {
         QPoint currentPos = event->pos();
         QPoint delta = currentPos - lastMousePos;

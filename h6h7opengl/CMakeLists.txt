@@ -45,8 +45,8 @@ add_executable(${PROJECT_NAME}
     glwidget/glwidget_loop_subdivision.cpp
     glwidget/glwidget_mesh_simplification.cpp
     glwidget/glwidget_parameteration.cpp
-    glwidget/glwidget_cvt.cpp
     glwidget/glwidget.h
+    cvtwidget/cvtglwidget.cpp
     ${RESOURCE_FILES}
 )
 

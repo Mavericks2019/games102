@@ -18,7 +18,6 @@
 #include <Eigen/IterativeLinearSolvers>
 #include <QOpenGLTexture> // 新增纹理支持
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-//#include <CGAL/Constrained_Delaunay_triangulation_2.h>
 #include <CGAL/Delaunay_triangulation_2.h>
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
@@ -250,67 +249,7 @@ public:
 public:
     std::vector<float> paramTexCoords; // 存储参数化生成的纹理坐标
     bool hasParamTexCoords = false;   // 是否有参数化纹理坐标
-
-    // ========== CVT ITERATION ========== //
-public:
-
-    struct CanvasData {
-        std::vector<Point> points;
-        bool opt_enable_context_menu{ true };
-        bool add_point{ false };
-        bool enable_delaunay{ false };
-        bool enable_voronoi{ false };
-        bool enable_lloyd{ false };
-        int points_num{ 10 };
-        int it_n{ 0 };
-        int max_iteration_number{ 50 };
-
-        Delaunay dt;
-    };
-    CanvasData canvasData;
-    void performCVTIteration();   // 执行CVT迭代
-    void calculateCVT();          // 计算CVT迭代
-    void updateVoronoiDiagram();   // 更新Voronoi图
-    void clipVoronoiToBoundary(std::vector<QVector2D>& cell, const QVector2D& site);  // 裁剪Voronoi多边形到边界
-    // 添加CVT控件相关变量
-    int cvtIterations = 10;       // CVT迭代次数
-    int currentCVTLevel = 0;       // 当前CVT迭代级别
-    bool isCVTActive = false;      // CVT是否激活
-    int currentPointCount = 0;           // 当前点数
-    bool showVoronoiDiagram = false;     // 是否显示Voronoi图 // 新增：控制Voronoi图显示
-    bool showDelaunay = false;           // 新增：是否显示Delaunay三角网格
-    QOpenGLShaderProgram pointProgram;    // 点绘制着色器
-    QOpenGLVertexArrayObject pointVao;    // 点绘制VAO
-    QOpenGLBuffer pointVbo;               // 点绘制VBO
     
-    // 新增：存储Delaunay三角网格数据
-    std::vector<float> delaunayVertices;
-    std::vector<unsigned int> delaunayIndices;
-    
-public:
-    // CVT 相关方法
-    bool showPoints = true; // 新增：控制是否显示点
-    void setShowPoints(bool show) { showPoints = show; update(); } // 新增：设置点显示状态
-    void generateRandomPoints(int count);
-    void drawVoronoiDiagram();
-    void drawRandomPoints();             // 绘制随机点
-    void drawDelaunayTriangles();        // 新增：绘制Delaunay三角网格
-    void computeDelaunayTriangulation();
-    void computeVoronoiDiagram();
-    void performLloydRelaxation();
-    void setShowVoronoiDiagram(bool show) { showVoronoiDiagram = show; update(); } // 新增：设置Voronoi图显示状态
-    void setShowDelaunay(bool show) { showDelaunay = show; update(); } // 新增：设置Delaunay显示状态
-    bool isCVTView; // 是否在CVT界面
-    std::vector<std::vector<QVector2D>> voronoiCells; // 存储Voronoi单元
-    void drawCVTBackground();
-    void setCVTView(bool enabled);
-    std::vector<QVector2D> clipVoronoiCellToRectangle(const std::vector<QVector2D>& cell, 
-                                                           float left, float right, 
-                                                           float bottom, float top);
-    
-    // 新增：存储边界点
-    std::vector<Point> boundaryPoints;
-    std::map<CGAL::Exact_predicates_inexact_constructions_kernel::Point_2, int> pointIndexMap; // 修复：使用K::Point_2替代CGAL::Point_2
 public:
     void drawWireframe(const QMatrix4x4& model, const QMatrix4x4& view, const QMatrix4x4& projection);
     void drawTextureMapping(const QMatrix4x4& model, const QMatrix4x4& view, const QMatrix4x4& projection, const QMatrix3x3& normalMatrix);

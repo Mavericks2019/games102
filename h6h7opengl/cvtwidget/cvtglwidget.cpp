@@ -1,39 +1,167 @@
-#include "glwidget.h"
+#include "cvtglwidget.h"
+#include <QMouseEvent>
+#include <QWheelEvent>
+#include <QKeyEvent>
+#include <QOpenGLShaderProgram>
+#include <QDebug>
+#include <ctime>
+#include <algorithm>
+#include <cmath>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Delaunay_triangulation_2.h>
 #include <CGAL/Voronoi_diagram_2.h>
 #include <CGAL/Delaunay_triangulation_adaptation_traits_2.h>
 #include <CGAL/Delaunay_triangulation_adaptation_policies_2.h>
-#include <algorithm>
-#include <cmath>
-#include <ctime> // 包含ctime用于srand
-// CGAL 类型定义
-typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
-typedef CGAL::Delaunay_triangulation_2<K> DelaunayTriangulation;
-typedef CGAL::Delaunay_triangulation_adaptation_traits_2<DelaunayTriangulation> AT;
-typedef CGAL::Delaunay_triangulation_caching_degeneracy_removal_policy_2<DelaunayTriangulation> AP;
-typedef CGAL::Voronoi_diagram_2<DelaunayTriangulation, AT, AP> VoronoiDiagram;
-typedef K::Point_2 Point_2;
-typedef VoronoiDiagram::Locate_result Locate_result;
-typedef VoronoiDiagram::Face_handle Face_handle;
-typedef VoronoiDiagram::Ccb_halfedge_circulator Ccb_halfedge_circulator;
 
-
-void GLWidget::generateRandomPoints(int count)
+CVTGLWidget::CVTGLWidget(QWidget *parent) : 
+    QOpenGLWidget(parent),
+    pointVbo(QOpenGLBuffer::VertexBuffer)
 {
-    canvasData.points.clear(); // 使用CanvasData存储点
+    QSurfaceFormat format;
+    format.setSamples(4); // 4x MSAA
+    setFormat(format);
+    setFocusPolicy(Qt::StrongFocus);
+}
 
-    canvasData.points.push_back(Point(-1.0f, -1.0f));
-    canvasData.points.push_back(Point(1.0f, -1.0f));
-    canvasData.points.push_back(Point(-1.0f, 1.0f));
-    canvasData.points.push_back(Point(1.0f, 1.0f));
+CVTGLWidget::~CVTGLWidget()
+{
+    makeCurrent();
+    pointVao.destroy();
+    pointVbo.destroy();
+    doneCurrent();
+}
+
+void CVTGLWidget::initializeGL()
+{
+    initializeOpenGLFunctions();
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_MULTISAMPLE); // 启用多重采样抗锯齿
+
+    // 初始化点绘制的VAO和VBO
+    pointVao.create();
+    pointVbo.create();
+
+    initializeShaders();
+}
+
+void CVTGLWidget::initializeShaders()
+{
+    // 点绘制着色器
+    if (!pointProgram.addShaderFromSourceCode(QOpenGLShader::Vertex,
+        "#version 330 core\n"
+        "layout(location = 0) in vec2 aPos;\n"
+        "uniform mat4 projection;\n"
+        "void main() {\n"
+        "    gl_Position = projection * vec4(aPos, 0.0, 1.0);\n"
+        "    gl_PointSize = 12.0;\n"  // 增大点的大小
+        "}")) {
+        qWarning() << "Point vertex shader error:" << pointProgram.log();
+    }
+    
+    if (!pointProgram.addShaderFromSourceCode(QOpenGLShader::Fragment,
+        "#version 330 core\n"
+        "out vec4 FragColor;\n"
+        "void main() {\n"
+        "    // 计算当前片元到点中心的距离\n"
+        "    vec2 coord = gl_PointCoord - vec2(0.5);\n"
+        "    float dist = length(coord) * 2.0; // 归一化到[0,1]\n"
+        "    \n"
+        "    // 如果距离大于1，则丢弃（形成圆形）\n"
+        "    if (dist > 1.0) discard;\n"
+        "    \n"
+        "    // 内部区域（80%以内）为红色，轮廓（80%到100%）为绿色\n"
+        "    if (dist < 0.8) {\n"
+        "        FragColor = vec4(1.0, 0.0, 0.0, 1.0); // 红色\n"
+        "    } else {\n"
+        "        FragColor = vec4(0.0, 1.0, 0.0, 1.0); // 绿色\n"
+        "    }\n"
+        "}")) {
+        qWarning() << "Point fragment shader error:" << pointProgram.log();
+    }
+    
+    if (!pointProgram.link()) {
+        qWarning() << "Point shader link error:" << pointProgram.log();
+    }
+}
+
+void CVTGLWidget::resizeGL(int w, int h)
+{
+    glViewport(0, 0, w, h);
+}
+
+void CVTGLWidget::paintGL()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    drawCVTBackground();
+}
+
+void CVTGLWidget::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        isDragging = true;
+        lastMousePos = event->pos();
+        setCursor(Qt::ClosedHandCursor);
+    }
+}
+
+void CVTGLWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton) {
+        isDragging = false;
+        setCursor(Qt::ArrowCursor);
+    }
+}
+
+void CVTGLWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    if (isDragging) {
+        QPoint currentPos = event->pos();
+        QPoint delta = currentPos - lastMousePos;
+        
+        // 根据鼠标移动距离计算旋转角度
+        rotationY += delta.x() * 0.5f;
+        rotationX += delta.y() * 0.5f;
+        
+        // 限制X轴旋转范围在-90到90度之间
+        rotationX = qBound(-90.0f, rotationX, 90.0f);
+        
+        lastMousePos = currentPos;
+        update();
+    }
+}
+
+void CVTGLWidget::wheelEvent(QWheelEvent *event)
+{
+    QPoint numDegrees = event->angleDelta() / 8;
+    if (!numDegrees.isNull()) {
+        float delta = numDegrees.y() > 0 ? 1.1f : 0.9f;
+        zoom *= delta;
+        
+        // 限制缩放范围
+        zoom = qBound(0.1f, zoom, 10.0f);
+        
+        update();
+    }
+}
+
+void CVTGLWidget::generateRandomPoints(int count)
+{
+    canvasData.points.clear();
+    
+    // 添加四个角点
+    canvasData.points.push_back(Point(-1.0, -1.0));
+    canvasData.points.push_back(Point(1.0, -1.0));
+    canvasData.points.push_back(Point(-1.0, 1.0));
+    canvasData.points.push_back(Point(1.0, 1.0));
 
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
     for (int i = 0; i < count; i++) {
-        float x = (static_cast<float>(std::rand()) / RAND_MAX) * 2.0f - 1.0f;
-        float y = (static_cast<float>(std::rand()) / RAND_MAX) * 2.0f - 1.0f;
-        canvasData.points.push_back(Point(x, y)); // 存入CanvasData
+        double x = (static_cast<double>(std::rand()) / RAND_MAX) * 2.0 - 1.0;
+        double y = (static_cast<double>(std::rand()) / RAND_MAX) * 2.0 - 1.0;
+        canvasData.points.push_back(Point(x, y));
     }
+    
     canvasData.dt = Delaunay(canvasData.points.begin(), canvasData.points.end());
     currentPointCount = count + 4;
     
@@ -41,13 +169,12 @@ void GLWidget::generateRandomPoints(int count)
     std::vector<float> points;
     points.reserve(canvasData.points.size() * 2);
     for (const auto& point : canvasData.points) {
-        points.push_back(point.x());
-        points.push_back(point.y());
+        points.push_back(static_cast<float>(point.x()));
+        points.push_back(static_cast<float>(point.y()));
     }
     
     // 更新点缓冲区
     makeCurrent();
-    
     pointVao.bind();
     pointVbo.bind();
     pointVbo.allocate(points.data(), static_cast<int>(points.size() * sizeof(float)));
@@ -71,9 +198,35 @@ void GLWidget::generateRandomPoints(int count)
     update();
 }
 
-void GLWidget::drawRandomPoints()
+void CVTGLWidget::setShowPoints(bool show)
 {
-    if (canvasData.points.empty()) return;
+    showPoints = show;
+    update();
+}
+
+void CVTGLWidget::setShowVoronoiDiagram(bool show)
+{
+    showVoronoiDiagram = show;
+    update();
+}
+
+void CVTGLWidget::setShowDelaunay(bool show)
+{
+    showDelaunay = show;
+    update();
+}
+
+void CVTGLWidget::resetView()
+{
+    rotationX = 0;
+    rotationY = 0;
+    zoom = 1.0f;
+    update();
+}
+
+void CVTGLWidget::drawRandomPoints()
+{
+    if (canvasData.points.empty() || !showPoints) return;
     
     // 禁用深度测试，确保点在最上层
     glDisable(GL_DEPTH_TEST);
@@ -82,7 +235,7 @@ void GLWidget::drawRandomPoints()
     pointVao.bind();
     pointProgram.bind();
     
-    // 设置投影矩阵（与背景相同）
+    // 设置投影矩阵
     float screenWidth = width();
     float screenHeight = height();
     float aspect = screenWidth / screenHeight;
@@ -107,21 +260,16 @@ void GLWidget::drawRandomPoints()
     glEnable(GL_DEPTH_TEST);
 }
 
-void GLWidget::computeDelaunayTriangulation() {
-    // 实现Delaunay三角剖分
-    // 这里可以添加具体实现
-}
-
-void GLWidget::drawVoronoiDiagram()
+void CVTGLWidget::drawVoronoiDiagram()
 {
-    if (voronoiCells.empty() || !showVoronoiDiagram) return; // 新增：检查是否显示Voronoi图
+    if (voronoiCells.empty() || !showVoronoiDiagram) return;
 
     // 获取窗口尺寸和宽高比
     float screenWidth = width();
     float screenHeight = height();
     float aspect = screenWidth / screenHeight;
 
-    // 设置投影矩阵（与背景相同）
+    // 设置投影矩阵
     QMatrix4x4 projection;
     if (aspect > 1.0f) {
         projection.ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
@@ -193,7 +341,7 @@ void GLWidget::drawVoronoiDiagram()
     program.release();
 }
 
-std::vector<QVector2D> GLWidget::clipVoronoiCellToRectangle(const std::vector<QVector2D>& cell, 
+std::vector<QVector2D> CVTGLWidget::clipVoronoiCellToRectangle(const std::vector<QVector2D>& cell, 
                                                            float left, float right, 
                                                            float bottom, float top)
 {
@@ -288,14 +436,14 @@ std::vector<QVector2D> GLWidget::clipVoronoiCellToRectangle(const std::vector<QV
     return clippedCell;
 }
 
-void GLWidget::computeVoronoiDiagram()
+void CVTGLWidget::computeVoronoiDiagram()
 {
     voronoiCells.clear();
 
     if (canvasData.points.empty()) return;
 
     // 直接使用已有的Delaunay三角剖分
-    const DelaunayTriangulation& dt = canvasData.dt;
+    const Delaunay& dt = canvasData.dt;
 
     // 创建Voronoi图
     VoronoiDiagram vd(dt);
@@ -319,8 +467,9 @@ void GLWidget::computeVoronoiDiagram()
         
         do {
             if (ec->has_target()) {
-                Point_2 p = ec->target()->point();
-                cell.push_back(QVector2D(p.x(), p.y()));
+                Point p = ec->target()->point();
+                cell.push_back(QVector2D(static_cast<float>(p.x()), 
+                                static_cast<float>(p.y())));
             }
         } while (++ec != ec_start);
         
@@ -332,10 +481,11 @@ void GLWidget::computeVoronoiDiagram()
     update();
 }
 
-void GLWidget::drawDelaunayTriangles()
+void CVTGLWidget::drawDelaunayTriangles()
 {
     if (canvasData.dt.number_of_faces() == 0 || !showDelaunay) 
         return;
+        
     // 获取窗口尺寸和宽高比
     float screenWidth = width();
     float screenHeight = height();
@@ -352,8 +502,8 @@ void GLWidget::drawDelaunayTriangles()
     // 准备顶点数据 (仅使用原始点集)
     std::vector<float> vertices;
     for (const auto& p : canvasData.points) {
-        vertices.push_back(p.x());
-        vertices.push_back(p.y());
+        vertices.push_back(static_cast<float>(p.x()));
+        vertices.push_back(static_cast<float>(p.y()));
     }
 
     // 准备索引数据 - 使用GL_LINES模式绘制边线
@@ -366,10 +516,10 @@ void GLWidget::drawDelaunayTriangles()
     }
     
     // 定义四个角点
-    Point corner1(-1.0f, -1.0f);
-    Point corner2(1.0f, -1.0f);
-    Point corner3(-1.0f, 1.0f);
-    Point corner4(1.0f, 1.0f);
+    Point corner1(-1.0, -1.0);
+    Point corner2(1.0, -1.0);
+    Point corner3(-1.0, 1.0);
+    Point corner4(1.0, 1.0);
     
     // 改为遍历所有有限边
     for (auto eit = canvasData.dt.finite_edges_begin(); 
@@ -381,8 +531,8 @@ void GLWidget::drawDelaunayTriangles()
         auto vh1 = face->vertex(face->cw(edgeIndex));
         auto vh2 = face->vertex(face->ccw(edgeIndex));
         
-        Point p1(vh1->point().x(), vh1->point().y());
-        Point p2(vh2->point().x(), vh2->point().y());
+        Point p1 = vh1->point();
+        Point p2 = vh2->point();
         
         // 检查是否与角点相连
         bool isCornerEdge = 
@@ -455,7 +605,8 @@ void GLWidget::drawDelaunayTriangles()
     program.release();
 }
 
-void GLWidget::performLloydRelaxation() {
+void CVTGLWidget::performLloydRelaxation()
+{
     if (voronoiCells.empty()) {
         computeVoronoiDiagram();
     }
@@ -505,8 +656,8 @@ void GLWidget::performLloydRelaxation() {
     std::vector<float> points;
     points.reserve(canvasData.points.size() * 2);
     for (const auto& point : canvasData.points) {
-        points.push_back(point.x());
-        points.push_back(point.y());
+        points.push_back(static_cast<float>(point.x()));
+        points.push_back(static_cast<float>(point.y()));
     }
     
     // 更新点缓冲区
@@ -524,7 +675,7 @@ void GLWidget::performLloydRelaxation() {
     update();
 }
 
-void GLWidget::drawCVTBackground()
+void CVTGLWidget::drawCVTBackground()
 {
     // 获取窗口尺寸
     float screenWidth = width();
@@ -614,11 +765,6 @@ void GLWidget::drawCVTBackground()
     vao.release();
     program.release();
     glDisable(GL_DEPTH_TEST);
-    
-    // 在背景上绘制随机点
-    if (!canvasData.points.empty() && showPoints) { // 修改：添加showPoints判断
-        drawRandomPoints();    
-    }
 
     if(showVoronoiDiagram) {
         drawVoronoiDiagram();
@@ -627,6 +773,16 @@ void GLWidget::drawCVTBackground()
     if(showDelaunay) {
         drawDelaunayTriangles();
     }
+
+    if (!canvasData.points.empty() && showPoints) { // 修改：添加showPoints判断
+        drawRandomPoints();    
+    }
     
     glEnable(GL_DEPTH_TEST);
+}
+
+void CVTGLWidget::setCVTView(bool enabled)
+{
+    isCVTView = enabled;
+    update();
 }

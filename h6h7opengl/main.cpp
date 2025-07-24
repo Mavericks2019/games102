@@ -22,7 +22,7 @@ QWidget* createParameterizationControlPanel(GLWidget* glWidget, QWidget* paramTa
 
 // 声明CVT标签页函数
 QWidget* createCVTTab(GLWidget* glWidget);
-QWidget* createCVTControlPanel(GLWidget* glWidget, QWidget* cvtTab);
+QWidget* createCVTControlPanel(CVTGLWidget* glWidget, QWidget* cvtTab);
 
 namespace UIUtils {
     // 获取当前激活的GLWidget
@@ -197,6 +197,7 @@ int main(int argc, char *argv[])
     
     // 创建OpenGL窗口
     GLWidget *glWidget = new GLWidget;
+    CVTGLWidget *cvtglWidget = new CVTGLWidget;
     
     // 创建标签页控件
     QTabWidget *tabWidget = new QTabWidget;
@@ -238,7 +239,7 @@ int main(int argc, char *argv[])
     tabWidget->addTab(paramTab, "Parameterization");
     
     // 创建CVT标签页
-    QWidget *cvtTab = createCVTTab(glWidget);
+    QWidget *cvtTab = createCVTTab(cvtglWidget);
     tabWidget->addTab(cvtTab, "CVT");
 
     
@@ -274,7 +275,7 @@ int main(int argc, char *argv[])
     
     // 创建CVT控制面板
     stackedLayout->addWidget(createCVTControlPanel(
-        glWidget, cvtTab
+        cvtglWidget, cvtTab
     ));
     
     // 连接标签切换信号
@@ -285,21 +286,19 @@ int main(int argc, char *argv[])
     // 连接标签切换信号 - CVT视图处理
     QObject::connect(tabWidget, &QTabWidget::currentChanged, [=](int index) {
         // 重置所有视图的CVT状态
-        glWidget->setCVTView(false);
+       cvtglWidget->setCVTView(false);
         
         // 获取参数化视图
         QWidget* paramTab = tabWidget->widget(1);
         GLWidget* paramView = paramTab->property("leftGLWidget").value<GLWidget*>();
-        if (paramView) paramView->setCVTView(false);
         
         // 获取CVT视图
-        GLWidget* cvtView = cvtTab->property("cvtGLWidget").value<GLWidget*>();
+        CVTGLWidget* cvtView = cvtTab->property("cvtGLWidget").value<CVTGLWidget*>();
         
         if (cvtView) {
             // 如果切换到CVT标签页
             if (index == 2) {
                 cvtView->setCVTView(true);
-                cvtView->resetViewForParameterization();
                 cvtView->update();
             } else {
                 // 离开CVT标签页时重置状态
