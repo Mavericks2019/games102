@@ -155,12 +155,12 @@ void GLWidget::initializeShaders()
     }
 
     // 纹理顶点着色器
-    if (!textureProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/texture.vert")) {
+    if (!textureProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/glwidget/shaders/texture.vert")) {
         qWarning() << "Texture vertex shader error:" << textureProgram.log();
     }
     
     // 纹理片段着色器
-    if (!textureProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/texture.frag")) {
+    if (!textureProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/glwidget/shaders/texture.frag")) {
         qWarning() << "Texture fragment shader error:" << textureProgram.log();
     }
     
@@ -169,11 +169,11 @@ void GLWidget::initializeShaders()
     }
     
     
-    if (!curvatureProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/curvature.vert")) {
+    if (!curvatureProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/glwidget/shaders/curvature.vert")) {
         qWarning() << "Curvature vertex shader error:" << curvatureProgram.log();
     }
     
-    if (!curvatureProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/curvature.frag")) {
+    if (!curvatureProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/glwidget/shaders/curvature.frag")) {
         qWarning() << "Curvature fragment shader error:" << curvatureProgram.log();
     }
     
@@ -182,11 +182,11 @@ void GLWidget::initializeShaders()
     }
 
     // 线框着色器程序
-    if (!wireframeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/wireframe.vert")) {
+    if (!wireframeProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/glwidget/shaders/wireframe.vert")) {
         qWarning() << "Vertex shader error:" << wireframeProgram.log();
     }
     
-    if (!wireframeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/wireframe.frag")) {
+    if (!wireframeProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/glwidget/shaders/wireframe.frag")) {
         qWarning() << "Fragment shader error:" << wireframeProgram.log();
     }
     
@@ -195,11 +195,11 @@ void GLWidget::initializeShaders()
     }
     
     // 布林冯着色器程序
-    if (!blinnPhongProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/blinnphong.vert")) {
+    if (!blinnPhongProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/glwidget/shaders/blinnphong.vert")) {
         qWarning() << "Blinn-Phong vertex shader error:" << blinnPhongProgram.log();
     }
     
-    if (!blinnPhongProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/blinnphong.frag")) {
+    if (!blinnPhongProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/glwidget/shaders/blinnphong.frag")) {
         qWarning() << "Blinn-Phong fragment shader error:" << blinnPhongProgram.log();
     }
     
@@ -208,11 +208,11 @@ void GLWidget::initializeShaders()
     }
 
     // 初始化Loop细分着色器
-    if (!loopSubdivisionProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/loop_subdivision.vert")) {
+    if (!loopSubdivisionProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/glwidget/shaders/loop_subdivision.vert")) {
         qWarning() << "Loop subdivision vertex shader error:" << loopSubdivisionProgram.log();
     }
     
-    if (!loopSubdivisionProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/shaders/loop_subdivision.frag")) {
+    if (!loopSubdivisionProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/glwidget/shaders/loop_subdivision.frag")) {
         qWarning() << "Loop subdivision fragment shader error:" << loopSubdivisionProgram.log();
     }
     

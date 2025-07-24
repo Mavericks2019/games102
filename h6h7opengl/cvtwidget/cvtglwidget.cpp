@@ -47,36 +47,12 @@ void CVTGLWidget::initializeGL()
 
 void CVTGLWidget::initializeShaders()
 {
-    // 点绘制着色器
-    if (!pointProgram.addShaderFromSourceCode(QOpenGLShader::Vertex,
-        "#version 330 core\n"
-        "layout(location = 0) in vec2 aPos;\n"
-        "uniform mat4 projection;\n"
-        "void main() {\n"
-        "    gl_Position = projection * vec4(aPos, 0.0, 1.0);\n"
-        "    gl_PointSize = 12.0;\n"  // 增大点的大小
-        "}")) {
+    // 点绘制着色器 - 从文件加载
+    if (!pointProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/cvtwidget/shaders/cvt_point.vert")) {
         qWarning() << "Point vertex shader error:" << pointProgram.log();
     }
     
-    if (!pointProgram.addShaderFromSourceCode(QOpenGLShader::Fragment,
-        "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main() {\n"
-        "    // 计算当前片元到点中心的距离\n"
-        "    vec2 coord = gl_PointCoord - vec2(0.5);\n"
-        "    float dist = length(coord) * 2.0; // 归一化到[0,1]\n"
-        "    \n"
-        "    // 如果距离大于1，则丢弃（形成圆形）\n"
-        "    if (dist > 1.0) discard;\n"
-        "    \n"
-        "    // 内部区域（80%以内）为红色，轮廓（80%到100%）为绿色\n"
-        "    if (dist < 0.8) {\n"
-        "        FragColor = vec4(1.0, 0.0, 0.0, 1.0); // 红色\n"
-        "    } else {\n"
-        "        FragColor = vec4(0.0, 1.0, 0.0, 1.0); // 绿色\n"
-        "    }\n"
-        "}")) {
+    if (!pointProgram.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/cvtwidget/shaders/cvt_point.frag")) {
         qWarning() << "Point fragment shader error:" << pointProgram.log();
     }
     
@@ -277,22 +253,15 @@ void CVTGLWidget::drawVoronoiDiagram()
         projection.ortho(-1.0f, 1.0f, -1.0f/aspect, 1.0f/aspect, -1.0f, 1.0f);
     }
 
-    // 设置简单的着色器
+    // 设置着色器 - 从文件加载
     QOpenGLShaderProgram program;
-    program.addShaderFromSourceCode(QOpenGLShader::Vertex,
-        "#version 330 core\n"
-        "layout(location = 0) in vec2 aPos;\n"
-        "uniform mat4 projection;\n"
-        "void main() {\n"
-        "    gl_Position = projection * vec4(aPos, 0.0, 1.0);\n"
-        "}");
+    if (!program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/cvtwidget/shaders/cvt_voronoi.vert")) {
+        qWarning() << "Voronoi vertex shader error:" << program.log();
+    }
     
-    program.addShaderFromSourceCode(QOpenGLShader::Fragment,
-        "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main() {\n"
-        "    FragColor = vec4(0.0, 0.0, 1.0, 1.0); // 蓝色线条\n"
-        "}");
+    if (!program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/cvtwidget/shaders/cvt_voronoi.frag")) {
+        qWarning() << "Voronoi fragment shader error:" << program.log();
+    }
     
     if (!program.link()) {
         qWarning() << "Voronoi shader link error:" << program.log();
@@ -549,22 +518,15 @@ void CVTGLWidget::drawDelaunayTriangles()
         }
     }
 
-    // 设置着色器
+    // 设置着色器 - 从文件加载
     QOpenGLShaderProgram program;
-    program.addShaderFromSourceCode(QOpenGLShader::Vertex,
-        "#version 330 core\n"
-        "layout(location = 0) in vec2 aPos;\n"
-        "uniform mat4 projection;\n"
-        "void main() {\n"
-        "    gl_Position = projection * vec4(aPos, 0.0, 1.0);\n"
-        "}");
+    if (!program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/cvtwidget/shaders/cvt_delaunay.vert")) {
+        qWarning() << "Delaunay vertex shader error:" << program.log();
+    }
     
-    program.addShaderFromSourceCode(QOpenGLShader::Fragment,
-        "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main() {\n"
-        "    FragColor = vec4(1.0, 0.5, 0.0, 1.0); // 橙色线条\n"
-        "}");
+    if (!program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/cvtwidget/shaders/cvt_delaunay.frag")) {
+        qWarning() << "Delaunay fragment shader error:" << program.log();
+    }
     
     if (!program.link()) {
         qWarning() << "Delaunay shader link error:" << program.log();
@@ -693,23 +655,15 @@ void CVTGLWidget::drawCVTBackground()
     // 创建模型矩阵
     QMatrix4x4 model;
     
-    // 使用简单的着色器绘制白色背景
+    // 使用着色器绘制白色背景 - 从文件加载
     QOpenGLShaderProgram program;
-    program.addShaderFromSourceCode(QOpenGLShader::Vertex,
-        "#version 330 core\n"
-        "layout(location = 0) in vec3 aPos;\n"
-        "uniform mat4 model;\n"
-        "uniform mat4 projection;\n"
-        "void main() {\n"
-        "    gl_Position = projection * model * vec4(aPos, 1.0);\n"
-        "}");
+    if (!program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/cvtwidget/shaders/cvt_background.vert")) {
+        qWarning() << "Background vertex shader error:" << program.log();
+    }
     
-    program.addShaderFromSourceCode(QOpenGLShader::Fragment,
-        "#version 330 core\n"
-        "out vec4 FragColor;\n"
-        "void main() {\n"
-        "    FragColor = vec4(1.0, 1.0, 1.0, 1.0); // 白色\n"
-        "}");
+    if (!program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/cvtwidget/shaders/cvt_background.frag")) {
+        qWarning() << "Background fragment shader error:" << program.log();
+    }
     
     if (!program.link()) {
         qWarning() << "Background shader link error:" << program.log();

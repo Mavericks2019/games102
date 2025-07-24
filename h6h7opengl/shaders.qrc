@@ -1,15 +1,23 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
 <qresource>
-    <file>shaders/wireframe.vert</file>
-    <file>shaders/wireframe.frag</file>
-    <file>shaders/blinnphong.vert</file>
-    <file>shaders/blinnphong.frag</file>
-    <file>shaders/curvature.vert</file>
-    <file>shaders/curvature.frag</file>
-    <file>shaders/loop_subdivision.vert</file>
-    <file>shaders/loop_subdivision.frag</file>
-    <file>shaders/texture.vert</file>
-    <file>shaders/texture.frag</file>
+    <file>glwidget/shaders/wireframe.vert</file>
+    <file>glwidget/shaders/wireframe.frag</file>
+    <file>glwidget/shaders/blinnphong.vert</file>
+    <file>glwidget/shaders/blinnphong.frag</file>
+    <file>glwidget/shaders/curvature.vert</file>
+    <file>glwidget/shaders/curvature.frag</file>
+    <file>glwidget/shaders/loop_subdivision.vert</file>
+    <file>glwidget/shaders/loop_subdivision.frag</file>
+    <file>glwidget/shaders/texture.vert</file>
+    <file>glwidget/shaders/texture.frag</file>
+    <file>cvtwidget/shaders/cvt_point.vert</file>
+    <file>cvtwidget/shaders/cvt_point.frag</file>
+    <file>cvtwidget/shaders/cvt_voronoi.vert</file>
+    <file>cvtwidget/shaders/cvt_voronoi.frag</file>
+    <file>cvtwidget/shaders/cvt_delaunay.vert</file>
+    <file>cvtwidget/shaders/cvt_delaunay.frag</file>
+    <file>cvtwidget/shaders/cvt_background.vert</file>
+    <file>cvtwidget/shaders/cvt_background.frag</file>
 </qresource>
 </RCC>

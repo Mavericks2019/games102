@@ -47,6 +47,7 @@ add_executable(${PROJECT_NAME}
     glwidget/glwidget_parameteration.cpp
     glwidget/glwidget.h
     cvtwidget/cvtglwidget.cpp
+    cvtwidget/cvtglwidget.h
     ${RESOURCE_FILES}
 )
 
