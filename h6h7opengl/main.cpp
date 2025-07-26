@@ -11,6 +11,7 @@
 #include "tabs/model_tab.h"
 #include "tabs/parameterization_tab.h"
 #include "tabs/cvt_tab.h"
+#include "../tabs/cvt_weight_tab.h" // 新增头文件
 
 // 声明模型标签页函数
 QWidget* createModelTab(GLWidget* glWidget);
@@ -23,6 +24,10 @@ QWidget* createParameterizationControlPanel(GLWidget* glWidget, QWidget* paramTa
 // 声明CVT标签页函数
 QWidget* createCVTTab(GLWidget* glWidget);
 QWidget* createCVTControlPanel(CVTGLWidget* glWidget, QWidget* cvtTab);
+
+// 声明CVT Weight标签页函数
+QWidget* createCVTWeightTab(CVTImageGLWidget* glWidget); // 新增
+QWidget* createCVTWeightControlPanel(CVTImageGLWidget* glWidget, QWidget* cvtWeightTab); // 新增
 
 namespace UIUtils {
     // 获取当前激活的GLWidget
@@ -44,6 +49,23 @@ namespace UIUtils {
         QVBoxLayout *layout = new QVBoxLayout(group);
         
         QLabel *label = new QLabel("No model loaded");
+        label->setAlignment(Qt::AlignCenter);
+        label->setFixedHeight(50);
+        label->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px; font-size: 14px;");
+        label->setWordWrap(true);
+        
+        layout->addWidget(label);
+        
+        if (infoLabel) *infoLabel = label;
+        return group;
+    }
+
+    // 创建图像信息显示组（新增）
+    QGroupBox* createImageInfoGroup(QLabel** infoLabel = nullptr) {
+        QGroupBox *group = new QGroupBox("Image Information");
+        QVBoxLayout *layout = new QVBoxLayout(group);
+        
+        QLabel *label = new QLabel("No image loaded");
         label->setAlignment(Qt::AlignCenter);
         label->setFixedHeight(50);
         label->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 5px; font-size: 14px;");
@@ -198,6 +220,7 @@ int main(int argc, char *argv[])
     // 创建OpenGL窗口
     GLWidget *glWidget = new GLWidget;
     CVTGLWidget *cvtglWidget = new CVTGLWidget;
+    CVTImageGLWidget *cvtImageWidget = new CVTImageGLWidget; // 新增
     
     // 创建标签页控件
     QTabWidget *tabWidget = new QTabWidget;
@@ -242,7 +265,10 @@ int main(int argc, char *argv[])
     QWidget *cvtTab = createCVTTab(cvtglWidget);
     tabWidget->addTab(cvtTab, "CVT");
 
-    
+    // 新增CVT Weight标签页
+    QWidget *cvtWeightTab = createCVTWeightTab(cvtImageWidget); // 新增
+    tabWidget->addTab(cvtWeightTab, "CVT Weight"); // 新增
+
     // 添加标签页到主布局
     mainLayout->addWidget(tabWidget, 8); // 8:2比例
 
@@ -276,6 +302,11 @@ int main(int argc, char *argv[])
     // 创建CVT控制面板
     stackedLayout->addWidget(createCVTControlPanel(
         cvtglWidget, cvtTab
+    ));
+
+        // 创建CVT Weight控制面板（新增）
+    stackedLayout->addWidget(createCVTWeightControlPanel(
+        cvtImageWidget, cvtWeightTab
     ));
     
     // 连接标签切换信号

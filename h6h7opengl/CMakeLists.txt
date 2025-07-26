@@ -48,6 +48,8 @@ add_executable(${PROJECT_NAME}
     glwidget/glwidget.h
     cvtwidget/cvtglwidget.cpp
     cvtwidget/cvtglwidget.h
+    cvtimagewidget/cvt_imageglwidget.h
+    cvtimagewidget/cvt_imageglwidget.cpp
     ${RESOURCE_FILES}
 )
 
