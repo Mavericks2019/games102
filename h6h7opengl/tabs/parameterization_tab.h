@@ -195,7 +195,9 @@ QWidget* createParameterizationControlPanel(GLWidget* glWidget, QWidget* paramTa
     });
     
     layout->addWidget(paramButton);
-    layout->addStretch();
+    
+    // 添加一个拉伸因子，但确保它不会使控件过度延伸
+    layout->addStretch(1);
 
     return panel;
 }

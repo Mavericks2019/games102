@@ -1,4 +1,3 @@
-#include "glwidget/glwidget.h"
 #include <QApplication>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -22,7 +21,7 @@ QWidget* createParameterizationTab(GLWidget* glWidget);
 QWidget* createParameterizationControlPanel(GLWidget* glWidget, QWidget* paramTab);
 
 // 声明CVT标签页函数
-QWidget* createCVTTab(GLWidget* glWidget);
+QWidget* createCVTTab(CVTGLWidget* glWidget);
 QWidget* createCVTControlPanel(CVTGLWidget* glWidget, QWidget* cvtTab);
 
 // 声明CVT Weight标签页函数
@@ -278,10 +277,6 @@ int main(int argc, char *argv[])
     controlLayout->setAlignment(Qt::AlignTop);
     controlPanel->setFixedWidth(400);
     
-    // ==== 模型信息组 ====
-    QLabel *modelInfoLabel = nullptr;
-    controlLayout->addWidget(UIUtils::createModelInfoGroup(&modelInfoLabel));
-    
     // ==== 颜色设置组 ====
     controlLayout->addWidget(UIUtils::createColorSettingsGroup(glWidget, &mainWindow, tabWidget));
     
@@ -290,21 +285,39 @@ int main(int argc, char *argv[])
     controlLayout->addLayout(stackedLayout);
     
     // 创建模型控制面板
-    stackedLayout->addWidget(createModelControlPanel(
+    QLabel *modelInfoLabel = nullptr;
+    QGroupBox *modelInfoGroup = UIUtils::createModelInfoGroup(&modelInfoLabel);
+    
+    QWidget* modelControlPanel = createModelControlPanel(
         glWidget, modelInfoLabel, &mainWindow, tabWidget
-    ));
+    );
+    QVBoxLayout* modelControlLayout = new QVBoxLayout();
+    modelControlLayout->addWidget(modelInfoGroup);
+    modelControlLayout->addWidget(modelControlPanel);
+    QWidget* modelControlContainer = new QWidget();
+    modelControlContainer->setLayout(modelControlLayout);
+    stackedLayout->addWidget(modelControlContainer);
     
     // 创建参数化控制面板
-    stackedLayout->addWidget(createParameterizationControlPanel(
+    QLabel *paramInfoLabel = nullptr;
+    QGroupBox *paramInfoGroup = UIUtils::createModelInfoGroup(&paramInfoLabel);
+    
+    QWidget* paramControlPanel = createParameterizationControlPanel(
         glWidget, paramTab
-    ));
+    );
+    QVBoxLayout* paramControlLayout = new QVBoxLayout();
+    paramControlLayout->addWidget(paramInfoGroup);
+    paramControlLayout->addWidget(paramControlPanel);
+    QWidget* paramControlContainer = new QWidget();
+    paramControlContainer->setLayout(paramControlLayout);
+    stackedLayout->addWidget(paramControlContainer);
     
     // 创建CVT控制面板
     stackedLayout->addWidget(createCVTControlPanel(
         cvtglWidget, cvtTab
     ));
 
-        // 创建CVT Weight控制面板（新增）
+    // 创建CVT Weight控制面板（新增）
     stackedLayout->addWidget(createCVTWeightControlPanel(
         cvtImageWidget, cvtWeightTab
     ));
@@ -321,10 +334,10 @@ int main(int argc, char *argv[])
         
         // 获取参数化视图
         QWidget* paramTab = tabWidget->widget(1);
-        GLWidget* paramView = paramTab->property("leftGLWidget").value<GLWidget*>();
+        GLWidget* paramView = paramTab ? paramTab->property("leftGLWidget").value<GLWidget*>() : nullptr;
         
         // 获取CVT视图
-        CVTGLWidget* cvtView = cvtTab->property("cvtGLWidget").value<CVTGLWidget*>();
+        CVTGLWidget* cvtView = cvtTab ? cvtTab->property("cvtGLWidget").value<CVTGLWidget*>() : nullptr;
         
         if (cvtView) {
             // 如果切换到CVT标签页
