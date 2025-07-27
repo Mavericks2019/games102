@@ -19,5 +19,7 @@
     <file>cvtwidget/shaders/cvt_delaunay.frag</file>
     <file>cvtwidget/shaders/cvt_background.vert</file>
     <file>cvtwidget/shaders/cvt_background.frag</file>
+    <file>cvtwidget/shaders/image.vert</file>
+    <file>cvtwidget/shaders/image.frag</file>
 </qresource>
 </RCC>

@@ -63,7 +63,19 @@ QWidget* createCVTWeightControlPanel(CVTImageGLWidget* glWidget, QWidget* cvtWei
         "}"
         "QPushButton:hover { background-color: #606060; }"
     );
-    QObject::connect(loadImageButton, &QPushButton::clicked, [cvtWeightTab, infoLabel]() {
+    
+    // 添加显示图像复选框
+    QCheckBox *showImageCheckbox = new QCheckBox("Show Image");
+    showImageCheckbox->setStyleSheet("color: white;");
+    showImageCheckbox->setChecked(true);
+    QObject::connect(showImageCheckbox, &QCheckBox::stateChanged, [cvtWeightTab](int state) {
+        CVTImageGLWidget *cvtImageView = cvtWeightTab->property("cvtImageGLWidget").value<CVTImageGLWidget*>();
+        if (cvtImageView) {
+            cvtImageView->setShowImage(state == Qt::Checked);
+        }
+    });
+    
+    QObject::connect(loadImageButton, &QPushButton::clicked, [cvtWeightTab, infoLabel, showImageCheckbox]() {
         // 打开文件对话框选择图像
         QString fileName = QFileDialog::getOpenFileName(
             nullptr, 
@@ -74,20 +86,29 @@ QWidget* createCVTWeightControlPanel(CVTImageGLWidget* glWidget, QWidget* cvtWei
         
         if (!fileName.isEmpty()) {
             // 更新信息标签
-            QFileInfo fileInfo(fileName);
-            infoLabel->setText(QString("Image: %1\nSize: %2x%3")
-                              .arg(fileInfo.fileName())
-                              .arg("Unknown")
-                              .arg("Unknown"));
-            
-            // TODO: 实际加载图像到CVT视图
-            CVTImageGLWidget *cvtImageView = cvtWeightTab->property("cvtImageGLWidget").value<CVTImageGLWidget*>();
-            if (cvtImageView) {
-                // cvtImageView->loadImage(fileName); // 需要实现此函数
+            QImage image(fileName);
+            if (!image.isNull()) {
+                infoLabel->setText(QString("Image: %1\nSize: %2x%3")
+                                  .arg(QFileInfo(fileName).fileName())
+                                  .arg(image.width())
+                                  .arg(image.height()));
+                
+                // 加载图像到CVT视图
+                CVTImageGLWidget *cvtImageView = cvtWeightTab->property("cvtImageGLWidget").value<CVTImageGLWidget*>();
+                if (cvtImageView) {
+                    cvtImageView->loadImage(image);
+                    // 确保图像显示复选框被选中
+                    showImageCheckbox->setChecked(true);
+                }
+            } else {
+                infoLabel->setText("Failed to load image");
             }
         }
     });
     imageLoadLayout->addWidget(loadImageButton);
+    
+    // 添加显示图像复选框到布局
+    imageLoadLayout->addWidget(showImageCheckbox);
     
     // 权重类型选择
     QHBoxLayout *weightTypeLayout = new QHBoxLayout();

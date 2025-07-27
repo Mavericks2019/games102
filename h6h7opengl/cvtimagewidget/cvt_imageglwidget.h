@@ -9,6 +9,7 @@
 #include <QMatrix4x4>
 #include <QVector2D>
 #include <QPoint>
+#include <QOpenGLTexture>
 #include <vector>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Delaunay_triangulation_2.h>
@@ -67,6 +68,19 @@ public:
     void drawDelaunayTriangles();
     void drawCVTBackground();
     void setCVTView(bool enabled);
+    
+    void loadImage(const QImage& image);
+    void setShowImage(bool show);
+    void drawBackground();
+    void drawCVTContent();
+    void drawImage();
+    // 图像相关
+    QImage loadedImage;
+    bool showImage = true;
+    QOpenGLTexture* imageTexture = nullptr;
+    // 着色器
+    void initializeImageShaders();
+    QOpenGLShaderProgram imageProgram;
     
     // Voronoi 单元处理
     std::vector<QVector2D> clipVoronoiCellToRectangle(const std::vector<QVector2D>& cell, 
