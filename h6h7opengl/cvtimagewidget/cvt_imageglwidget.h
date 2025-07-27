@@ -50,10 +50,6 @@ public:
     void initializeGL() override;
     void resizeGL(int w, int h) override;
     void paintGL() override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-    void wheelEvent(QWheelEvent *event) override;
 
 public:
     // CVT 数据结构
@@ -66,14 +62,12 @@ public:
     void drawRandomPoints();
     void drawVoronoiDiagram();
     void drawDelaunayTriangles();
-    void drawCVTBackground();
-    void setCVTView(bool enabled);
-    
+    void drawBackground();
+    void drawWhiteImageBackground(); // 新增：绘制白色图像背景
+    void drawCVTContent();
+    void drawImage();    
     void loadImage(const QImage& image);
     void setShowImage(bool show);
-    void drawBackground();
-    void drawCVTContent();
-    void drawImage();
     // 图像相关
     QImage loadedImage;
     bool showImage = true;

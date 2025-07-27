@@ -1,5 +1,4 @@
 #include "cvt_imageglwidget.h"
-#include <QMouseEvent>
 #include <QWheelEvent>
 #include <QKeyEvent>
 #include <QOpenGLShaderProgram>
@@ -36,7 +35,6 @@ CVTImageGLWidget::~CVTImageGLWidget()
     }
 
     doneCurrent();
-
 }
 
 void CVTImageGLWidget::initializeGL()
@@ -52,7 +50,6 @@ void CVTImageGLWidget::initializeGL()
 
     initializeShaders();
     initializeImageShaders();
-
 }
 
 void CVTImageGLWidget::initializeShaders()
@@ -115,6 +112,27 @@ void CVTImageGLWidget::setShowImage(bool show)
 {
     showImage = show;
     update();
+}
+
+void CVTImageGLWidget::paintGL()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    // 如果有加载图像但不显示图像，绘制白色背景（保持原图比例）
+    if (!loadedImage.isNull() && !showImage) {
+        drawWhiteImageBackground();
+    } 
+    // 显示图像
+    else if (!loadedImage.isNull() && showImage) {
+        drawImage();
+    }
+    // 如果没有图像，绘制默认白色背景
+    else {
+        drawBackground();
+    }
+    
+    // 然后绘制CVT内容（Voronoi图、Delaunay三角剖分、点）
+    drawCVTContent();
 }
 
 void CVTImageGLWidget::drawImage()
@@ -216,30 +234,205 @@ void CVTImageGLWidget::drawImage()
     glDisable(GL_BLEND);
 }
 
+void CVTImageGLWidget::drawWhiteImageBackground()
+{
+    // 获取窗口尺寸
+    float screenWidth = width();
+    float screenHeight = height();
+    float aspect = screenWidth / screenHeight;
+    
+    // 设置正交投影
+    QMatrix4x4 projection;
+    if (aspect > 1.0f) {
+        projection.ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+    } else {
+        projection.ortho(-1.0f, 1.0f, -1.0f/aspect, 1.0f/aspect, -1.0f, 1.0f);
+    }
+    
+    // 计算图像比例
+    float imgAspect = static_cast<float>(loadedImage.width()) / loadedImage.height();
+    float drawWidth, drawHeight;
+    
+    if (imgAspect > aspect) {
+        // 宽度充满
+        drawWidth = 2.0f * aspect;
+        drawHeight = drawWidth / imgAspect;
+    } else {
+        // 高度充满
+        drawHeight = 2.0f;
+        drawWidth = drawHeight * imgAspect;
+    }
+    
+    // 顶点数据
+    float vertices[] = {
+        // 位置              
+        -drawWidth/2, -drawHeight/2, 0.0f,
+         drawWidth/2, -drawHeight/2, 0.0f,
+         drawWidth/2,  drawHeight/2, 0.0f,
+        -drawWidth/2,  drawHeight/2, 0.0f
+    };
+    
+    unsigned int indices[] = {
+        0, 1, 2,
+        0, 2, 3
+    };
+    
+    // 使用着色器程序
+    QOpenGLShaderProgram program;
+    program.addShaderFromSourceCode(QOpenGLShader::Vertex,
+        "#version 330 core\n"
+        "layout (location = 0) in vec3 aPos;\n"
+        "uniform mat4 projection;\n"
+        "void main()\n"
+        "{\n"
+        "   gl_Position = projection * vec4(aPos, 1.0);\n"
+        "}\n"
+    );
+    program.addShaderFromSourceCode(QOpenGLShader::Fragment,
+        "#version 330 core\n"
+        "out vec4 FragColor;\n"
+        "void main()\n"
+        "{\n"
+        "   FragColor = vec4(1.0); // 白色\n"
+        "}\n"
+    );
+    if (!program.link()) {
+        qWarning() << "Shader link error in drawWhiteImageBackground:" << program.log();
+        return;
+    }
+    
+    program.bind();
+    program.setUniformValue("projection", projection);
+    
+    // 创建临时VAO/VBO
+    QOpenGLVertexArrayObject vao;
+    QOpenGLBuffer vbo(QOpenGLBuffer::VertexBuffer);
+    QOpenGLBuffer ebo(QOpenGLBuffer::IndexBuffer);
+    
+    vao.create();
+    vao.bind();
+    
+    vbo.create();
+    vbo.bind();
+    vbo.allocate(vertices, sizeof(vertices));
+    
+    ebo.create();
+    ebo.bind();
+    ebo.allocate(indices, sizeof(indices));
+    
+    // 设置顶点属性
+    int posLoc = program.attributeLocation("aPos");
+    if (posLoc != -1) {
+        program.enableAttributeArray(posLoc);
+        program.setAttributeBuffer(posLoc, GL_FLOAT, 0, 3, 3 * sizeof(float));
+    }
+    
+    // 绘制
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    
+    // 清理
+    vao.release();
+    vbo.release();
+    ebo.release();
+    program.release();
+}
+
+void CVTImageGLWidget::drawBackground()
+{
+    // 获取窗口尺寸
+    float screenWidth = width();
+    float screenHeight = height();
+    float aspect = screenWidth / screenHeight;
+    
+    // 设置正交投影
+    QMatrix4x4 projection;
+    if (aspect > 1.0f) {
+        projection.ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
+    } else {
+        projection.ortho(-1.0f, 1.0f, -1.0f/aspect, 1.0f/aspect, -1.0f, 1.0f);
+    }
+    
+    // 顶点数据
+    float vertices[] = {
+        -1.0f, -1.0f, 0.0f,
+         1.0f, -1.0f, 0.0f,
+         1.0f,  1.0f, 0.0f,
+        -1.0f,  1.0f, 0.0f
+    };
+    
+    unsigned int indices[] = {
+        0, 1, 2,
+        0, 2, 3
+    };
+    
+    // 使用着色器程序
+    QOpenGLShaderProgram program;
+    program.addShaderFromSourceCode(QOpenGLShader::Vertex,
+        "#version 330 core\n"
+        "layout (location = 0) in vec3 aPos;\n"
+        "uniform mat4 projection;\n"
+        "void main()\n"
+        "{\n"
+        "   gl_Position = projection * vec4(aPos, 1.0);\n"
+        "}\n"
+    );
+    program.addShaderFromSourceCode(QOpenGLShader::Fragment,
+        "#version 330 core\n"
+        "out vec4 FragColor;\n"
+        "void main()\n"
+        "{\n"
+        "   FragColor = vec4(1.0); // 白色\n"
+        "}\n"
+    );
+    if (!program.link()) {
+        qWarning() << "Background shader link error:" << program.log();
+        return;
+    }
+    
+    program.bind();
+    program.setUniformValue("projection", projection);
+    
+    // 创建临时VAO和VBO
+    QOpenGLVertexArrayObject vao;
+    QOpenGLBuffer vbo(QOpenGLBuffer::VertexBuffer);
+    QOpenGLBuffer ebo(QOpenGLBuffer::IndexBuffer);
+    
+    vao.create();
+    vao.bind();
+    
+    vbo.create();
+    vbo.bind();
+    vbo.allocate(vertices, sizeof(vertices));
+    
+    ebo.create();
+    ebo.bind();
+    ebo.allocate(indices, sizeof(indices));
+    
+    // 设置顶点属性
+    int posLoc = program.attributeLocation("aPos");
+    if (posLoc != -1) {
+        program.enableAttributeArray(posLoc);
+        program.setAttributeBuffer(posLoc, GL_FLOAT, 0, 3, 3 * sizeof(float));
+    }
+    
+    // 绘制正方形
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    
+    // 清理
+    vao.release();
+    vbo.release();
+    ebo.release();
+    program.release();
+}
+
 void CVTImageGLWidget::resizeGL(int w, int h)
 {
     glViewport(0, 0, w, h);
 }
 
-void CVTImageGLWidget::paintGL()
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    // 先绘制图像（作为背景）
-    if (!loadedImage.isNull() && showImage) {
-        drawImage();
-    } else {
-        // 如果没有图像或不显示图像，绘制白色背景
-        drawBackground();
-    }
-    
-    // 然后绘制CVT内容（Voronoi图、Delaunay三角剖分、点）
-    drawCVTContent();
-}
-
 void CVTImageGLWidget::drawCVTContent()
 {
-    // 获取窗口尺寸
+    // 获取窗口尺寸和宽高比
     float screenWidth = width();
     float screenHeight = height();
     float aspect = screenWidth / screenHeight;
@@ -271,136 +464,6 @@ void CVTImageGLWidget::drawCVTContent()
     }
 
     glEnable(GL_DEPTH_TEST);
-}
-
-void CVTImageGLWidget::drawBackground()
-{
-    // 获取窗口尺寸
-    float screenWidth = width();
-    float screenHeight = height();
-    float aspect = screenWidth / screenHeight;
-    
-    // 设置正交投影
-    QMatrix4x4 projection;
-    if (aspect > 1.0f) {
-        projection.ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
-    } else {
-        projection.ortho(-1.0f, 1.0f, -1.0f/aspect, 1.0f/aspect, -1.0f, 1.0f);
-    }
-    
-    // 使用背景着色器
-    QOpenGLShaderProgram program;
-    if (!program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/cvtwidget/shaders/cvt_background.vert")) {
-        qWarning() << "Background vertex shader error:" << program.log();
-    }
-    
-    if (!program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/cvtwidget/shaders/cvt_background.frag")) {
-        qWarning() << "Background fragment shader error:" << program.log();
-    }
-    
-    if (!program.link()) {
-        qWarning() << "Background shader link error:" << program.log();
-        return;
-    }
-    
-    // 正方形顶点数据
-    float vertices[] = {
-        -1.0f, -1.0f, 0.0f,
-         1.0f, -1.0f, 0.0f,
-         1.0f,  1.0f, 0.0f,
-        -1.0f,  1.0f, 0.0f
-    };
-    
-    // 索引数据
-    unsigned int indices[] = {
-        0, 1, 2,
-        0, 2, 3
-    };
-    
-    // 创建临时VAO和VBO
-    QOpenGLVertexArrayObject vao;
-    QOpenGLBuffer vbo(QOpenGLBuffer::VertexBuffer);
-    QOpenGLBuffer ebo(QOpenGLBuffer::IndexBuffer);
-    
-    vao.create();
-    vao.bind();
-    
-    vbo.create();
-    vbo.bind();
-    vbo.allocate(vertices, sizeof(vertices));
-    
-    ebo.create();
-    ebo.bind();
-    ebo.allocate(indices, sizeof(indices));
-    
-    // 设置顶点属性
-    program.bind();
-    int posLoc = program.attributeLocation("aPos");
-    if (posLoc != -1) {
-        program.enableAttributeArray(posLoc);
-        program.setAttributeBuffer(posLoc, GL_FLOAT, 0, 3, 3 * sizeof(float));
-    }
-    
-    // 设置变换矩阵
-    QMatrix4x4 model;
-    program.setUniformValue("model", model);
-    program.setUniformValue("projection", projection);
-    
-    // 绘制正方形
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    
-    // 清理
-    vao.release();
-    program.release();
-}
-
-void CVTImageGLWidget::mousePressEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton) {
-        isDragging = true;
-        lastMousePos = event->pos();
-        setCursor(Qt::ClosedHandCursor);
-    }
-}
-
-void CVTImageGLWidget::mouseReleaseEvent(QMouseEvent *event)
-{
-    if (event->button() == Qt::LeftButton) {
-        isDragging = false;
-        setCursor(Qt::ArrowCursor);
-    }
-}
-
-void CVTImageGLWidget::mouseMoveEvent(QMouseEvent *event)
-{
-    if (isDragging) {
-        QPoint currentPos = event->pos();
-        QPoint delta = currentPos - lastMousePos;
-        
-        // 根据鼠标移动距离计算旋转角度
-        rotationY += delta.x() * 0.5f;
-        rotationX += delta.y() * 0.5f;
-        
-        // 限制X轴旋转范围在-90到90度之间
-        rotationX = qBound(-90.0f, rotationX, 90.0f);
-        
-        lastMousePos = currentPos;
-        update();
-    }
-}
-
-void CVTImageGLWidget::wheelEvent(QWheelEvent *event)
-{
-    QPoint numDegrees = event->angleDelta() / 8;
-    if (!numDegrees.isNull()) {
-        float delta = numDegrees.y() > 0 ? 1.1f : 0.9f;
-        zoom *= delta;
-        
-        // 限制缩放范围
-        zoom = qBound(0.1f, zoom, 10.0f);
-        
-        update();
-    }
 }
 
 void CVTImageGLWidget::generateRandomPoints(int count)
@@ -476,9 +539,7 @@ void CVTImageGLWidget::setShowDelaunay(bool show)
 
 void CVTImageGLWidget::resetView()
 {
-    rotationX = 0;
-    rotationY = 0;
-    zoom = 1.0f;
+    // 图像CVT不需要重置视图
     update();
 }
 
@@ -916,109 +977,5 @@ void CVTImageGLWidget::performLloydRelaxation()
     // 重新计算Voronoi图
     computeVoronoiDiagram();
     
-    update();
-}
-
-void CVTImageGLWidget::drawCVTBackground()
-{
-    // 获取窗口尺寸
-    float screenWidth = width();
-    float screenHeight = height();
-    float aspect = screenWidth / screenHeight;
-
-    // 设置正交投影
-    QMatrix4x4 projection;
-    if (aspect > 1.0f) {
-        projection.ortho(-aspect, aspect, -1.0f, 1.0f, -1.0f, 1.0f);
-    } else {
-        projection.ortho(-1.0f, 1.0f, -1.0f/aspect, 1.0f/aspect, -1.0f, 1.0f);
-    }
-    
-    // 创建模型矩阵
-    QMatrix4x4 model;
-    
-    // 使用着色器绘制白色背景 - 从文件加载
-    QOpenGLShaderProgram program;
-    if (!program.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/cvtwidget/shaders/cvt_background.vert")) {
-        qWarning() << "Background vertex shader error:" << program.log();
-    }
-    
-    if (!program.addShaderFromSourceFile(QOpenGLShader::Fragment, ":/cvtwidget/shaders/cvt_background.frag")) {
-        qWarning() << "Background fragment shader error:" << program.log();
-    }
-    
-    if (!program.link()) {
-        qWarning() << "Background shader link error:" << program.log();
-        return;
-    }
-    
-    // 正方形顶点数据
-    float vertices[] = {
-        -1.0f, -1.0f, 0.0f,
-         1.0f, -1.0f, 0.0f,
-         1.0f,  1.0f, 0.0f,
-        -1.0f,  1.0f, 0.0f
-    };
-    
-    // 索引数据
-    unsigned int indices[] = {
-        0, 1, 2,
-        0, 2, 3
-    };
-    
-    // 创建临时VAO和VBO
-    QOpenGLVertexArrayObject vao;
-    QOpenGLBuffer vbo(QOpenGLBuffer::VertexBuffer);
-    QOpenGLBuffer ebo(QOpenGLBuffer::IndexBuffer);
-    
-    vao.create();
-    vao.bind();
-    
-    vbo.create();
-    vbo.bind();
-    vbo.allocate(vertices, sizeof(vertices));
-    
-    ebo.create();
-    ebo.bind();
-    ebo.allocate(indices, sizeof(indices));
-    
-    // 设置顶点属性
-    program.bind();
-    int posLoc = program.attributeLocation("aPos");
-    if (posLoc != -1) {
-        program.enableAttributeArray(posLoc);
-        program.setAttributeBuffer(posLoc, GL_FLOAT, 0, 3, 3 * sizeof(float));
-    }
-    
-    // 设置变换矩阵
-    program.setUniformValue("model", model);
-    program.setUniformValue("projection", projection);
-    
-    // 绘制正方形
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    
-    // 清理
-    vao.release();
-    program.release();
-    glDisable(GL_DEPTH_TEST);
-
-    if(showVoronoiDiagram) {
-        drawVoronoiDiagram();
-    }
-
-    if(showDelaunay) {
-        drawDelaunayTriangles();
-    }
-
-    if (!canvasData.points.empty() && showPoints) { // 修改：添加showPoints判断
-        drawRandomPoints();    
-    }
-    
-    glEnable(GL_DEPTH_TEST);
-}
-
-void CVTImageGLWidget::setCVTView(bool enabled)
-{
-    isCVTView = enabled;
     update();
 }

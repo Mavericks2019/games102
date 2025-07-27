@@ -21,5 +21,15 @@
     <file>cvtwidget/shaders/cvt_background.frag</file>
     <file>cvtwidget/shaders/image.vert</file>
     <file>cvtwidget/shaders/image.frag</file>
+    <file>cvtimagewidget/shaders/cvt_point.vert</file>
+    <file>cvtimagewidget/shaders/cvt_point.frag</file>
+    <file>cvtimagewidget/shaders/cvt_voronoi.vert</file>
+    <file>cvtimagewidget/shaders/cvt_voronoi.frag</file>
+    <file>cvtimagewidget/shaders/cvt_delaunay.vert</file>
+    <file>cvtimagewidget/shaders/cvt_delaunay.frag</file>
+    <file>cvtimagewidget/shaders/cvt_background.vert</file>
+    <file>cvtimagewidget/shaders/cvt_background.frag</file>
+    <file>cvtimagewidget/shaders/image.vert</file>
+    <file>cvtimagewidget/shaders/image.frag</file>
 </qresource>
 </RCC>
