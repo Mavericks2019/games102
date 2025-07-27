@@ -466,20 +466,29 @@ void CVTImageGLWidget::drawCVTContent()
     glEnable(GL_DEPTH_TEST);
 }
 
+// cvt_imageglwidget.cpp
 void CVTImageGLWidget::generateRandomPoints(int count)
 {
     canvasData.points.clear();
     
-    // 添加四个角点
-    canvasData.points.push_back(Point(-1.0, -1.0));
-    canvasData.points.push_back(Point(1.0, -1.0));
-    canvasData.points.push_back(Point(-1.0, 1.0));
-    canvasData.points.push_back(Point(1.0, 1.0));
+    // 获取当前边界（如果有图像则使用图像边界）
+    QRectF bounds = getImageBounds();
+    float left = bounds.left();
+    float right = bounds.right();
+    float bottom = bounds.top();    // 注意：OpenGL坐标系中y轴向上
+    float top = bounds.bottom();    // 所以top > bottom
+    
+    // 添加四个角点（使用边界范围）
+    canvasData.points.push_back(Point(left, bottom));  // 左下
+    canvasData.points.push_back(Point(right, bottom)); // 右下
+    canvasData.points.push_back(Point(left, top));     // 左上
+    canvasData.points.push_back(Point(right, top));    // 右上
 
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
     for (int i = 0; i < count; i++) {
-        double x = (static_cast<double>(std::rand()) / RAND_MAX) * 2.0 - 1.0;
-        double y = (static_cast<double>(std::rand()) / RAND_MAX) * 2.0 - 1.0;
+        // 在边界范围内生成随机点
+        double x = left + (static_cast<double>(std::rand()) / RAND_MAX * (right - left));
+        double y = bottom + (static_cast<double>(std::rand()) / RAND_MAX * (top - bottom));
         canvasData.points.push_back(Point(x, y));
     }
     
@@ -657,6 +666,14 @@ std::vector<QVector2D> CVTImageGLWidget::clipVoronoiCellToRectangle(const std::v
                                                            float left, float right, 
                                                            float bottom, float top)
 {
+    // 如果有图像，使用图像边界
+    if (hasValidImage()) {
+        QRectF bounds = getImageBounds();
+        left = bounds.left();
+        right = bounds.right();
+        bottom = bounds.top();    // 注意：OpenGL坐标系中y轴向上
+        top = bounds.bottom();    // 所以top > bottom
+    }
     std::vector<QVector2D> clippedCell;
     
     // 检查单元是否需要裁剪
@@ -754,17 +771,18 @@ void CVTImageGLWidget::computeVoronoiDiagram()
 
     if (canvasData.points.empty()) return;
 
+    // 获取当前边界
+    QRectF bounds = getImageBounds();
+    const float left = bounds.left();
+    const float right = bounds.right();
+    const float bottom = bounds.top();    // 注意：OpenGL坐标系中y轴向上
+    const float top = bounds.bottom();    // 所以top > bottom
+
     // 直接使用已有的Delaunay三角剖分
     const Delaunay& dt = canvasData.dt;
 
     // 创建Voronoi图
     VoronoiDiagram vd(dt);
-
-    // 定义矩形边界
-    const float left = -1.0f;
-    const float right = 1.0f;
-    const float bottom = -1.0f;
-    const float top = 1.0f;
 
     // 遍历所有面（每个面对应一个采样点）
     for (auto fit = vd.faces_begin(); fit != vd.faces_end(); ++fit) {
@@ -827,11 +845,30 @@ void CVTImageGLWidget::drawDelaunayTriangles()
         pointToIndex[canvasData.points[i]] = i;
     }
     
-    // 定义四个角点
-    Point corner1(-1.0, -1.0);
-    Point corner2(1.0, -1.0);
-    Point corner3(-1.0, 1.0);
-    Point corner4(1.0, 1.0);
+    // 获取当前边界点（四个角点）
+    std::vector<Point> boundaryPoints;
+    if (hasValidImage()) {
+        QRectF bounds = getImageBounds();
+        float left = bounds.left();
+        float right = bounds.right();
+        float top = bounds.top();     // 注意：OpenGL坐标系中，top是上边界（y值较大）
+        float bottom = bounds.bottom(); // bottom是下边界（y值较小）
+        
+        boundaryPoints = {
+            Point(left, bottom),  // 左下
+            Point(right, bottom), // 右下
+            Point(left, top),     // 左上
+            Point(right, top)     // 右上
+        };
+    } else {
+        // 默认正方形边界
+        boundaryPoints = {
+            Point(-1.0, -1.0),
+            Point(1.0, -1.0),
+            Point(-1.0, 1.0),
+            Point(1.0, 1.0)
+        };
+    }
     
     // 改为遍历所有有限边
     for (auto eit = canvasData.dt.finite_edges_begin(); 
@@ -846,13 +883,19 @@ void CVTImageGLWidget::drawDelaunayTriangles()
         Point p1 = vh1->point();
         Point p2 = vh2->point();
         
-        // 检查是否与角点相连
-        bool isCornerEdge = 
-            (p1 == corner1 || p1 == corner2 || p1 == corner3 || p1 == corner4) ||
-            (p2 == corner1 || p2 == corner2 || p2 == corner3 || p2 == corner4);
+        // 检查是否与边界点相连
+        bool isBoundaryEdge = false;
+        for (const auto& boundaryPt : boundaryPoints) {
+            // 使用CGAL的精确比较
+            if (CGAL::compare_xy(p1, boundaryPt) == CGAL::EQUAL || 
+                CGAL::compare_xy(p2, boundaryPt) == CGAL::EQUAL) {
+                isBoundaryEdge = true;
+                break;
+            }
+        }
         
-        // 添加边的两个端点索引（排除与角点相连的边）
-        if (!isCornerEdge && 
+        // 添加边的两个端点索引（排除与边界点相连的边）
+        if (!isBoundaryEdge && 
             pointToIndex.find(p1) != pointToIndex.end() && 
             pointToIndex.find(p2) != pointToIndex.end()) 
         {
@@ -978,4 +1021,58 @@ void CVTImageGLWidget::performLloydRelaxation()
     computeVoronoiDiagram();
     
     update();
+}
+
+// cvt_imageglwidget.cpp
+QRectF CVTImageGLWidget::getImageBounds() const
+{
+    if (!hasValidImage()) {
+        // 没有图像时返回默认正方形范围
+        return QRectF(-1.0f, -1.0f, 2.0f, 2.0f);
+    }
+
+    float screenWidth = width();
+    float screenHeight = height();
+    float aspect = screenWidth / screenHeight;
+    float imgAspect = static_cast<float>(loadedImage.width()) / loadedImage.height();
+
+    float drawWidth, drawHeight;
+    
+    if (imgAspect > aspect) {
+        // 宽度充满
+        drawWidth = 2.0f * aspect;
+        drawHeight = drawWidth / imgAspect;
+    } else {
+        // 高度充满
+        drawHeight = 2.0f;
+        drawWidth = drawHeight * imgAspect;
+    }
+
+    return QRectF(-drawWidth/2, -drawHeight/2, drawWidth, drawHeight);
+}
+
+std::vector<Point> CVTImageGLWidget::getBoundaryPoints() const
+{
+    if (hasValidImage()) {
+        QRectF bounds = getImageBounds();
+        float left = bounds.left();
+        float right = bounds.right();
+        float top = bounds.top();     // 注意：OpenGL坐标系中，top是上边界（y值较大）
+        float bottom = bounds.bottom(); // bottom是下边界（y值较小）
+        
+        return {
+            Point(left, bottom),  // 左下
+            Point(right, bottom), // 右下
+            Point(left, top),     // 左上
+            Point(right, top)     // 右上
+        };
+    } else {
+        // 默认正方形边界
+        return {
+            Point(-1.0, -1.0),
+            Point(1.0, -1.0),
+            Point(-1.0, 1.0),
+            Point(1.0, 1.0)
+        };
+    }
 }

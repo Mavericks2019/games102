@@ -45,6 +45,11 @@ public:
     void setShowPoints(bool show);
     void setShowVoronoiDiagram(bool show);
     void setShowDelaunay(bool show);
+    // 获取当前图像边界（在OpenGL坐标系中）
+    QRectF getImageBounds() const;
+    std::vector<Point> getBoundaryPoints() const;
+    // 检查是否有有效图像
+    bool hasValidImage() const { return !loadedImage.isNull(); }
 
 public:
     void initializeGL() override;
