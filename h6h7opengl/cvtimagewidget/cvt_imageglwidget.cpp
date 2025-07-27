@@ -94,8 +94,9 @@ void CVTImageGLWidget::loadImage(const QImage& image)
         imageTexture = nullptr;
     }
     
-    // 保存图像
-    loadedImage = image.convertToFormat(QImage::Format_RGBA8888);
+    // 保存图像 - 垂直翻转以匹配OpenGL坐标系
+    loadedImage = image.convertToFormat(QImage::Format_RGBA8888)
+                 .mirrored(false, true); // false: 水平不翻转, true: 垂直翻转
     
     // 创建纹理
     if (!loadedImage.isNull()) {
