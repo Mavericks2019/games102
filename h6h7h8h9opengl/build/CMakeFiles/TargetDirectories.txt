@@ -1,0 +1,9 @@
+/opt/games102/h6h7opengl/build/CMakeFiles/objViewer.dir
+/opt/games102/h6h7opengl/build/CMakeFiles/edit_cache.dir
+/opt/games102/h6h7opengl/build/CMakeFiles/rebuild_cache.dir
+/opt/games102/h6h7opengl/build/CMakeFiles/list_install_components.dir
+/opt/games102/h6h7opengl/build/CMakeFiles/install.dir
+/opt/games102/h6h7opengl/build/CMakeFiles/install/local.dir
+/opt/games102/h6h7opengl/build/CMakeFiles/install/strip.dir
+/opt/games102/h6h7opengl/build/CMakeFiles/objViewer_autogen_timestamp_deps.dir
+/opt/games102/h6h7opengl/build/CMakeFiles/objViewer_autogen.dir
