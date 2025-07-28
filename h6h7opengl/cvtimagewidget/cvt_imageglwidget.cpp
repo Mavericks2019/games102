@@ -967,18 +967,17 @@ void CVTImageGLWidget::performLloydRelaxation()
     for (size_t i = 4; i < canvasData.points.size(); i++) {
         // 获取当前点的Voronoi单元
         const std::vector<QVector2D>& cell = voronoiCells[i-4];
+        if (cell.empty()) continue;
         
-        // 计算单元重心
+        // 计算单元重心（均匀密度）
         float centroidX = 0.0f;
         float centroidY = 0.0f;
         float area = 0.0f;
-        
-        // 使用鞋带公式计算重心
         int n = cell.size();
+        
         for (int j = 0; j < n; j++) {
             const QVector2D& p1 = cell[j];
             const QVector2D& p2 = cell[(j+1) % n];
-            
             float cross = p1.x() * p2.y() - p2.x() * p1.y();
             area += cross;
             centroidX += (p1.x() + p2.x()) * cross;
@@ -989,8 +988,98 @@ void CVTImageGLWidget::performLloydRelaxation()
             area *= 0.5f;
             centroidX /= (6.0f * area);
             centroidY /= (6.0f * area);
+        } else {
+            // 如果面积为0，使用顶点平均值
+            for (const auto& pt : cell) {
+                centroidX += pt.x();
+                centroidY += pt.y();
+            }
+            centroidX /= cell.size();
+            centroidY /= cell.size();
+        }
+        
+        if (hasValidImage()) {
+            // ====== 新增：基于图像权重的重心计算 ======
+            double total_weight = 0.0;
+            double weighted_centroidX = 0.0;
+            double weighted_centroidY = 0.0;
             
-            // 更新点位置
+            // 获取图像边界
+            QRectF bounds = getImageBounds();
+            float left = bounds.left();
+            float right = bounds.right();
+            float top = bounds.top();     // OpenGL坐标系中y向上
+            float bottom = bounds.bottom();
+            
+            // 将单元分割成三角形（重心+每条边）
+            for (int j = 0; j < n; j++) {
+                const QVector2D& p1 = cell[j];
+                const QVector2D& p2 = cell[(j+1) % n];
+                
+                // 三角形的三个顶点：p1, p2, (centroidX, centroidY)
+                // 计算三角形的包围盒
+                float min_x = std::min({p1.x(), p2.x(), centroidX});
+                float max_x = std::max({p1.x(), p2.x(), centroidX});
+                float min_y = std::min({p1.y(), p2.y(), centroidY});
+                float max_y = std::max({p1.y(), p2.y(), centroidY});
+                
+                // 将三角形分成3x3网格（16个采样点）
+                const int samples_per_side = 4;
+                double dx = (max_x - min_x) / 3.0;
+                double dy = (max_y - min_y) / 3.0;
+                
+                // 存储当前三角形的加权重心和总权重
+                double tri_centroid_x = 0.0;
+                double tri_centroid_y = 0.0;
+                double tri_total_weight = 0.0;
+                
+                for (int si = 0; si < samples_per_side; si++) {
+                    for (int sj = 0; sj < samples_per_side; sj++) {
+                        double x = min_x + si * dx;
+                        double y = min_y + sj * dy;
+                        
+                        // 将OpenGL坐标转换为图像UV坐标 [0,1]
+                        double u = (x - left) / (right - left);
+                        double v = (y - bottom) / (top - bottom);
+                        
+                        // 确保在图像范围内
+                        u = std::clamp(u, 0.0, 1.0);
+                        v = std::clamp(v, 0.0, 1.0);
+                        
+                        // 获取图像像素坐标
+                        int imgX = static_cast<int>(u * (loadedImage.width() - 1));
+                        int imgY = static_cast<int>((1.0 - v) * (loadedImage.height() - 1)); // 翻转Y轴
+                        
+                        // 获取像素灰度值 (0-255)
+                        QRgb pixel = loadedImage.pixel(imgX, imgY);
+                        int gray = qGray(pixel);
+                        
+                        // 计算权重：d = max(0.001, (1 - gray/255)^2)
+                        double d = std::max(0.001, std::pow(1.0 - gray/255.0, 2));
+                        
+                        // 累加加权坐标
+                        tri_centroid_x += d * x;
+                        tri_centroid_y += d * y;
+                        tri_total_weight += d;
+                    }
+                }
+                
+                if (tri_total_weight > 0) {
+                    weighted_centroidX += tri_centroid_x;
+                    weighted_centroidY += tri_centroid_y;
+                    total_weight += tri_total_weight;
+                }
+            }
+            
+            if (total_weight > 0) {
+                newPoints[i] = Point(weighted_centroidX / total_weight, 
+                                    weighted_centroidY / total_weight);
+            } else {
+                // 如果总权重为0，使用均匀重心
+                newPoints[i] = Point(centroidX, centroidY);
+            }
+        } else {
+            // 没有图像，使用均匀重心
             newPoints[i] = Point(centroidX, centroidY);
         }
     }
