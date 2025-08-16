@@ -1,4 +1,4 @@
-# Install script for directory: /opt/games102/h6h7opengl
+# Install script for directory: /opt/games102/h6h7h8h9opengl
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -49,7 +49,7 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
          FILE "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/objViewer"
          RPATH "")
   endif()
-  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "/opt/games102/h6h7opengl/build/objViewer")
+  file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/bin" TYPE EXECUTABLE FILES "/opt/games102/h6h7h8h9opengl/build/objViewer")
   if(EXISTS "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/objViewer" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/bin/objViewer")
     file(RPATH_CHANGE
@@ -63,7 +63,7 @@ if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT
 endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
-  include("/opt/games102/h6h7opengl/build/CMakeFiles/objViewer.dir/install-cxx-module-bmi-noconfig.cmake" OPTIONAL)
+  include("/opt/games102/h6h7h8h9opengl/build/CMakeFiles/objViewer.dir/install-cxx-module-bmi-noconfig.cmake" OPTIONAL)
 endif()
 
 if(CMAKE_INSTALL_COMPONENT)
@@ -74,5 +74,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/opt/games102/h6h7opengl/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/opt/games102/h6h7h8h9opengl/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

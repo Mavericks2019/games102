@@ -999,7 +999,6 @@ void CVTImageGLWidget::performLloydRelaxation()
         }
         
         if (hasValidImage()) {
-            // ====== 新增：基于图像权重的重心计算 ======
             double total_weight = 0.0;
             double weighted_centroidX = 0.0;
             double weighted_centroidY = 0.0;

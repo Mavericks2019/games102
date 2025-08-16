@@ -31,5 +31,7 @@
     <file>cvtimagewidget/shaders/cvt_background.frag</file>
     <file>cvtimagewidget/shaders/image.vert</file>
     <file>cvtimagewidget/shaders/image.frag</file>
+    <file>shaderwidget/shaders/basic.frag</file>
+    <file>shaderwidget/shaders/basic.vert</file>
 </qresource>
 </RCC>

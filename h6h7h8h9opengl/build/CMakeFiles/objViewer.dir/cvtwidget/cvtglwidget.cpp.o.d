@@ -1,7 +1,7 @@
 CMakeFiles/objViewer.dir/cvtwidget/cvtglwidget.cpp.o: \
- /opt/games102/h6h7opengl/cvtwidget/cvtglwidget.cpp \
+ /opt/games102/h6h7h8h9opengl/cvtwidget/cvtglwidget.cpp \
  /usr/include/stdc-predef.h \
- /opt/games102/h6h7opengl/cvtwidget/cvtglwidget.h \
+ /opt/games102/h6h7h8h9opengl/cvtwidget/cvtglwidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QOpenGLWidget \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qopenglwidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtwidgetsglobal.h \

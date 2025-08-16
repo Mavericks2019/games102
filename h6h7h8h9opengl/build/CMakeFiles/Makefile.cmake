@@ -7,11 +7,11 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
-  "/opt/games102/h6h7opengl/CMakeLists.txt"
+  "/opt/games102/h6h7h8h9opengl/CMakeLists.txt"
   "CMakeFiles/3.28.3/CMakeCCompiler.cmake"
   "CMakeFiles/3.28.3/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.28.3/CMakeSystem.cmake"
-  "/opt/games102/h6h7opengl/shaders.qrc"
+  "/opt/games102/h6h7h8h9opengl/shaders.qrc"
   "/usr/lib/x86_64-linux-gnu/cmake/Boost-1.83.0/BoostConfig.cmake"
   "/usr/lib/x86_64-linux-gnu/cmake/Boost-1.83.0/BoostConfigVersion.cmake"
   "/usr/lib/x86_64-linux-gnu/cmake/CGAL/CGALConfig.cmake"

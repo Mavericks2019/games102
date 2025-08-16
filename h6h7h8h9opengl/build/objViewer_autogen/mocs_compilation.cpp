@@ -2,3 +2,4 @@
 #include "3RY6HJG7CN/moc_cvt_imageglwidget.cpp"
 #include "KXEPEWKVHX/moc_cvtglwidget.cpp"
 #include "KTNQVRIVIS/moc_glwidget.cpp"
+#include "SKADV3LRBJ/moc_glbasicwidget.cpp"

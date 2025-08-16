@@ -1,6 +1,7 @@
 CMakeFiles/objViewer.dir/glwidget/glwidget_core.cpp.o: \
- /opt/games102/h6h7opengl/glwidget/glwidget_core.cpp \
- /usr/include/stdc-predef.h /opt/games102/h6h7opengl/glwidget/glwidget.h \
+ /opt/games102/h6h7h8h9opengl/glwidget/glwidget_core.cpp \
+ /usr/include/stdc-predef.h \
+ /opt/games102/h6h7h8h9opengl/glwidget/glwidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QOpenGLWidget \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qopenglwidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtwidgetsglobal.h \

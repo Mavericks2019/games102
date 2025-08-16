@@ -1,5 +1,5 @@
 CMakeFiles/objViewer.dir/glwidget/glwidget_parameteration.cpp.o: \
- /opt/games102/h6h7opengl/glwidget/glwidget_parameteration.cpp \
+ /opt/games102/h6h7h8h9opengl/glwidget/glwidget_parameteration.cpp \
  /usr/include/stdc-predef.h /usr/include/c++/13/cmath \
  /usr/include/c++/13/bits/requires_hosted.h \
  /usr/include/x86_64-linux-gnu/c++/13/bits/c++config.h \
@@ -85,7 +85,7 @@ CMakeFiles/objViewer.dir/glwidget/glwidget_parameteration.cpp.o: \
  /usr/include/c++/13/tr1/poly_hermite.tcc \
  /usr/include/c++/13/tr1/poly_laguerre.tcc \
  /usr/include/c++/13/tr1/riemann_zeta.tcc \
- /opt/games102/h6h7opengl/glwidget/glwidget.h \
+ /opt/games102/h6h7h8h9opengl/glwidget/glwidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QOpenGLWidget \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qopenglwidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtwidgetsglobal.h \

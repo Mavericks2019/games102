@@ -1,4 +1,0 @@
-/opt/games102/hw6_clear/build/CMakeFiles/rebuild_cache.dir
-/opt/games102/hw6_clear/build/CMakeFiles/edit_cache.dir
-/opt/games102/hw6_clear/build/CMakeFiles/OBJModelViewer.dir
-/opt/games102/hw6_clear/build/CMakeFiles/OBJModelViewer_autogen.dir

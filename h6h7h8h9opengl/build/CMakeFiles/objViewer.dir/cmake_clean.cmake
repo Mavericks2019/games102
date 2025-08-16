@@ -26,6 +26,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o.d"
   "CMakeFiles/objViewer.dir/qrc_shaders.cpp.o"
   "CMakeFiles/objViewer.dir/qrc_shaders.cpp.o.d"
+  "CMakeFiles/objViewer.dir/shaderwidget/glbasicwidget.cpp.o"
+  "CMakeFiles/objViewer.dir/shaderwidget/glbasicwidget.cpp.o.d"
   "objViewer"
   "objViewer.pdb"
   "objViewer_autogen/mocs_compilation.cpp"

@@ -10,7 +10,8 @@
 #include "tabs/model_tab.h"
 #include "tabs/parameterization_tab.h"
 #include "tabs/cvt_tab.h"
-#include "../tabs/cvt_weight_tab.h" // 新增头文件
+#include "../tabs/cvt_weight_tab.h"
+#include "shaderwidget/glbasicwidget.h"  // 新增头文件
 
 // 声明模型标签页函数
 QWidget* createModelTab(GLWidget* glWidget);
@@ -25,8 +26,12 @@ QWidget* createCVTTab(CVTGLWidget* glWidget);
 QWidget* createCVTControlPanel(CVTGLWidget* glWidget, QWidget* cvtTab);
 
 // 声明CVT Weight标签页函数
-QWidget* createCVTWeightTab(CVTImageGLWidget* glWidget); // 新增
-QWidget* createCVTWeightControlPanel(CVTImageGLWidget* glWidget, QWidget* cvtWeightTab); // 新增
+QWidget* createCVTWeightTab(CVTImageGLWidget* glWidget);
+QWidget* createCVTWeightControlPanel(CVTImageGLWidget* glWidget, QWidget* cvtWeightTab);
+
+// 声明Shader标签页函数 (新增)
+QWidget* createShaderTab();
+QWidget* createShaderControlPanel(GLBasicWidget* glWidget);
 
 namespace UIUtils {
     // 获取当前激活的GLWidget
@@ -59,7 +64,7 @@ namespace UIUtils {
         return group;
     }
 
-    // 创建图像信息显示组（新增）
+    // 创建图像信息显示组
     QGroupBox* createImageInfoGroup(QLabel** infoLabel = nullptr) {
         QGroupBox *group = new QGroupBox("Image Information");
         QVBoxLayout *layout = new QVBoxLayout(group);
@@ -219,7 +224,8 @@ int main(int argc, char *argv[])
     // 创建OpenGL窗口
     GLWidget *glWidget = new GLWidget;
     CVTGLWidget *cvtglWidget = new CVTGLWidget;
-    CVTImageGLWidget *cvtImageWidget = new CVTImageGLWidget; // 新增
+    CVTImageGLWidget *cvtImageWidget = new CVTImageGLWidget;
+    GLBasicWidget *shaderWidget = new GLBasicWidget; // 新增Shader窗口
     
     // 创建标签页控件
     QTabWidget *tabWidget = new QTabWidget;
@@ -265,8 +271,12 @@ int main(int argc, char *argv[])
     tabWidget->addTab(cvtTab, "CVT");
 
     // 新增CVT Weight标签页
-    QWidget *cvtWeightTab = createCVTWeightTab(cvtImageWidget); // 新增
-    tabWidget->addTab(cvtWeightTab, "CVT Weight"); // 新增
+    QWidget *cvtWeightTab = createCVTWeightTab(cvtImageWidget);
+    tabWidget->addTab(cvtWeightTab, "CVT Weight");
+
+    // 新增Shader标签页
+    QWidget *shaderTab = createShaderTab();
+    tabWidget->addTab(shaderTab, "Shader"); // 新增
 
     // 添加标签页到主布局
     mainLayout->addWidget(tabWidget, 8); // 8:2比例
@@ -317,9 +327,14 @@ int main(int argc, char *argv[])
         cvtglWidget, cvtTab
     ));
 
-    // 创建CVT Weight控制面板（新增）
+    // 创建CVT Weight控制面板
     stackedLayout->addWidget(createCVTWeightControlPanel(
         cvtImageWidget, cvtWeightTab
+    ));
+
+    // 创建Shader控制面板 (新增)
+    stackedLayout->addWidget(createShaderControlPanel(
+        shaderWidget
     ));
     
     // 连接标签切换信号
@@ -360,4 +375,109 @@ int main(int argc, char *argv[])
     mainWindow.show();
 
     return app.exec();
+}
+
+// ====================== Shader Tab ====================== (新增)
+QWidget* createShaderTab() {
+    QWidget *tab = new QWidget;
+    QVBoxLayout *layout = new QVBoxLayout(tab);
+    
+    // 创建Shader视图
+    GLBasicWidget *shaderWidget = new GLBasicWidget;
+    layout->addWidget(shaderWidget);
+    
+    // 保存视图指针
+    tab->setProperty("shaderWidget", QVariant::fromValue(shaderWidget));
+    
+    return tab;
+}
+
+QWidget* createShaderControlPanel(GLBasicWidget* glWidget) {
+    QWidget *panel = new QWidget;
+    QVBoxLayout *layout = new QVBoxLayout(panel);
+    layout->setAlignment(Qt::AlignTop);
+    
+    // ==== Shader信息组 ====
+    QGroupBox *infoGroup = new QGroupBox("Shader Information");
+    QVBoxLayout *infoLayout = new QVBoxLayout(infoGroup);
+    
+    QLabel *infoLabel = new QLabel("Uniforms:\n"
+                                  "float iTime (elapsed time)\n"
+                                  "vec2 iResolution (viewport size)");
+    infoLabel->setAlignment(Qt::AlignLeft);
+    infoLabel->setFixedHeight(80);
+    infoLabel->setStyleSheet("background-color: #3A3A3A; color: white; border-radius: 5px; padding: 10px; font-size: 14px;");
+    infoLabel->setWordWrap(true);
+    
+    infoLayout->addWidget(infoLabel);
+    layout->addWidget(infoGroup);
+    
+    // ==== 控制组 ====
+    QGroupBox *controlGroup = new QGroupBox("Shader Controls");
+    QVBoxLayout *controlLayout = new QVBoxLayout(controlGroup);
+    
+    // 重置时间按钮
+    QPushButton *resetTimeButton = new QPushButton("Reset Time (iTime=0)");
+    resetTimeButton->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #505050;"
+        "   color: white;"
+        "   border: none;"
+        "   padding: 10px 20px;"
+        "   font-size: 16px;"
+        "   border-radius: 5px;"
+        "   margin-bottom: 10px;"
+        "}"
+        "QPushButton:hover { background-color: #606060; }"
+    );
+    QObject::connect(resetTimeButton, &QPushButton::clicked, [glWidget]() {
+        if (glWidget) {
+            glWidget->resetTime();
+        }
+    });
+    
+    // 重新加载着色器按钮
+    QPushButton *reloadButton = new QPushButton("Reload Shaders");
+    reloadButton->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #505050;"
+        "   color: white;"
+        "   border: none;"
+        "   padding: 10px 20px;"
+        "   font-size: 16px;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:hover { background-color: #606060; }"
+    );
+    QObject::connect(reloadButton, &QPushButton::clicked, [glWidget]() {
+        if (glWidget) {
+            glWidget->reloadShaders();
+        }
+    });
+    
+    controlLayout->addWidget(resetTimeButton);
+    controlLayout->addWidget(reloadButton);
+    layout->addWidget(controlGroup);
+    
+    // ==== 状态组 ====
+    QGroupBox *statusGroup = new QGroupBox("Shader Status");
+    QVBoxLayout *statusLayout = new QVBoxLayout(statusGroup);
+    
+    QLabel *resolutionLabel = new QLabel("Resolution: ");
+    resolutionLabel->setStyleSheet("color: white; font-size: 14px;");
+    
+    // 连接分辨率更新信号
+    QObject::connect(glWidget, &GLBasicWidget::resolutionChanged, 
+                     [resolutionLabel](int w, int h) {
+        resolutionLabel->setText(QString("Resolution: %1 x %2").arg(w).arg(h));
+    });
+    
+    // 初始分辨率
+    resolutionLabel->setText(QString("Resolution: %1 x %2").arg(glWidget->width()).arg(glWidget->height()));
+    
+    statusLayout->addWidget(resolutionLabel);
+    layout->addWidget(statusGroup);
+    
+    layout->addStretch();
+    return panel;
 }

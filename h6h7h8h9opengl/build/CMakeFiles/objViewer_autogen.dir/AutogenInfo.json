@@ -1,17 +1,17 @@
 {
-	"BUILD_DIR" : "/opt/games102/h6h7opengl/build/objViewer_autogen",
-	"CMAKE_BINARY_DIR" : "/opt/games102/h6h7opengl/build",
-	"CMAKE_CURRENT_BINARY_DIR" : "/opt/games102/h6h7opengl/build",
-	"CMAKE_CURRENT_SOURCE_DIR" : "/opt/games102/h6h7opengl",
+	"BUILD_DIR" : "/opt/games102/h6h7h8h9opengl/build/objViewer_autogen",
+	"CMAKE_BINARY_DIR" : "/opt/games102/h6h7h8h9opengl/build",
+	"CMAKE_CURRENT_BINARY_DIR" : "/opt/games102/h6h7h8h9opengl/build",
+	"CMAKE_CURRENT_SOURCE_DIR" : "/opt/games102/h6h7h8h9opengl",
 	"CMAKE_EXECUTABLE" : "/usr/bin/cmake",
 	"CMAKE_LIST_FILES" : 
 	[
-		"/opt/games102/h6h7opengl/CMakeLists.txt",
-		"/opt/games102/h6h7opengl/build/CMakeFiles/3.28.3/CMakeSystem.cmake",
+		"/opt/games102/h6h7h8h9opengl/CMakeLists.txt",
+		"/opt/games102/h6h7h8h9opengl/build/CMakeFiles/3.28.3/CMakeSystem.cmake",
 		"/usr/share/cmake-3.28/Modules/CMakeSystemSpecificInitialize.cmake",
 		"/usr/share/cmake-3.28/Modules/Platform/Linux-Initialize.cmake",
-		"/opt/games102/h6h7opengl/build/CMakeFiles/3.28.3/CMakeCCompiler.cmake",
-		"/opt/games102/h6h7opengl/build/CMakeFiles/3.28.3/CMakeCXXCompiler.cmake",
+		"/opt/games102/h6h7h8h9opengl/build/CMakeFiles/3.28.3/CMakeCCompiler.cmake",
+		"/opt/games102/h6h7h8h9opengl/build/CMakeFiles/3.28.3/CMakeCXXCompiler.cmake",
 		"/usr/share/cmake-3.28/Modules/CMakeSystemSpecificInformation.cmake",
 		"/usr/share/cmake-3.28/Modules/CMakeGenericSystem.cmake",
 		"/usr/share/cmake-3.28/Modules/CMakeInitializeConfigs.cmake",
@@ -75,7 +75,7 @@
 		"/usr/share/cmake-3.28/Modules/CMakeParseArguments.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/Qt5OpenGL/Qt5OpenGLConfigVersion.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/Qt5OpenGL/Qt5OpenGLConfig.cmake",
-		"/opt/games102/h6h7opengl/shaders.qrc",
+		"/opt/games102/h6h7h8h9opengl/shaders.qrc",
 		"/usr/local/share/OpenMesh/cmake/OpenMeshConfig.cmake",
 		"/usr/local/share/OpenMesh/cmake/OpenMeshConfig-release.cmake",
 		"/usr/share/eigen3/cmake/Eigen3ConfigVersion.cmake",
@@ -142,33 +142,39 @@
 		"/usr/lib/x86_64-linux-gnu/cmake/CGAL/CGAL_GeneratorSpecificSettings.cmake",
 		"/usr/lib/x86_64-linux-gnu/cmake/CGAL/CGAL_TweakFindBoost.cmake"
 	],
-	"CMAKE_SOURCE_DIR" : "/opt/games102/h6h7opengl",
-	"DEP_FILE" : "/opt/games102/h6h7opengl/build/objViewer_autogen/deps",
+	"CMAKE_SOURCE_DIR" : "/opt/games102/h6h7h8h9opengl",
+	"DEP_FILE" : "/opt/games102/h6h7h8h9opengl/build/objViewer_autogen/deps",
 	"DEP_FILE_RULE_NAME" : "objViewer_autogen/timestamp",
 	"HEADERS" : 
 	[
 		[
-			"/opt/games102/h6h7opengl/cvtimagewidget/cvt_imageglwidget.h",
+			"/opt/games102/h6h7h8h9opengl/cvtimagewidget/cvt_imageglwidget.h",
 			"MU",
 			"3RY6HJG7CN/moc_cvt_imageglwidget.cpp",
 			null
 		],
 		[
-			"/opt/games102/h6h7opengl/cvtwidget/cvtglwidget.h",
+			"/opt/games102/h6h7h8h9opengl/cvtwidget/cvtglwidget.h",
 			"MU",
 			"KXEPEWKVHX/moc_cvtglwidget.cpp",
 			null
 		],
 		[
-			"/opt/games102/h6h7opengl/glwidget/glwidget.h",
+			"/opt/games102/h6h7h8h9opengl/glwidget/glwidget.h",
 			"MU",
 			"KTNQVRIVIS/moc_glwidget.cpp",
+			null
+		],
+		[
+			"/opt/games102/h6h7h8h9opengl/shaderwidget/glbasicwidget.h",
+			"MU",
+			"SKADV3LRBJ/moc_glbasicwidget.cpp",
 			null
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
-	"INCLUDE_DIR" : "/opt/games102/h6h7opengl/build/objViewer_autogen/include",
-	"MOC_COMPILATION_FILE" : "/opt/games102/h6h7opengl/build/objViewer_autogen/mocs_compilation.cpp",
+	"INCLUDE_DIR" : "/opt/games102/h6h7h8h9opengl/build/objViewer_autogen/include",
+	"MOC_COMPILATION_FILE" : "/opt/games102/h6h7h8h9opengl/build/objViewer_autogen/mocs_compilation.cpp",
 	"MOC_DEFINITIONS" : 
 	[
 		"CGAL_USE_CORE=1",
@@ -188,7 +194,7 @@
 	],
 	"MOC_INCLUDES" : 
 	[
-		"/opt/games102/h6h7opengl/build",
+		"/opt/games102/h6h7h8h9opengl/build",
 		"/usr/include/x86_64-linux-gnu/qt5",
 		"/usr/include/x86_64-linux-gnu/qt5/QtWidgets",
 		"/usr/include/x86_64-linux-gnu/qt5/QtGui",
@@ -216,57 +222,62 @@
 		"-c",
 		"/usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp"
 	],
-	"MOC_PREDEFS_FILE" : "/opt/games102/h6h7opengl/build/objViewer_autogen/moc_predefs.h",
+	"MOC_PREDEFS_FILE" : "/opt/games102/h6h7h8h9opengl/build/objViewer_autogen/moc_predefs.h",
 	"MOC_RELAXED_MODE" : false,
 	"MOC_SKIP" : [],
 	"MULTI_CONFIG" : false,
 	"PARALLEL" : 10,
-	"PARSE_CACHE_FILE" : "/opt/games102/h6h7opengl/build/CMakeFiles/objViewer_autogen.dir/ParseCache.txt",
+	"PARSE_CACHE_FILE" : "/opt/games102/h6h7h8h9opengl/build/CMakeFiles/objViewer_autogen.dir/ParseCache.txt",
 	"QT_MOC_EXECUTABLE" : "/usr/lib/qt5/bin/moc",
 	"QT_UIC_EXECUTABLE" : "/usr/lib/qt5/bin/uic",
 	"QT_VERSION_MAJOR" : 5,
 	"QT_VERSION_MINOR" : 15,
-	"SETTINGS_FILE" : "/opt/games102/h6h7opengl/build/CMakeFiles/objViewer_autogen.dir/AutogenUsed.txt",
+	"SETTINGS_FILE" : "/opt/games102/h6h7h8h9opengl/build/CMakeFiles/objViewer_autogen.dir/AutogenUsed.txt",
 	"SOURCES" : 
 	[
 		[
-			"/opt/games102/h6h7opengl/cvtimagewidget/cvt_imageglwidget.cpp",
+			"/opt/games102/h6h7h8h9opengl/cvtimagewidget/cvt_imageglwidget.cpp",
 			"MU",
 			null
 		],
-		[ "/opt/games102/h6h7opengl/cvtwidget/cvtglwidget.cpp", "MU", null ],
-		[ "/opt/games102/h6h7opengl/glwidget/glwidget_core.cpp", "MU", null ],
+		[ "/opt/games102/h6h7h8h9opengl/cvtwidget/cvtglwidget.cpp", "MU", null ],
+		[ "/opt/games102/h6h7h8h9opengl/glwidget/glwidget_core.cpp", "MU", null ],
 		[
-			"/opt/games102/h6h7opengl/glwidget/glwidget_curvature.cpp",
-			"MU",
-			null
-		],
-		[
-			"/opt/games102/h6h7opengl/glwidget/glwidget_loop_subdivision.cpp",
+			"/opt/games102/h6h7h8h9opengl/glwidget/glwidget_curvature.cpp",
 			"MU",
 			null
 		],
 		[
-			"/opt/games102/h6h7opengl/glwidget/glwidget_mesh_loader.cpp",
+			"/opt/games102/h6h7h8h9opengl/glwidget/glwidget_loop_subdivision.cpp",
 			"MU",
 			null
 		],
 		[
-			"/opt/games102/h6h7opengl/glwidget/glwidget_mesh_simplification.cpp",
+			"/opt/games102/h6h7h8h9opengl/glwidget/glwidget_mesh_loader.cpp",
 			"MU",
 			null
 		],
 		[
-			"/opt/games102/h6h7opengl/glwidget/glwidget_minimal_surface.cpp",
+			"/opt/games102/h6h7h8h9opengl/glwidget/glwidget_mesh_simplification.cpp",
 			"MU",
 			null
 		],
 		[
-			"/opt/games102/h6h7opengl/glwidget/glwidget_parameteration.cpp",
+			"/opt/games102/h6h7h8h9opengl/glwidget/glwidget_minimal_surface.cpp",
 			"MU",
 			null
 		],
-		[ "/opt/games102/h6h7opengl/main.cpp", "MU", null ]
+		[
+			"/opt/games102/h6h7h8h9opengl/glwidget/glwidget_parameteration.cpp",
+			"MU",
+			null
+		],
+		[ "/opt/games102/h6h7h8h9opengl/main.cpp", "MU", null ],
+		[
+			"/opt/games102/h6h7h8h9opengl/shaderwidget/glbasicwidget.cpp",
+			"MU",
+			null
+		]
 	],
 	"UIC_OPTIONS" : [],
 	"UIC_SEARCH_PATHS" : [],

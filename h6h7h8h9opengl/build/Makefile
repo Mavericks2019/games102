@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /opt/games102/h6h7opengl
+CMAKE_SOURCE_DIR = /opt/games102/h6h7h8h9opengl
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /opt/games102/h6h7opengl/build
+CMAKE_BINARY_DIR = /opt/games102/h6h7h8h9opengl/build
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -132,9 +132,9 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /opt/games102/h6h7opengl/build/CMakeFiles /opt/games102/h6h7opengl/build//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /opt/games102/h6h7h8h9opengl/build/CMakeFiles /opt/games102/h6h7h8h9opengl/build//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /opt/games102/h6h7opengl/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /opt/games102/h6h7h8h9opengl/build/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -488,6 +488,30 @@ qrc_shaders.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/qrc_shaders.cpp.s
 .PHONY : qrc_shaders.cpp.s
 
+shaderwidget/glbasicwidget.o: shaderwidget/glbasicwidget.cpp.o
+.PHONY : shaderwidget/glbasicwidget.o
+
+# target to build an object file
+shaderwidget/glbasicwidget.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/shaderwidget/glbasicwidget.cpp.o
+.PHONY : shaderwidget/glbasicwidget.cpp.o
+
+shaderwidget/glbasicwidget.i: shaderwidget/glbasicwidget.cpp.i
+.PHONY : shaderwidget/glbasicwidget.i
+
+# target to preprocess a source file
+shaderwidget/glbasicwidget.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/shaderwidget/glbasicwidget.cpp.i
+.PHONY : shaderwidget/glbasicwidget.cpp.i
+
+shaderwidget/glbasicwidget.s: shaderwidget/glbasicwidget.cpp.s
+.PHONY : shaderwidget/glbasicwidget.s
+
+# target to generate assembly for a file
+shaderwidget/glbasicwidget.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/objViewer.dir/build.make CMakeFiles/objViewer.dir/shaderwidget/glbasicwidget.cpp.s
+.PHONY : shaderwidget/glbasicwidget.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -539,6 +563,9 @@ help:
 	@echo "... qrc_shaders.o"
 	@echo "... qrc_shaders.i"
 	@echo "... qrc_shaders.s"
+	@echo "... shaderwidget/glbasicwidget.o"
+	@echo "... shaderwidget/glbasicwidget.i"
+	@echo "... shaderwidget/glbasicwidget.s"
 .PHONY : help
 
 

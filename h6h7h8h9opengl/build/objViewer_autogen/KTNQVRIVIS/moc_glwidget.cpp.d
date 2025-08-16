@@ -1,5 +1,5 @@
-/opt/games102/h6h7opengl/build/objViewer_autogen/KTNQVRIVIS/moc_glwidget.cpp: /opt/games102/h6h7opengl/glwidget/glwidget.h \
-  /opt/games102/h6h7opengl/build/objViewer_autogen/moc_predefs.h \
+/opt/games102/h6h7h8h9opengl/build/objViewer_autogen/KTNQVRIVIS/moc_glwidget.cpp: /opt/games102/h6h7h8h9opengl/glwidget/glwidget.h \
+  /opt/games102/h6h7h8h9opengl/build/objViewer_autogen/moc_predefs.h \
   /usr/include/CGAL/Aff_transformation_2.h \
   /usr/include/CGAL/Aff_transformation_3.h \
   /usr/include/CGAL/Algebraic_extension_traits.h \

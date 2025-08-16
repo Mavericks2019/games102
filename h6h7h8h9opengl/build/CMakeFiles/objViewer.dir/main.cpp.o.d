@@ -1,5 +1,5 @@
-CMakeFiles/objViewer.dir/main.cpp.o: /opt/games102/h6h7opengl/main.cpp \
- /usr/include/stdc-predef.h \
+CMakeFiles/objViewer.dir/main.cpp.o: \
+ /opt/games102/h6h7h8h9opengl/main.cpp /usr/include/stdc-predef.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qapplication.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtwidgetsglobal.h \
@@ -313,8 +313,8 @@ CMakeFiles/objViewer.dir/main.cpp.o: /opt/games102/h6h7opengl/main.cpp \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qdialog.h \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QPalette \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qpalette.h \
- /opt/games102/h6h7opengl/tabs/model_tab.h \
- /opt/games102/h6h7opengl/tabs/../glwidget/glwidget.h \
+ /opt/games102/h6h7h8h9opengl/tabs/model_tab.h \
+ /opt/games102/h6h7h8h9opengl/tabs/../glwidget/glwidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QOpenGLWidget \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qopenglwidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QWidget \
@@ -3057,11 +3057,11 @@ CMakeFiles/objViewer.dir/main.cpp.o: /opt/games102/h6h7opengl/main.cpp \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qvalidator.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qregularexpression.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QDoubleSpinBox \
- /opt/games102/h6h7opengl/tabs/parameterization_tab.h \
+ /opt/games102/h6h7h8h9opengl/tabs/parameterization_tab.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QSplitter \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qsplitter.h \
- /opt/games102/h6h7opengl/tabs/cvt_tab.h \
- /opt/games102/h6h7opengl/tabs/../cvtwidget/cvtglwidget.h \
+ /opt/games102/h6h7h8h9opengl/tabs/cvt_tab.h \
+ /opt/games102/h6h7h8h9opengl/tabs/../cvtwidget/cvtglwidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector2D \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qvector2d.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QPoint \
@@ -3104,8 +3104,8 @@ CMakeFiles/objViewer.dir/main.cpp.o: /opt/games102/h6h7opengl/main.cpp \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qtextformat.h \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qpen.h \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qtextoption.h \
- /opt/games102/h6h7opengl/build/../tabs/cvt_weight_tab.h \
- /opt/games102/h6h7opengl/build/../tabs/../cvtimagewidget/cvt_imageglwidget.h \
+ /opt/games102/h6h7h8h9opengl/build/../tabs/cvt_weight_tab.h \
+ /opt/games102/h6h7h8h9opengl/build/../tabs/../cvtimagewidget/cvt_imageglwidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QComboBox \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qcombobox.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qabstractitemdelegate.h \
@@ -3115,4 +3115,20 @@ CMakeFiles/objViewer.dir/main.cpp.o: /opt/games102/h6h7opengl/main.cpp \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtabbar.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtabwidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qrubberband.h \
- /usr/include/x86_64-linux-gnu/qt5/QtCore/qabstractitemmodel.h
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qabstractitemmodel.h \
+ /opt/games102/h6h7h8h9opengl/shaderwidget/glbasicwidget.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLFunctions_4_3_Core \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglfunctions_4_3_core.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QOpenGLVersionFunctions \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qopenglversionfunctions.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/QTimer \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qtimer.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qbasictimer.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/QFile \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qfile.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/QElapsedTimer \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qelapsedtimer.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QPainter \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qpainter.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/QDebug \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qdebug.h
