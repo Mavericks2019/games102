@@ -3066,6 +3066,10 @@ CMakeFiles/objViewer.dir/main.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qvector2d.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QPoint \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qpoint.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QImage \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qimage.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/QDir \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qdir.h \
  /usr/include/CGAL/Voronoi_diagram_2.h \
  /usr/include/CGAL/license/Voronoi_diagram_2.h \
  /usr/include/CGAL/Voronoi_diagram_2/basic.h \
@@ -3098,6 +3102,8 @@ CMakeFiles/objViewer.dir/main.cpp.o: \
  /usr/include/CGAL/Voronoi_diagram_2/Construct_dual_points.h \
  /usr/include/CGAL/Delaunay_triangulation_adaptation_policies_2.h \
  /usr/include/CGAL/Voronoi_diagram_2/Delaunay_triangulation_degeneracy_testers.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/QCoreApplication \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QLineEdit \
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlineedit.h \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qtextcursor.h \

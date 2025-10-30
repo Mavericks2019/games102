@@ -4,7 +4,9 @@
 #include <QPushButton>
 #include <QGroupBox>
 #include <QLineEdit>
-#include <QCheckBox> // 新增：包含复选框头文件
+#include <QCheckBox>
+#include <QFileDialog> // 新增：文件对话框头文件
+#include <QDir>        // 新增：目录操作头文件
 
 // 创建CVT选项卡
 QWidget* createCVTTab(CVTGLWidget* glWidget) {
@@ -162,6 +164,30 @@ QWidget* createCVTControlPanel(CVTGLWidget* glWidget, QWidget* cvtTab) {
     lloydLayout->addWidget(lloydButton);
     
     layout->addWidget(lloydGroup);
+
+    // 新增：保存图片按钮组
+    QGroupBox *saveGroup = new QGroupBox("Save Image");
+    QVBoxLayout *saveLayout = new QVBoxLayout(saveGroup);
+    
+    QPushButton *saveImageButton = new QPushButton("Save Square Image");
+    saveImageButton->setStyleSheet(buttonStyle);
+    QObject::connect(saveImageButton, &QPushButton::clicked, [cvtView]() {
+        // 获取保存文件路径
+        QString fileName = QFileDialog::getSaveFileName(
+            nullptr,
+            "Save CVT Image",
+            QDir::homePath() + "/cvt_image.png",
+            "PNG Images (*.png);;JPEG Images (*.jpg *.jpeg);;All Files (*)"
+        );
+        
+        if (!fileName.isEmpty()) {
+            // 使用新的公共方法保存图片
+            cvtView->saveSquareImage(fileName);
+        }
+    });
+    
+    saveLayout->addWidget(saveImageButton);
+    layout->addWidget(saveGroup);
     
     layout->addStretch();
     return panel;

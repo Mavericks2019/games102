@@ -740,3 +740,31 @@ void CVTGLWidget::setCVTView(bool enabled)
     isCVTView = enabled;
     update();
 }
+
+// 新增：保存当前视图为图片的公共方法
+void CVTGLWidget::saveSquareImage(const QString& fileName)
+{
+    // 确保当前视图已经渲染
+    update();
+    repaint();
+    QCoreApplication::processEvents(); // 处理所有待处理的事件
+    
+    // 获取当前帧缓冲区的图像
+    QImage image = grabFramebuffer();
+    
+    if (image.isNull()) {
+        qWarning() << "Failed to grab framebuffer";
+        return;
+    }
+    
+    // 创建一个正方形图像 (使用最小边长)
+    int size = qMin(image.width(), image.height());
+    QImage squareImage = image.copy(0, 0, size, size);
+    
+    // 保存图像
+    if (squareImage.save(fileName)) {
+        qDebug() << "Image saved successfully:" << fileName;
+    } else {
+        qDebug() << "Failed to save image:" << fileName;
+    }
+}

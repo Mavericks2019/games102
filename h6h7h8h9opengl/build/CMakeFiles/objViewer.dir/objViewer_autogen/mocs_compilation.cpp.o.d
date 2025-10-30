@@ -2545,6 +2545,17 @@ CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: \
  /usr/include/CGAL/Voronoi_diagram_2/Delaunay_triangulation_degeneracy_testers.h \
  /opt/games102/h6h7h8h9opengl/build/objViewer_autogen/KXEPEWKVHX/moc_cvtglwidget.cpp \
  /opt/games102/h6h7h8h9opengl/build/objViewer_autogen/KXEPEWKVHX/../../../cvtwidget/cvtglwidget.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QImage \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qimage.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/QDir \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qdir.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qfileinfo.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qfile.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qfiledevice.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/QCoreApplication \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreevent.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qeventloop.h \
  /opt/games102/h6h7h8h9opengl/build/objViewer_autogen/KTNQVRIVIS/moc_glwidget.cpp \
  /opt/games102/h6h7h8h9opengl/build/objViewer_autogen/KTNQVRIVIS/../../../glwidget/glwidget.h \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QVector3D \
@@ -3043,7 +3054,6 @@ CMakeFiles/objViewer.dir/objViewer_autogen/mocs_compilation.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qbasictimer.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QFile \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qfile.h \
- /usr/include/x86_64-linux-gnu/qt5/QtCore/qfiledevice.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QElapsedTimer \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qelapsedtimer.h \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QPainter \

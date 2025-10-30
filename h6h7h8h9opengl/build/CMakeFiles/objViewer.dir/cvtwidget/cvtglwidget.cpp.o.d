@@ -324,6 +324,13 @@ CMakeFiles/objViewer.dir/cvtwidget/cvtglwidget.cpp.o: \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qvector2d.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/QPoint \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qpoint.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/QImage \
+ /usr/include/x86_64-linux-gnu/qt5/QtGui/qimage.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/QDir \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qdir.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qfileinfo.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qfile.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qfiledevice.h \
  /usr/include/CGAL/Exact_predicates_inexact_constructions_kernel.h \
  /usr/include/CGAL/Simple_cartesian.h \
  /usr/include/CGAL/Cartesian/Cartesian_base.h /usr/include/CGAL/basic.h \
@@ -2540,12 +2547,13 @@ CMakeFiles/objViewer.dir/cvtwidget/cvtglwidget.cpp.o: \
  /usr/include/CGAL/Voronoi_diagram_2/Construct_dual_points.h \
  /usr/include/CGAL/Delaunay_triangulation_adaptation_policies_2.h \
  /usr/include/CGAL/Voronoi_diagram_2/Delaunay_triangulation_degeneracy_testers.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/QCoreApplication \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreevent.h \
+ /usr/include/x86_64-linux-gnu/qt5/QtCore/qeventloop.h \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QMouseEvent \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qevent.h \
- /usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreevent.h \
  /usr/include/x86_64-linux-gnu/qt5/QtCore/qurl.h \
- /usr/include/x86_64-linux-gnu/qt5/QtCore/qfile.h \
- /usr/include/x86_64-linux-gnu/qt5/QtCore/qfiledevice.h \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/qtouchdevice.h \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QWheelEvent \
  /usr/include/x86_64-linux-gnu/qt5/QtGui/QKeyEvent \

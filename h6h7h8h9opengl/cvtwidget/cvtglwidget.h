@@ -9,6 +9,8 @@
 #include <QMatrix4x4>
 #include <QVector2D>
 #include <QPoint>
+#include <QImage> // 新增：用于图像处理
+#include <QDir>   // 新增：用于目录操作
 #include <vector>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Delaunay_triangulation_2.h>
@@ -17,7 +19,7 @@
 #include <CGAL/Delaunay_triangulation_adaptation_policies_2.h>
 #include <unordered_map>
 #include <map>
-
+#include <QCoreApplication> // 新增：包含QCoreApplication头文件
 // CGAL 类型定义
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef CGAL::Delaunay_triangulation_2<K> Delaunay;
@@ -44,6 +46,7 @@ public:
     void setShowPoints(bool show);
     void setShowVoronoiDiagram(bool show);
     void setShowDelaunay(bool show);
+    void saveSquareImage(const QString& fileName); // 新增：保存图片方法
 
 public:
     void initializeGL() override;
@@ -82,7 +85,6 @@ public:
     QOpenGLVertexArrayObject pointVao;
     QOpenGLBuffer pointVbo;
     bool isCVTView = true;
-
 
     // 显示控制
     bool showPoints = true;
