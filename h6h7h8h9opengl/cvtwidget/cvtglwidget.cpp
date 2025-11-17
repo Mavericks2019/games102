@@ -757,13 +757,60 @@ void CVTGLWidget::saveSquareImage(const QString& fileName)
         return;
     }
     
-    // 创建一个正方形图像 (使用最小边长)
-    int size = qMin(image.width(), image.height());
-    QImage squareImage = image.copy(0, 0, size, size);
+    // 计算正方形区域（中间的白色正方形，不包括黑边）
+    int width = image.width();
+    int height = image.height();
+    
+    // 找到白色正方形的边界
+    int minX = width, maxX = 0, minY = height, maxY = 0;
+    bool foundWhite = false;
+    
+    // 扫描图像找到白色区域的边界
+    for (int y = 0; y < height; ++y) {
+        for (int x = 0; x < width; ++x) {
+            QColor color = image.pixelColor(x, y);
+            // 检查是否为白色或接近白色（考虑到抗锯齿可能产生的灰色）
+            if (color.red() > 200 && color.green() > 200 && color.blue() > 200) {
+                foundWhite = true;
+                minX = qMin(minX, x);
+                maxX = qMax(maxX, x);
+                minY = qMin(minY, y);
+                maxY = qMax(maxY, y);
+            }
+        }
+    }
+    
+    if (!foundWhite) {
+        qWarning() << "No white square found in the image";
+        return;
+    }
+    
+    // 计算正方形尺寸（取宽高中的较大值以确保包含整个正方形）
+    int squareSize = qMax(maxX - minX, maxY - minY);
+    
+    // 调整边界以确保正方形居中
+    int centerX = (minX + maxX) / 2;
+    int centerY = (minY + maxY) / 2;
+    int newMinX = centerX - squareSize / 2;
+    int newMinY = centerY - squareSize / 2;
+    
+    // 确保不超出图像边界
+    newMinX = qMax(0, newMinX);
+    newMinY = qMax(0, newMinY);
+    if (newMinX + squareSize > width) {
+        squareSize = width - newMinX;
+    }
+    if (newMinY + squareSize > height) {
+        squareSize = height - newMinY;
+    }
+    
+    // 裁剪正方形区域
+    QImage squareImage = image.copy(newMinX, newMinY, squareSize, squareSize);
     
     // 保存图像
     if (squareImage.save(fileName)) {
-        qDebug() << "Image saved successfully:" << fileName;
+        qDebug() << "Square image saved successfully:" << fileName;
+        qDebug() << "Saved region: x=" << newMinX << "y=" << newMinY << "size=" << squareSize;
     } else {
         qDebug() << "Failed to save image:" << fileName;
     }
